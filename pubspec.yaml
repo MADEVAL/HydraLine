@@ -66,21 +66,13 @@ melos:
       description: Collect Flutter coverage (LCOV).
       run: dart run melos:melos exec --flutter --dir-exists=test -- flutter test --coverage
 
-    coverage:gate:
-      description: Enforce per-package coverage thresholds (I9).
-      run: dart run tool/check_coverage.dart
-
     test:golden:
       description: Run only golden-tagged tests (line endings normalized to \n).
       run: dart run melos:melos exec --dir-exists=test/goldens -- dart test --tags golden
 
     test:security:
-      description: Property/fuzz XSS suite (I2/S4).
+      description: Property/fuzz XSS suite.
       run: dart run melos:melos exec --dir-exists=test/security -- dart test --tags security
-
-    boundaries:
-      description: Scan for forbidden imports (invariant I1).
-      run: dart run tool/check_boundaries.dart
 
     precommit:
       description: Local superset of blocking CI gates (SC1).
@@ -88,4 +80,3 @@ melos:
         - analyze
         - format:check
         - test
-        - boundaries

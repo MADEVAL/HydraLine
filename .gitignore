@@ -13,8 +13,12 @@ pubspec.lock
 coverage/
 *.lcov
 
-# Hydraline scratch space (AGENTS.md).
+# Hydraline scratch space (TEMP/).
 TEMP/
+
+# Opencode / AGENTS
+AGENTS.md
+.opencode/
 
 # IDE
 .idea/
