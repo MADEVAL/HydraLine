@@ -40,22 +40,28 @@ double lineCoverage(String lcov) {
 
 /// Checks every [target] against its threshold; returns a process exit code
 /// (0 = all pass, 1 = at least one below threshold).
-int runCoverageGate(List<CoverageTarget> targets,
-    {void Function(String)? log}) {
+int runCoverageGate(
+  List<CoverageTarget> targets, {
+  void Function(String)? log,
+}) {
   final report = log ?? stdout.writeln;
   var failed = false;
   for (final target in targets) {
     final file = File(target.lcovPath);
     if (!file.existsSync()) {
-      report('coverage: ${target.name}: no report at ${target.lcovPath} '
-          '(skipped)');
+      report(
+        'coverage: ${target.name}: no report at ${target.lcovPath} '
+        '(skipped)',
+      );
       continue;
     }
     final percent = lineCoverage(file.readAsStringSync());
     final ok = percent + 1e-9 >= target.minPercent;
-    report('coverage: ${target.name}: ${percent.toStringAsFixed(1)}% '
-        '(min ${target.minPercent.toStringAsFixed(0)}%) '
-        '${ok ? 'OK' : 'FAIL'}');
+    report(
+      'coverage: ${target.name}: ${percent.toStringAsFixed(1)}% '
+      '(min ${target.minPercent.toStringAsFixed(0)}%) '
+      '${ok ? 'OK' : 'FAIL'}',
+    );
     if (!ok) {
       failed = true;
     }

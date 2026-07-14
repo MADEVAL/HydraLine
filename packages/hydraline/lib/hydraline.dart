@@ -7,4 +7,5 @@ library;
 
 export 'src/document_node.dart';
 export 'src/escaping.dart';
+export 'src/html_serializer.dart';
 export 'src/validators.dart';

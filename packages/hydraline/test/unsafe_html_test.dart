@@ -26,9 +26,7 @@ void main() {
 
   group('SeoValidator — unsafe HTML warning (S3)', () {
     test('warns on an UnsafeHtmlNode without a sanitizer', () {
-      const root = DocumentRootNode(
-        body: [UnsafeHtmlNode('<b>x</b>')],
-      );
+      const root = DocumentRootNode(body: [UnsafeHtmlNode('<b>x</b>')]);
       final issues = const SeoValidator().validate(root);
       expect(
         issues.map((i) => i.code),
@@ -44,9 +42,7 @@ void main() {
 
     test('does not warn when a sanitizer is provided', () {
       final root = DocumentRootNode(
-        body: [
-          UnsafeHtmlNode('<b>x</b>', sanitizer: (raw) => raw),
-        ],
+        body: [UnsafeHtmlNode('<b>x</b>', sanitizer: (raw) => raw)],
       );
       final issues = const SeoValidator().validate(root);
       expect(

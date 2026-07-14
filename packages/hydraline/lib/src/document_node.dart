@@ -78,7 +78,7 @@ final class LinkNode extends DocumentNode {
 /// A heading `<h1>`..`<h6>`.
 final class HeadingNode extends DocumentNode {
   const HeadingNode({required this.level, required this.children})
-      : assert(level >= 1 && level <= 6, 'heading level must be in 1..6');
+    : assert(level >= 1 && level <= 6, 'heading level must be in 1..6');
 
   final int level;
 
@@ -234,7 +234,7 @@ enum HydrationDirective {
   onVisible,
   onInteraction,
   onMedia,
-  manual
+  manual,
 }
 
 /// What an island emits into the HTML.

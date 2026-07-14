@@ -12,10 +12,12 @@ void main() {
       );
     });
 
-    test('TitleNode keeps its raw text (escaped only on serialization, N2)',
-        () {
-      expect(const TitleNode('A & B').text, 'A & B');
-    });
+    test(
+      'TitleNode keeps its raw text (escaped only on serialization, N2)',
+      () {
+        expect(const TitleNode('A & B').text, 'A & B');
+      },
+    );
 
     test('MetaNode carries name/property/content/charset', () {
       const meta = MetaNode(property: 'og:title', content: 'Home');
