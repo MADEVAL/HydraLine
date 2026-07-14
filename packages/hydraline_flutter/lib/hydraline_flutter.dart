@@ -3,4 +3,6 @@
 library;
 
 export 'src/hydra_app.dart' show HydraApp, HydraScope;
+export 'src/island.dart' show Island;
+export 'src/seo_widgets.dart' show Seo;
 export 'src/ssg_sandbox.dart' show SsgSandbox;

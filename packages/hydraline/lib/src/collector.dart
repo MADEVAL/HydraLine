@@ -21,6 +21,7 @@ abstract interface class SsgCollector {
   });
   void addLink(SafeUrl href, String text, {String? key});
   void addIsland(IslandSpec spec, {String? key});
+  void addNode(DocumentNode node, {String? key});
   void addMeta(SeoMeta meta);
 
   /// Finalises: dedup by key, N5 (no cycles), immutable result.
@@ -73,6 +74,9 @@ class _SsgCollector implements SsgCollector {
   @override
   void addIsland(IslandSpec spec, {String? key}) =>
       _add(_islandNode(spec), key);
+
+  @override
+  void addNode(DocumentNode node, {String? key}) => _add(node, key);
 
   @override
   void addMeta(SeoMeta meta) {
