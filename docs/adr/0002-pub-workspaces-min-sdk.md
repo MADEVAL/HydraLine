@@ -1,4 +1,4 @@
-# ADR-0002: pub workspaces raise the minimum SDK (Dart 3.7 / Flutter 3.29)
+# ADR-0002: pub workspaces raise the minimum SDK (Dart 3.8 / Flutter 3.32)
 
 - **Статус:** Accepted
 - **Дата:** 2026-07-14
@@ -16,17 +16,19 @@ ADR-0001 зафиксировал переход на melos 8 + Dart **pub works
 Error: `workspace` and `resolution` requires at least language version 3.7
 ```
 
-Pub workspaces требуют **Dart ≥ 3.7**. Flutter 3.22 (заявленный в спеке как
-минимум, NF-5/Q7) поставляется с Dart 3.4 и физически не может участвовать в
-pub-workspace — `dart pub get` падает ещё до анализа. Первый Flutter SDK с
-Dart 3.7 — **Flutter 3.29**.
+Pub workspaces требуют **Dart ≥ 3.7**, а сама **melos ^8** — **Dart ≥ 3.8**.
+Flutter 3.22 (заявленный в спеке как минимум, NF-5/Q7) поставляется с Dart 3.4
+и физически не может участвовать в pub-workspace — `dart pub get` падает ещё до
+анализа. Flutter 3.29 несёт Dart 3.7 (workspace резолвится, но melos не
+устанавливается: `melos requires SDK >=3.8.0`). Первый Flutter SDK с Dart 3.8 —
+**Flutter 3.32**, он и становится минимумом.
 
-Таким образом требования спеки «melos ≥ 7» (→ pub workspaces) и «min Flutter
-3.22» **взаимно несовместимы**.
+Таким образом требования спеки «melos ≥ 7» (→ pub workspaces + Dart ≥ 3.8) и
+«min Flutter 3.22» **взаимно несовместимы**.
 
 ## Рассмотренные варианты
 
-1. **Поднять минимум до Dart 3.7 / Flutter 3.29**, сохранив pub workspaces.
+1. **Поднять минимум до Dart 3.8 / Flutter 3.32**, сохранив pub workspaces.
 2. **Отказаться от pub workspaces** (убрать `workspace:`/`resolution:`),
    вернувшись к melos-bootstrap + `pubspec_overrides.yaml`, чтобы сохранить
    Flutter 3.22. Противоречит направлению melos ≥ 7 (pub workspaces — основной
@@ -36,10 +38,10 @@ Dart 3.7 — **Flutter 3.29**.
 
 Принят вариант 1 (подтверждено владельцем продукта):
 
-- Минимальные SDK: **Dart ≥ 3.7.0**, **Flutter ≥ 3.29.0**.
-- `environment.sdk: ^3.7.0` во всех пакетах и в корне; `environment.flutter:
-  ">=3.29.0"` в `hydraline_flutter`.
-- CI-матрица `flutter`: `3.29.0` (min) + `3.44.6` (latest), плюс `3.41.x`
+- Минимальные SDK: **Dart ≥ 3.8.0**, **Flutter ≥ 3.32.0**.
+- `environment.sdk: ^3.8.0` во всех пакетах и в корне; `environment.flutter:
+  ">=3.32.0"` в `hydraline_flutter`.
+- CI-матрица `flutter`: `3.32.0` (min) + `3.44.6` (latest), плюс `3.41.x`
   informational (R1). Джоб `3.22` удалён.
 - **Обновляет NF-5/Q7:** заявленный минимум Flutter меняется с 3.22 на 3.29.
 
@@ -59,6 +61,6 @@ Dart 3.7 — **Flutter 3.29**.
 
 ## Проверка
 
-- `dart pub get` резолвит workspace на Dart 3.7+.
-- CI-джоб `flutter 3.29.0` зелёный; вызовы `dart run melos:melos run …`
+- `dart pub get` резолвит workspace на Dart 3.8+.
+- CI-джоб `Flutter 3.32.0` зелёный; вызовы `dart run melos:melos run …`
   проходят на Windows и Linux.

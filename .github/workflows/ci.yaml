@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flutter: ['3.29.0', '3.44.6']
+        flutter: ['3.32.0', '3.44.6']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
