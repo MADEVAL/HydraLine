@@ -70,7 +70,7 @@ Seo.link({
 
 Registers an `AnchorNode`. When `child` is a `Text` widget, its string becomes
 the link label visible to crawlers; for other child widgets the label is empty
-— add `Seo.text` nearby for crawler-visible copy. At runtime, renders a
+- add `Seo.text` nearby for crawler-visible copy. At runtime, renders a
 `GestureDetector` wrapping `child`.
 
 ### Seo.section
@@ -105,7 +105,7 @@ Seo.head(SeoMeta meta)
 ```
 
 Registers route metadata (title, description, OG, Twitter, etc.). At runtime,
-renders `SizedBox.shrink()` — it produces no visual output. This is the widget
+renders `SizedBox.shrink()` - it produces no visual output. This is the widget
 equivalent of `buildHead()` in the pure-Dart surface.
 
 ## HydraApp and HydraScope
@@ -176,10 +176,10 @@ Island({
 | `directive` | When the island hydrates (default: `onIdle`) |
 | `renderMode` | `ssr` (semantic fallback in HTML) or `skeletonOnly` (skeleton only) |
 | `styleMode` | `shadow` (isolated Shadow DOM) or `scoped` (CSS `@scope`, best for many identical islands) |
-| `width` / `height` | Reserved space in px — prevents Cumulative Layout Shift |
+| `width` / `height` | Reserved space in px - prevents Cumulative Layout Shift |
 | `placeholder` | Widget shown before hydration (default: sized `SizedBox`) |
 | `errorFallback` | Reserved for a future release; on failure the SSR fallback stays visible |
-| `mediaQuery` | CSS media query for `hydrateOnMedia` — serialized as `data-media` |
+| `mediaQuery` | CSS media query for `hydrateOnMedia` - serialized as `data-media` |
 
 ### Island Types
 
@@ -187,9 +187,9 @@ Island({
 enum IslandType { flutter, vanilla, htmx }
 ```
 
-- `flutter` — Level 2: CanvasKit-rendered Flutter widget. Engine loaded on trigger.
-- `vanilla` — Level 1: Lightweight JS widget (~8 KB). No Flutter engine.
-- `htmx` — Level 1: Server-driven HTML fragments (~14 KB HTMX). No Flutter engine.
+- `flutter` - Level 2: CanvasKit-rendered Flutter widget. Engine loaded on trigger.
+- `vanilla` - Level 1: Lightweight JS widget (~8 KB). No Flutter engine.
+- `htmx` - Level 1: Server-driven HTML fragments (~14 KB HTMX). No Flutter engine.
 
 ### Hydration Directives
 
@@ -210,11 +210,11 @@ enum HydrationDirective {
 enum IslandRenderMode { ssr, skeletonOnly }
 ```
 
-- `ssr` (default) — The island emits semantic fallback content into the HTML.
-- `skeletonOnly` — Only a skeleton/placeholder is emitted. For islands that
+- `ssr` (default) - The island emits semantic fallback content into the HTML.
+- `skeletonOnly` - Only a skeleton/placeholder is emitted. For islands that
   require runtime APIs (3D configurators, WebGL, `window`/`localStorage`).
 
-`renderMode` is orthogonal to `directive` — it controls *what* goes into HTML,
+`renderMode` is orthogonal to `directive` - it controls *what* goes into HTML,
 while `directive` controls *when* the island hydrates.
 
 ### Style Modes
@@ -223,9 +223,9 @@ while `directive` controls *when* the island hydrates.
 enum IslandStyleMode { shadow, scoped }
 ```
 
-- `shadow` (default) — Declarative Shadow DOM. Full style isolation. The
+- `shadow` (default) - Declarative Shadow DOM. Full style isolation. The
   `<style>` block lives inside each island's shadow root.
-- `scoped` — CSS `@scope` or attribute prefix. Styles are emitted once in
+- `scoped` - CSS `@scope` or attribute prefix. Styles are emitted once in
   the `<head>` and shared. Recommended for pages with many identical islands
   (product cards, feeds).
 
@@ -249,13 +249,13 @@ abstract interface class SsgCollector {
 }
 ```
 
-After `seal()` is called, the collector becomes immutable — subsequent `add*`
+After `seal()` is called, the collector becomes immutable - subsequent `add*`
 calls are silently ignored. Each extraction run gets its own collector instance.
 
 ## SsgSandbox
 
 During SSG extraction (which runs in `flutter_tester`), widgets may depend on
-ancestors that don't exist in the test environment — `MediaQuery`,
+ancestors that don't exist in the test environment - `MediaQuery`,
 `Directionality`. `SsgSandbox` provides stubs for these *and* wires the
 collector into scope:
 
@@ -346,7 +346,7 @@ void main() {
 ## Route Adapter
 
 Hydraline integrates with Flutter routers through the `RouteAdapter` interface.
-First-class support is provided for `go_router` (without a hard dependency —
+First-class support is provided for `go_router` (without a hard dependency -
 the adapter inspects the router object dynamically).
 
 ```dart
@@ -397,13 +397,13 @@ Future<SsgResult> run({required String outputDir});
 The runner:
 1. Iterates the route manifest (skipping `app` routes)
 2. Expands dynamic segments into concrete paths
-3. Builds a `DocumentNode` per page — a registered pure-Dart
+3. Builds a `DocumentNode` per page - a registered pure-Dart
    `SsgPageBuilder` (surface B) wins; otherwise a metadata-only shell is
    generated from the manifest
 4. Serializes HTML files into the output directory
 5. Generates `sitemap.xml` (with auto-split at 50,000 URLs) and `robots.txt`
 6. Copies the island runtime assets (custom element, dispatcher, service
-   worker) into the output — only when Flutter islands exist
+   worker) into the output - only when Flutter islands exist
 
 ```dart
 typedef SsgPageBuilder = DocumentNode Function(String path);
@@ -424,7 +424,7 @@ final result = await runner.run(outputDir: 'dist');
 ```
 
 Widget extraction (surface A) runs inside `flutter_tester`: pump pages in a
-`SsgSandbox` from a test tagged `ssg` and serialize `collector.seal()` — see
+`SsgSandbox` from a test tagged `ssg` and serialize `collector.seal()` - see
 [SsgSandbox](#ssgsandbox).
 
 CLI invocation (plain Dart VM, no Flutter engine needed):
@@ -519,7 +519,7 @@ class ProductPage extends StatelessWidget {
         ]),
       ]),
 
-      // Flutter island — hydrates when scrolled into view
+      // Flutter island - hydrates when scrolled into view
       const Island(
         id: 'calculator',
         type: IslandType.flutter,
@@ -529,7 +529,7 @@ class ProductPage extends StatelessWidget {
         height: 480,
       ),
 
-      // Vanilla island — lightweight accordion for FAQ
+      // Vanilla island - lightweight accordion for FAQ
       const Island(
         id: 'faq',
         type: IslandType.vanilla,
@@ -542,7 +542,7 @@ class ProductPage extends StatelessWidget {
 
 ## See Also
 
-- [Getting Started](./getting-started.md) — installation, SSG vs SSR
-- [Architecture](./architecture.md) — islands, SSG pipeline, client runtime
-- [Configuration](./configuration.md) — route manifest, island manifest
+- [Getting Started](./getting-started.md) - installation, SSG vs SSR
+- [Architecture](./architecture.md) - islands, SSG pipeline, client runtime
+- [Configuration](./configuration.md) - route manifest, island manifest
 - [`hydraline_flutter` package README](../packages/hydraline_flutter/README.md)

@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 const _goodHtml = '''
 <!DOCTYPE html><html lang="en"><head>
-<title>Home — Store</title>
+<title>Home - Store</title>
 <meta name="description" content="A concise, useful description of the page.">
 <meta property="og:title" content="Home">
 <meta property="og:image" content="/img/og.jpg">

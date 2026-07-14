@@ -5,7 +5,7 @@ title: "[bug] "
 labels: bug
 ---
 
-<!-- IMPORTANT: do NOT report security vulnerabilities here — follow the
+<!-- IMPORTANT: do NOT report security vulnerabilities here - follow the
      Security Policy (../../SECURITY.md) and use a private advisory. -->
 <!-- Docs: https://github.com/MADEVAL/HydraLine/tree/main/docs -->
 <!-- Contributing guide: ../../CONTRIBUTING.md -->
@@ -30,7 +30,7 @@ labels: bug
 ## Actual behavior
 
 ## Minimal reproduction
-<!-- Code/repo/steps. For SSR — use deterministic input (no DateTime.now/random). -->
+<!-- Code/repo/steps. For SSR - use deterministic input (no DateTime.now/random). -->
 
 ## Logs / audit output
 <!-- CI output, screenshots, stack traces -->

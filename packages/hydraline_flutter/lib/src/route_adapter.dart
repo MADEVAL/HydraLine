@@ -22,7 +22,7 @@ abstract interface class RouteAdapter {
 
 /// First-class go_router adapter: wraps a `go_router` object and reads its
 /// route configuration. The constructor accepts `Object` so the package does
-/// not need an explicit `go_router` dependency — route extraction works
+/// not need an explicit `go_router` dependency - route extraction works
 /// at runtime via reflection-ish inspection of the `GoRouter.routes` property.
 class GoRouterAdapter implements RouteAdapter {
   GoRouterAdapter(this._goRouter);

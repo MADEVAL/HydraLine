@@ -7,9 +7,9 @@ Hydraline is a Dart/Flutter monorepo with three packages:
 ```
 hydraline/
 ├── packages/
-│   ├── hydraline/            Core — pure Dart
-│   ├── hydraline_server/     Server — pure Dart
-│   └── hydraline_flutter/    Flutter — widgets + JS runtime
+│   ├── hydraline/            Core - pure Dart
+│   ├── hydraline_server/     Server - pure Dart
+│   └── hydraline_flutter/    Flutter - widgets + JS runtime
 └── docs/
 ```
 
@@ -65,7 +65,7 @@ hydraline_flutter ──► Imports hydraline + flutter
 ```
 
 These boundaries are enforced at build time. The server physically cannot
-execute Flutter widgets — it works exclusively with pure-Dart `DocumentNode`
+execute Flutter widgets - it works exclusively with pure-Dart `DocumentNode`
 builders.
 
 ## DocumentNode Model
@@ -104,10 +104,10 @@ DocumentNode (sealed)
 ```
 
 The tree is always:
-- **Immutable** — nodes are `const`-constructible where possible
-- **Deterministic** — same input → identical tree → identical HTML
-- **Acyclic** — verified at build time
-- **Type-safe** — URLs are `SafeUrl`, text is always escaped
+- **Immutable** - nodes are `const`-constructible where possible
+- **Deterministic** - same input → identical tree → identical HTML
+- **Acyclic** - verified at build time
+- **Type-safe** - URLs are `SafeUrl`, text is always escaped
 
 ## HTML Serialization
 
@@ -118,16 +118,16 @@ Three modes:
 
 | Mode | Method | Output |
 |---|---|---|
-| Buffered | `serialize(root)` | Complete HTML string — for bots, SSG files |
-| Streaming | `serializeToStream(root)` | `Stream<String>` — progressive chunked delivery |
-| Fragment | `serializeFragment(node)` | HTML without `<html>/<head>` — for HTMX responses |
+| Buffered | `serialize(root)` | Complete HTML string - for bots, SSG files |
+| Streaming | `serializeToStream(root)` | `Stream<String>` - progressive chunked delivery |
+| Fragment | `serializeFragment(node)` | HTML without `<html>/<head>` - for HTMX responses |
 
 Key properties:
-- **Single-pass** — O(nodes + text length), no quadratic concatenation
-- **Deterministic** — stable attribute order, predictable output
-- **Identity guarantee** — `serialize(root)` is byte-identical to the
+- **Single-pass** - O(nodes + text length), no quadratic concatenation
+- **Deterministic** - stable attribute order, predictable output
+- **Identity guarantee** - `serialize(root)` is byte-identical to the
   concatenation of `serializeToStream(root)` on the same input
-- **Line endings** — always `\n`, cross-platform
+- **Line endings** - always `\n`, cross-platform
 
 ## SSR + Streaming
 
@@ -144,7 +144,7 @@ builder(req, data)           bot  → buffered (Content-Length)
 The `DocumentBuilder` function signature deliberately excludes `User-Agent`.
 The builder always produces the same `DocumentNode` for the same input.
 The transport layer decides buffered vs. chunked delivery based on UA,
-but the body bytes are identical. This is not cloaking — cloaking means
+but the body bytes are identical. This is not cloaking - cloaking means
 *different bodies*; here only `Transfer-Encoding` differs.
 
 Streaming order (in-order, progressive flush):
@@ -155,7 +155,7 @@ Streaming order (in-order, progressive flush):
 ## Islands Architecture
 
 Islands are isolated interactive zones on a static page. They hydrate
-independently — one island never blocks another.
+independently - one island never blocks another.
 
 ### Level 0: Static HTML
 
@@ -205,7 +205,7 @@ On failure, a `hydraline:island-error` DOM event fires with `{id, reason}`.
 ### Resumable Model
 
 Island state is serialized as JSON into the `data-state` HTML attribute.
-On hydration, the island deserializes this state and resumes from it —
+On hydration, the island deserializes this state and resumes from it -
 no widget tree recalculation needed.
 
 ## SSG Pipeline
@@ -231,7 +231,7 @@ The CLI runs surface B on the plain Dart VM:
 dart run hydraline_flutter:build hydraline.routes.yaml dist
 ```
 
-Surface A (widget extraction) requires `flutter_tester` — run it as a test
+Surface A (widget extraction) requires `flutter_tester` - run it as a test
 tagged `ssg` that pumps pages inside `SsgSandbox` and feeds the sealed
 collector output to the runner.
 
@@ -260,7 +260,7 @@ collector output to the runner.
 </hydraline-island>
 ```
 
-Declarative Shadow DOM means no FOUC — the shadow root exists from HTML parse
+Declarative Shadow DOM means no FOUC - the shadow root exists from HTML parse
 time. The same element is reused during hydration (no re-creation).
 
 ### Dispatcher
@@ -319,8 +319,8 @@ without Flutter. This is verified at the dispatcher and SSR/SSG generator levels
 
 ## See Also
 
-- [Getting Started](./getting-started.md) — first steps
-- [Document Model](./document-model.md) — the tree in detail
-- [Server](./server.md) — SSR delivery in practice
-- [Flutter Widgets](./flutter-widgets.md) — the widget surface
-- [Security](./security.md) — threat model and guarantees
+- [Getting Started](./getting-started.md) - first steps
+- [Document Model](./document-model.md) - the tree in detail
+- [Server](./server.md) - SSR delivery in practice
+- [Flutter Widgets](./flutter-widgets.md) - the widget surface
+- [Security](./security.md) - threat model and guarantees

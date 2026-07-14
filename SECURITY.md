@@ -18,16 +18,16 @@ We aim to acknowledge reports within 48 hours and provide a fix within 7 days.
 
 Hydraline is an HTML generation and delivery library. Its security properties:
 
-- **Contextual escaping** — text and attributes are escaped in the correct
+- **Contextual escaping** - text and attributes are escaped in the correct
   context, preventing XSS injection
-- **SafeUrl** — URL fields are type-safe and validated against a scheme
+- **SafeUrl** - URL fields are type-safe and validated against a scheme
   allowlist (http, https, mailto, tel, relative). `javascript:`, `data:`,
   and `vbscript:` are blocked at the type level
-- **UnsafeHtmlNode** — raw HTML requires explicit opt-in via a separate
+- **UnsafeHtmlNode** - raw HTML requires explicit opt-in via a separate
   node type, preventing accidental injection
-- **No cloaking** — bots and users receive byte-identical document bodies,
+- **No cloaking** - bots and users receive byte-identical document bodies,
   verified in CI
-- **Self-hosted JS** — all JavaScript assets are first-party and
+- **Self-hosted JS** - all JavaScript assets are first-party and
   CSP-compatible (`script-src 'self'`)
 
 See [docs/security.md](docs/security.md) for full details, including the

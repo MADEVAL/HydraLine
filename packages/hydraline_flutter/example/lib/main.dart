@@ -2,7 +2,7 @@
 // islands. The same widgets render visually at runtime and register semantic
 // HTML during SSG extraction.
 //
-// SSG extraction runs inside flutter_tester — see the package README.
+// SSG extraction runs inside flutter_tester - see the package README.
 // Static build: dart run hydraline_flutter:build hydraline.routes.yaml dist
 import 'package:flutter/material.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
@@ -17,17 +17,17 @@ class ProductPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     body: HydraApp(
-      // At runtime `collector` is null — widgets just render.
+      // At runtime `collector` is null - widgets just render.
       // During SSG extraction a SsgCollector instance is injected and the
       // same widgets self-register their semantic content.
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Route metadata — renders nothing, registers <head> content.
+            // Route metadata - renders nothing, registers <head> content.
             Seo.head(
               const SeoMeta(
-                title: 'Espresso Machine — Barista Shop',
+                title: 'Espresso Machine - Barista Shop',
                 description: 'Compact 15-bar espresso machine.',
               ),
             ),
@@ -58,7 +58,7 @@ class ProductPage extends StatelessWidget {
               ],
             ),
 
-            // Level 2: a Flutter island — the engine loads only when this
+            // Level 2: a Flutter island - the engine loads only when this
             // scrolls into the viewport. Size reservation prevents CLS.
             const Island(
               id: 'price-calculator',
@@ -69,7 +69,7 @@ class ProductPage extends StatelessWidget {
               height: 320,
             ),
 
-            // Level 1: a vanilla JS accordion — no Flutter engine involved.
+            // Level 1: a vanilla JS accordion - no Flutter engine involved.
             const Island(
               id: 'faq',
               type: IslandType.vanilla,

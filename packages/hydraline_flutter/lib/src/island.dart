@@ -1,4 +1,4 @@
-/// Island widget — a Flutter island that registers as an
+/// Island widget - a Flutter island that registers as an
 /// `IslandPlaceholderNode` during extraction and renders a placeholder UI
 /// at configuration time.
 library;

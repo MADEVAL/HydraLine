@@ -39,7 +39,7 @@ void main() async {
 
 Requests that match a `document`/`hybrid` route are rendered by the
 middleware. Requests that match an `app` route are passed through to the inner
-handler (your Flutter app shell). Requests that match nothing return 404 —
+handler (your Flutter app shell). Requests that match nothing return 404 -
 serve API endpoints and static assets *in front of* the middleware (see
 [Complete Example](#complete-example)).
 
@@ -100,7 +100,7 @@ typedef DocumentBuilder = FutureOr<DocumentNode> Function(
 ```
 
 The signature deliberately **does not accept `User-Agent`**. The builder is
-architecturally prevented from cloaking — it always produces the same tree for
+architecturally prevented from cloaking - it always produces the same tree for
 the same input, regardless of who requested it. Keep builders deterministic:
 no `DateTime.now()`, no random values.
 
@@ -152,9 +152,9 @@ Used by default for bots. Gives crawlers a complete document in one chunk.
 HTML is sent progressively as chunks using `Transfer-Encoding: chunked`.
 The serializer emits in document order:
 
-1. **Shell** — `<!DOCTYPE html>`, `<head>` with metadata and JSON-LD
-2. **Static content** — headings, paragraphs, images, links
-3. **Island placeholders** — skeletons with `data-state`
+1. **Shell** - `<!DOCTYPE html>`, `<head>` with metadata and JSON-LD
+2. **Static content** - headings, paragraphs, images, links
+3. **Island placeholders** - skeletons with `data-state`
 
 This allows the browser to start rendering and fetching subresources before
 the full response arrives.
@@ -174,7 +174,7 @@ When `botUserAgentPattern` is configured and the request's `User-Agent` matches:
 - **Users** get chunked streaming (`Transfer-Encoding: chunked`)
 
 The body bytes are **identical** in both cases. Only the transport encoding
-differs. This is not cloaking — cloaking means *different bodies*. The content
+differs. This is not cloaking - cloaking means *different bodies*. The content
 builder never sees the `User-Agent` header.
 
 **Important**: `botUserAgentPattern` is read only by the transport layer, not
@@ -208,7 +208,7 @@ DocumentNode oldPageBuilder(Request req, Object? data) {
 | 302 | `throw RedirectException(location, status: 302)` |
 | 404 | Returned automatically when no route matches |
 | 410 | `throw RedirectException.gone()` for permanently removed content |
-| other | `throw RedirectException(location, status: 308)` — status + `Location` header |
+| other | `throw RedirectException(location, status: 308)` - status + `Location` header |
 | 5xx | Unhandled exceptions in the builder produce a 500 |
 
 The standalone `Http` helper covers the same ground outside builders:
@@ -306,7 +306,7 @@ etc.):
 ### L0–L1 JS Assets, robots.txt, sitemap.xml
 
 Vanilla islands and the HTMX glue are served as first-party assets straight
-from the `hydraline` package — no CDN, compatible with
+from the `hydraline` package - no CDN, compatible with
 `Content-Security-Policy: script-src 'self'`:
 
 ```dart
@@ -328,7 +328,7 @@ final page = Assets.injectFlutterAssets(root, baseHref: '/');
 // <script src="/main.dart.js" type="module" defer> before </body>.
 ```
 
-For routes without Flutter islands, no Flutter assets are injected — the
+For routes without Flutter islands, no Flutter assets are injected - the
 zero-overhead guarantee.
 
 ## Complete Example
@@ -403,7 +403,7 @@ void main() async {
 
 ## See Also
 
-- [Architecture](./architecture.md) — SSR flow, two-layer delivery design
-- [Configuration](./configuration.md) — route manifest reference
-- [Security](./security.md) — cloaking prevention, CSP
+- [Architecture](./architecture.md) - SSR flow, two-layer delivery design
+- [Configuration](./configuration.md) - route manifest reference
+- [Security](./security.md) - cloaking prevention, CSP
 - [`hydraline_server` package README](../packages/hydraline_server/README.md)

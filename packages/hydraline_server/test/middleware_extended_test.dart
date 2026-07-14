@@ -38,7 +38,7 @@ routes:
 
     test('path with trailing slash is matched via normalisation', () async {
       final response = await httpGet(handler, '/blog/');
-      // The raw path '/' + 'blog/' — middleware sees '/blog/' which doesn't
+      // The raw path '/' + 'blog/' - middleware sees '/blog/' which doesn't
       // exactly match. But /blog is a prefix match for /blog/:slug.
       expect(response.statusCode, 200);
     });

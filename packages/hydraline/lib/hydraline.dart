@@ -1,4 +1,4 @@
-/// Hydraline core — pure-Dart document model, HTML serializer, escaping and SEO
+/// Hydraline core - pure-Dart document model, HTML serializer, escaping and SEO
 /// artifacts.
 ///
 /// This package must not import `package:flutter/*`, `dart:ui` or `dart:html`.

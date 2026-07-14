@@ -14,7 +14,7 @@ dart pub get
 ## Development workflow
 
 1. Create a feature branch: `feat/<slug>`, `fix/<slug>`, `docs/<slug>`
-2. Write tests first (TDD — test-driven development)
+2. Write tests first (TDD - test-driven development)
 3. Implement the change
 4. Run the full suite: `melos run test`
 5. Verify analysis: `melos run analyze`
@@ -45,19 +45,19 @@ Scopes: `core`, `server`, `flutter`, `web`, `ci`, `docs`
 
 - Fill in the PR template (all sections)
 - All checks must pass (analysis, formatting, tests)
-- Keep changes focused — one concern per PR
+- Keep changes focused - one concern per PR
 
 ## Code style
 
-- Pure Dart in `hydraline` and `hydraline_server` — no `package:flutter`, no `dart:ui`, no `dart:html`
+- Pure Dart in `hydraline` and `hydraline_server` - no `package:flutter`, no `dart:ui`, no `dart:html`
 - Flutter code lives only in `hydraline_flutter`
 - Document public API with dartdoc
 - Use English for all code, comments, and documentation
-- Keep builders deterministic — no `DateTime.now()` / random values at render time
+- Keep builders deterministic - no `DateTime.now()` / random values at render time
 
 ## Security issues
 
-Never report vulnerabilities in public issues — see the
+Never report vulnerabilities in public issues - see the
 [Security Policy](SECURITY.md).
 
 ## Questions?

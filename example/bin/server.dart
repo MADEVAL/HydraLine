@@ -1,4 +1,4 @@
-// Hydraline showcase — the SSR server (pure Dart, no Flutter).
+// Hydraline showcase - the SSR server (pure Dart, no Flutter).
 //
 // Run with: dart run bin/server.dart
 // Try:      curl -N http://localhost:8080/                (chunked streaming)
@@ -47,7 +47,7 @@ DocumentNode buildProduct(Request request, Object? data) {
   return DocumentRootNode(
     lang: 'en',
     head: buildHead(
-      SeoMeta(title: 'Product — $id'),
+      SeoMeta(title: 'Product - $id'),
       structuredData: [JsonLd.product(name: id, price: 249, currency: 'EUR')],
     ),
     body: [

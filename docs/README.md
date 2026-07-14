@@ -1,7 +1,7 @@
 # Hydraline
 
 **SEO, SSR, prerender + islands for Flutter Web.** Real semantic HTML in the
-first HTTP response, with hydration of interactive zones (islands) on top —
+first HTTP response, with hydration of interactive zones (islands) on top -
 without rewriting your app and without a new framework.
 
 | | |
@@ -17,11 +17,11 @@ without rewriting your app and without a new framework.
 
 Flutter Web renders UI into a `<canvas>` element. The first HTTP response is an
 empty app-shell. Social media crawlers (Facebook, X/Twitter, LinkedIn, Telegram,
-WhatsApp, Slack, Discord) don't execute JavaScript — they parse raw HTML and look
+WhatsApp, Slack, Discord) don't execute JavaScript - they parse raw HTML and look
 for `og:*` / `twitter:*` tags. They see an empty shell and can't build previews.
 Search engines index content slower and poorer.
 
-Existing SEO packages do runtime DOM injection *after* Flutter loads — the tags
+Existing SEO packages do runtime DOM injection *after* Flutter loads - the tags
 aren't present in `view-source`. Firebase Functions + UA-sniff is cloaking (risk
 of search-engine penalties).
 
@@ -29,11 +29,11 @@ of search-engine penalties).
 
 Hydraline gives Flutter Web three things:
 
-1. **Real HTML in the first response** for `document` / `hybrid` routes —
+1. **Real HTML in the first response** for `document` / `hybrid` routes -
    accessible in `view-source`, without JavaScript.
-2. **Flutter hydrates islands on top** via the multi-view API — static content is
+2. **Flutter hydrates islands on top** via the multi-view API - static content is
    never re-rendered.
-3. **Three interactivity levels** — the Flutter engine loads *only* when truly needed:
+3. **Three interactivity levels** - the Flutter engine loads *only* when truly needed:
 
 ```
 Level 0  Static HTML                          FCP < 100 ms, no JS
@@ -54,20 +54,20 @@ the Flutter engine at all.
 
 ## Interactivity Levels
 
-### Level 0 — Static HTML
+### Level 0 - Static HTML
 
 Semantic headings, paragraphs, images with `alt`, links, `<details>`/`<summary>`
 accordions. Full metadata: `title`, `meta`, Open Graph, Twitter Card, JSON-LD.
 Works without any JavaScript. Skeleton placeholders reserve space for islands.
 
-### Level 1 — Vanilla + HTMX Islands
+### Level 1 - Vanilla + HTMX Islands
 
 Lightweight interactivity without the Flutter engine. **Vanilla islands** (~8 KB JS):
-accordions, tabs, carousels, copy buttons, theme toggles, lazy images — each with
+accordions, tabs, carousels, copy buttons, theme toggles, lazy images - each with
 no-JS fallback. **HTMX islands** (~14 KB JS): forms, search, pagination, lazy
-loading — server-rendered HTML fragments replace DOM without page reload.
+loading - server-rendered HTML fragments replace DOM without page reload.
 
-### Level 2 — Flutter Islands
+### Level 2 - Flutter Islands
 
 Complex interactive widgets: calculators, configurators, charts, 3D viewers.
 The Flutter engine loads only when an island's hydration trigger fires
@@ -89,7 +89,7 @@ Worker caches the engine, making warm visits ~1 second TTI.
 
 Bots and users receive **byte-identical document bodies**. Only the transport
 differs: buffered for bots (single response), chunked streaming for users. The
-content builder is architecturally UA-blind — its API doesn't accept `User-Agent`.
+content builder is architecturally UA-blind - its API doesn't accept `User-Agent`.
 This invariant is verified in CI.
 
 ## Quick Start
@@ -151,19 +151,19 @@ Widget build(BuildContext context) => HydraApp(
 
 ## Documentation Index
 
-- [Getting Started](./getting-started.md) — installation, prerequisites, minimal examples
-- [Architecture](./architecture.md) — project structure, subsystems, data flows
-- [Document Model](./document-model.md) — DocumentNode hierarchy, all node types, metadata, escaping
-- [Server](./server.md) — shelf/Dart Frog setup, SSR, streaming, HTMX, caching, bot-aware delivery
-- [Flutter Widgets](./flutter-widgets.md) — Seo.* widgets, Island, HydraApp, IslandHost, SSG runner
-- [Configuration](./configuration.md) — route manifest, island manifest, SEO config, budgets, security
-- [Security](./security.md) — SafeUrl, contextual escaping, CSP, XSS prevention, cloaking guarantee
-- [Showcase example](../example/README.md) — runnable full-stack demo (SSR + SSG + Flutter)
+- [Getting Started](./getting-started.md) - installation, prerequisites, minimal examples
+- [Architecture](./architecture.md) - project structure, subsystems, data flows
+- [Document Model](./document-model.md) - DocumentNode hierarchy, all node types, metadata, escaping
+- [Server](./server.md) - shelf/Dart Frog setup, SSR, streaming, HTMX, caching, bot-aware delivery
+- [Flutter Widgets](./flutter-widgets.md) - Seo.* widgets, Island, HydraApp, IslandHost, SSG runner
+- [Configuration](./configuration.md) - route manifest, island manifest, SEO config, budgets, security
+- [Security](./security.md) - SafeUrl, contextual escaping, CSP, XSS prevention, cloaking guarantee
+- [Showcase example](../example/README.md) - runnable full-stack demo (SSR + SSG + Flutter)
 
 ## What Hydraline Is Not
 
 Hydraline is **not a framework**. It doesn't own `main()`, doesn't dictate which
 router you use, doesn't replace `MaterialApp`. It doesn't automatically convert
 arbitrary Flutter widgets to HTML. It doesn't execute Flutter widgets on the
-server. It's a set of libraries you plug into an existing project — additively,
+server. It's a set of libraries you plug into an existing project - additively,
 one route at a time.

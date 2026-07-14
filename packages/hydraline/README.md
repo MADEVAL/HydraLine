@@ -1,13 +1,13 @@
 # hydraline
 
-Pure-Dart core of [Hydraline](../../README.md) — the foundation all other
+Pure-Dart core of [Hydraline](../../README.md) - the foundation all other
 packages build on.
 
 ## What's inside
 
 | Module | Description |
 |---|---|
-| `DocumentNode` | Sealed immutable tree — headings, paragraphs, links, images, tables, islands |
+| `DocumentNode` | Sealed immutable tree - headings, paragraphs, links, images, tables, islands |
 | `HtmlSerializer` | Single-pass deterministic HTML serializer (buffered + streaming + fragment) |
 | `SafeUrl` | Type-safe URL validation against a scheme allowlist |
 | `SeoMeta` | Open Graph, Twitter Card, hreflang, canonical, meta tags |
@@ -18,13 +18,13 @@ packages build on.
 | `IslandSpec` / `IslandStateCodec` | `data-state` props contract (JSON-safe, ~10 KB budget) |
 | `SsgCollector` | Widget-to-node registration surface |
 | `SeoValidator` / `Audit` | SEO validation + crawler-view audit |
-| `runAuditCli` | `dart run hydraline:audit` — page audit + anti-cloaking check |
+| `runAuditCli` | `dart run hydraline:audit` - page audit + anti-cloaking check |
 | `vanillaIslandsJs` | Level-1 vanilla islands bundle (≤ 8 KB) |
 | `htmxGlueJs` | HTMX bootstrap glue (< 1 KB) |
 
 ## Rules
 
-No `package:flutter`, `dart:ui`, or `dart:html` — ever. This package is
+No `package:flutter`, `dart:ui`, or `dart:html` - ever. This package is
 pure Dart.
 
 ## Quick start
@@ -51,7 +51,7 @@ const serializer = HtmlSerializer();
 print(serializer.serialize(root)); // <!DOCTYPE html><html>...
 ```
 
-Runnable example: [`example/main.dart`](example/main.dart) — document
+Runnable example: [`example/main.dart`](example/main.dart) - document
 building, streaming, sitemap, robots and validation in one file.
 
 ## Audit CLI
@@ -64,11 +64,11 @@ dart run hydraline:audit --server-integration <url>     # anti-cloaking check
 
 ## Documentation
 
-- [Document Model](../../docs/document-model.md) — full node hierarchy
-- [Configuration](../../docs/configuration.md) — route manifest, sitemap, SEO
-- [Security](../../docs/security.md) — SafeUrl, escaping, CSP
-- [Getting Started](../../docs/getting-started.md) — prerequisites, examples
+- [Document Model](../../docs/document-model.md) - full node hierarchy
+- [Configuration](../../docs/configuration.md) - route manifest, sitemap, SEO
+- [Security](../../docs/security.md) - SafeUrl, escaping, CSP
+- [Getting Started](../../docs/getting-started.md) - prerequisites, examples
 
 ## License
 
-MIT — [Yevhen Leonidov](https://leonidov.dev)
+MIT - [Yevhen Leonidov](https://leonidov.dev)

@@ -49,7 +49,7 @@ class HydralineConfig {
 
 /// A pure-Dart function that builds a [DocumentNode] for a given request and
 /// optional application data. The signature deliberately does **not** include
-/// `User-Agent` — the builder is architecturally prevented from cloaking.
+/// `User-Agent` - the builder is architecturally prevented from cloaking.
 typedef DocumentBuilder =
     FutureOr<DocumentNode> Function(Request request, Object? data);
 
@@ -179,7 +179,7 @@ Response _cachedResponse(
   );
 }
 
-/// Deterministic FNV-1a hash over the HTML — stable across process restarts.
+/// Deterministic FNV-1a hash over the HTML - stable across process restarts.
 String _etag(String html) {
   var hash = 0x811c9dc5;
   for (final unit in html.codeUnits) {

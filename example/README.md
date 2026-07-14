@@ -4,11 +4,11 @@ A minimal full-stack demo of all three Hydraline packages working together:
 
 | File | Shows |
 |---|---|
-| [`lib/main.dart`](lib/main.dart) | Flutter app with `Seo.*` widgets and `Island` zones — [`hydraline_flutter`](../packages/hydraline_flutter/) |
+| [`lib/main.dart`](lib/main.dart) | Flutter app with `Seo.*` widgets and `Island` zones - [`hydraline_flutter`](../packages/hydraline_flutter/) |
 | [`lib/island_main.dart`](lib/island_main.dart) | Island entry-point: `IslandMultiViewApp` + deferred island factories |
 | [`web/flutter_bootstrap.js`](web/flutter_bootstrap.js) | Custom bootstrap exposing `window._hydralineApp` (multi-view engine contract) |
-| [`bin/server.dart`](bin/server.dart) | SSR server: streaming, bot-aware delivery, caching — [`hydraline_server`](../packages/hydraline_server/) |
-| [`hydraline.routes.yaml`](hydraline.routes.yaml) | Route manifest: `document` / `hybrid` / `app` modes — [`hydraline`](../packages/hydraline/) |
+| [`bin/server.dart`](bin/server.dart) | SSR server: streaming, bot-aware delivery, caching - [`hydraline_server`](../packages/hydraline_server/) |
+| [`hydraline.routes.yaml`](hydraline.routes.yaml) | Route manifest: `document` / `hybrid` / `app` modes - [`hydraline`](../packages/hydraline/) |
 
 ## Run the SSR server
 
@@ -17,7 +17,7 @@ cd example
 dart run bin/server.dart
 
 curl -N http://localhost:8080/                # chunked streaming (users)
-curl -A Googlebot http://localhost:8080/      # buffered (bots) — same bytes
+curl -A Googlebot http://localhost:8080/      # buffered (bots) - same bytes
 curl http://localhost:8080/product/espresso   # hybrid page with an island
 curl http://localhost:8080/robots.txt
 ```

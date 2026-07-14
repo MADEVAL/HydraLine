@@ -6,7 +6,7 @@ library;
 
 /// Escapes text content: `&`, `<`, `>` become entities.
 ///
-/// Quotes are intentionally left untouched — text and attribute contexts use
+/// Quotes are intentionally left untouched - text and attribute contexts use
 /// different escapers so they can never be confused (see [escapeHtmlAttribute]).
 String escapeHtmlText(String input) {
   if (!input.contains(RegExp('[&<>]'))) {

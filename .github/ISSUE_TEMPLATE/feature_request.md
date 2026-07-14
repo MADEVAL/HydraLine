@@ -6,7 +6,7 @@ labels: enhancement
 ---
 
 <!-- Before proposing, skim the docs (docs/) and the Contributing guide
-     (../../CONTRIBUTING.md) — your idea may already have a home. -->
+     (../../CONTRIBUTING.md) - your idea may already have a home. -->
 
 ## Problem / need
 <!-- What problem does this solve? For whom and why. -->

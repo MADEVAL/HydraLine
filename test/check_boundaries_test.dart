@@ -42,7 +42,7 @@ void main() {
     });
   });
 
-  group('runCheck (invariant I1 — negative test)', () {
+  group('runCheck (invariant I1 - negative test)', () {
     test(
       'returns non-zero when a rule dir contains a forbidden import',
       () async {

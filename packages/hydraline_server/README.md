@@ -1,6 +1,6 @@
 # hydraline_server
 
-Pure-Dart server for [Hydraline](../../README.md) — SSR, streaming,
+Pure-Dart server for [Hydraline](../../README.md) - SSR, streaming,
 and HTMX helpers for shelf and Dart Frog.
 
 ## What's inside
@@ -18,7 +18,7 @@ and HTMX helpers for shelf and Dart Frog.
 
 ## Rules
 
-No `package:flutter` — this package is pure Dart and works on any Dart server.
+No `package:flutter` - this package is pure Dart and works on any Dart server.
 
 Automatic behaviors: bot-aware transport (byte-identical bodies),
 `X-Robots-Tag` for noindex routes and `app` routes, ETag revalidation when a
@@ -56,17 +56,17 @@ void main() async {
 }
 ```
 
-Runnable example: [`example/main.dart`](example/main.dart) — SSR, streaming,
+Runnable example: [`example/main.dart`](example/main.dart) - SSR, streaming,
 bot-aware delivery, caching and an HTMX endpoint.
 
 ## Documentation
 
-- [Server Guide](../../docs/server.md) — full setup, streaming, HTMX, caching
-- [Configuration](../../docs/configuration.md) — route manifest, SEO
-- [Architecture](../../docs/architecture.md) — SSR flow, bot-aware delivery
-- [Security](../../docs/security.md) — cloaking prevention, CSP
-- [Getting Started](../../docs/getting-started.md) — prerequisites
+- [Server Guide](../../docs/server.md) - full setup, streaming, HTMX, caching
+- [Configuration](../../docs/configuration.md) - route manifest, SEO
+- [Architecture](../../docs/architecture.md) - SSR flow, bot-aware delivery
+- [Security](../../docs/security.md) - cloaking prevention, CSP
+- [Getting Started](../../docs/getting-started.md) - prerequisites
 
 ## License
 
-MIT — [Yevhen Leonidov](https://leonidov.dev)
+MIT - [Yevhen Leonidov](https://leonidov.dev)

@@ -9,7 +9,7 @@
       /____/                                      
 ```
 
-**Real, crawlable HTML for Flutter Web — without giving up Flutter.**
+**Real, crawlable HTML for Flutter Web - without giving up Flutter.**
 
 SEO · SSR · SSG · Islands
 
@@ -25,27 +25,27 @@ meta-tag injectors don't survive `view-source`, and UA-sniffing prerender
 hacks are cloaking.
 
 **Hydraline fixes this at the root: your pages become real semantic HTML in
-the very first HTTP response — and Flutter hydrates interactive islands on
+the very first HTTP response - and Flutter hydrates interactive islands on
 top.** No new framework. No rewrite. One route at a time.
 
 ## Why Hydraline
 
 - **Real HTML, first response.** Headings, paragraphs, images with `alt`,
-  `og:*`/`twitter:*` tags, JSON-LD — all present in `view-source`, no
+  `og:*`/`twitter:*` tags, JSON-LD - all present in `view-source`, no
   JavaScript required.
 - **Three interactivity levels.** Static HTML (no JS) → vanilla + HTMX
   islands (~8–14 KB, no Flutter engine) → full Flutter islands (engine loads
   only when an island actually triggers). ~80% of content-page interactivity
   never needs the engine at all.
 - **Zero cloaking, by architecture.** Content builders physically cannot see
-  the `User-Agent` — bots and users get byte-identical bodies, only the
+  the `User-Agent` - bots and users get byte-identical bodies, only the
   transport differs (buffered vs streamed). Verifiable with one CLI command.
 - **Safe by the type system.** All text is contextually escaped; URLs must
   pass the `SafeUrl` scheme allowlist (`javascript:`/`data:` blocked at
   compile time); raw HTML requires an explicit `UnsafeHtmlNode` opt-in.
   Backed by a million-input XSS fuzz suite.
 - **Zero layout shift.** Islands reserve exact pixel dimensions with
-  Declarative Shadow DOM skeletons — CLS ≈ 0.
+  Declarative Shadow DOM skeletons - CLS ≈ 0.
 - **SSR and SSG from one model.** The same `DocumentNode` tree streams from a
   shelf/Dart Frog server or compiles to a static `dist/` for any hosting.
 - **SEO toolchain included.** sitemap.xml (auto-split at 50k URLs),
@@ -58,8 +58,8 @@ top.** No new framework. No rewrite. One route at a time.
 ```yaml
 # pubspec.yaml
 dependencies:
-  hydraline: ^0.0.1           # core — pure Dart
-  hydraline_server: ^0.0.1    # SSR — pure Dart (shelf / Dart Frog)
+  hydraline: ^0.0.1           # core - pure Dart
+  hydraline_server: ^0.0.1    # SSR - pure Dart (shelf / Dart Frog)
   hydraline_flutter: ^0.0.1   # widgets + SSG + web runtime
 ```
 
@@ -70,7 +70,7 @@ import 'package:hydraline/hydraline.dart';
 
 final page = DocumentRootNode(
   head: buildHead(SeoMeta(
-    title: 'Espresso Machine — Barista Shop',
+    title: 'Espresso Machine - Barista Shop',
     description: 'Compact 15-bar espresso machine.',
     openGraph: OpenGraph(type: 'product',
       image: SafeUrl.parse('https://shop.example/og.jpg')),
@@ -107,7 +107,7 @@ Or ship it static:
 
 ```bash
 dart run hydraline_flutter:build hydraline.routes.yaml dist
-# dist/: HTML pages + sitemap.xml + robots.txt — ready for any static host
+# dist/: HTML pages + sitemap.xml + robots.txt - ready for any static host
 ```
 
 And prove there's no cloaking:
@@ -131,7 +131,7 @@ hybrid     HTML + Flutter islands      product page + calculator
 Interactivity levels
 ────────────────────
 L0  static HTML             0 KB JS      <details>, :target, loading=lazy
-L1  vanilla + HTMX          ~8–14 KB     tabs, forms, search — no engine
+L1  vanilla + HTMX          ~8–14 KB     tabs, forms, search - no engine
 L2  Flutter islands         on trigger   charts, configurators, 3D
 ```
 
@@ -139,7 +139,7 @@ An **island** is an isolated interactive zone with a hydration directive
 (`onVisible`, `onIdle`, `onInteraction`, `onMedia`, `manual`). Props cross the
 server → client boundary as JSON in `data-state`; one Flutter engine instance
 hosts N islands in N views. Pages without Flutter islands never load the
-engine — that's the zero-overhead guarantee.
+engine - that's the zero-overhead guarantee.
 
 Deep dive: [Architecture](docs/architecture.md).
 
@@ -168,13 +168,13 @@ Dart ≥ 3.9 · Flutter ≥ 3.35 (only for `hydraline_flutter`) · MIT licensed.
 
 ## Community
 
-- **Contribute** — see the [Contributing Guide](CONTRIBUTING.md) and the
+- **Contribute** - see the [Contributing Guide](CONTRIBUTING.md) and the
   [PR template](.github/PULL_REQUEST_TEMPLATE/pull_request_template.md)
-- **Found a bug?** — open a [bug report](.github/ISSUE_TEMPLATE/bug_report.md)
-- **Have an idea?** — open a [feature request](.github/ISSUE_TEMPLATE/feature_request.md)
-- **Security issue?** — follow the [Security Policy](SECURITY.md) (private advisory, please)
-- **Be kind** — we follow the [Code of Conduct](CODE_OF_CONDUCT.md)
+- **Found a bug?** - open a [bug report](.github/ISSUE_TEMPLATE/bug_report.md)
+- **Have an idea?** - open a [feature request](.github/ISSUE_TEMPLATE/feature_request.md)
+- **Security issue?** - follow the [Security Policy](SECURITY.md) (private advisory, please)
+- **Be kind** - we follow the [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## License
 
-[MIT](LICENSE) — [Yevhen Leonidov](https://leonidov.dev) / [Globus Studio](https://globus.studio)
+[MIT](LICENSE) - [Yevhen Leonidov](https://leonidov.dev) / [Globus Studio](https://globus.studio)

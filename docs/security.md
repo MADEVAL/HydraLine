@@ -7,7 +7,7 @@ the threat model, and the recommended deployment configuration.
 ## Safe by Default
 
 Every piece of user-supplied text is escaped before it reaches HTML output.
-You cannot accidentally output raw text or unsafe URLs — the type system and
+You cannot accidentally output raw text or unsafe URLs - the type system and
 serialization layer enforce safety at compile time.
 
 ### Text Escaping
@@ -27,10 +27,10 @@ String escapeHtmlAttribute(String s)  // " ' & < > → &quot; &#39; ...
 by the correct context function. This means the `DocumentNode` tree itself is
 safe to inspect, log, and transform without double-escaping risk.
 
-### SafeUrl — Type-Level URL Validation
+### SafeUrl - Type-Level URL Validation
 
 URL fields (`AnchorNode.href`, `ImageNode.src`, `LinkNode.href`) accept only
-`SafeUrl` instances. There is **no public constructor** for `SafeUrl` — instances
+`SafeUrl` instances. There is **no public constructor** for `SafeUrl` - instances
 come only from the sanitizing factory:
 
 ```dart
@@ -49,10 +49,10 @@ unchecked URL. The allowlist permits:
 | `tel` | Telephone links |
 | Relative | `/path`, `./path`, `#anchor`, `?query` |
 
-Blocked schemes include `javascript:`, `data:`, and `vbscript:` — the
+Blocked schemes include `javascript:`, `data:`, and `vbscript:` - the
 dangerous XSS vectors.
 
-## UnsafeHtmlNode — Explicit Opt-In
+## UnsafeHtmlNode - Explicit Opt-In
 
 Raw HTML injection is possible **only** through `UnsafeHtmlNode`. The name is
 intentionally explicit about the risk. The SEO validator emits a warning when
@@ -71,7 +71,7 @@ UnsafeHtmlNode(
 
 ## Cloaking Prevention (Architectural)
 
-Cloaking — serving different content to bots vs. users — is a search-engine
+Cloaking - serving different content to bots vs. users - is a search-engine
 violation. Hydraline prevents it architecturally, not by convention:
 
 ```
@@ -115,9 +115,9 @@ base-uri 'self'
 
 Key points:
 - **`'wasm-unsafe-eval'`** is required by CanvasKit (Flutter Web's WASM renderer)
-- **No `'unsafe-inline'`** — prevents XSS from executing `<script>` tags even
+- **No `'unsafe-inline'`** - prevents XSS from executing `<script>` tags even
   if they somehow appear in the output
-- **HTMX and vanilla JS are first-party** — served from your domain, compatible
+- **HTMX and vanilla JS are first-party** - served from your domain, compatible
   with `script-src 'self'`. No external CDN dependencies
 - **`object-src 'none'`** blocks legacy plugin vectors
 
@@ -151,7 +151,7 @@ Island props cross the boundary `server → HTML → client` through the
 ## JSON-LD Encoding
 
 Structured data inside `<script type="application/ld+json">` is encoded with
-`\uXXXX` escapes for `<`, `>`, `&` — preventing `</script>` breakout even if
+`\uXXXX` escapes for `<`, `>`, `&` - preventing `</script>` breakout even if
 the JSON payload contains HTML-like strings.
 
 ## Secrets in Logs
@@ -177,7 +177,7 @@ advisory and a regression test for the specific vector.
 ## Deploying Securely
 
 1. **Set CSP header** in your production server/serving config
-2. **Keep Flutter SDK up to date** — Hydraline supports the latest 3 stable
+2. **Keep Flutter SDK up to date** - Hydraline supports the latest 3 stable
    Flutter releases. Flutter 3.41.x has a known multi-view sizing regression;
    3.44+ is recommended
 3. **Pass a sanitizer to `UnsafeHtmlNode`** whenever you use it
@@ -185,12 +185,12 @@ advisory and a regression test for the specific vector.
    ```bash
    dart run hydraline:audit https://example.com
    ```
-5. **Enable HTTPS** — `SafeUrl` allowlists `http` for development, but
+5. **Enable HTTPS** - `SafeUrl` allowlists `http` for development, but
    production should use HTTPS throughout
-6. **Review `canonical` URLs** — they should be absolute and consistent
+6. **Review `canonical` URLs** - they should be absolute and consistent
 
 ## See Also
 
-- [Security Policy](../SECURITY.md) � reporting and response timelines
-- [Document Model](./document-model.md) � escaping and SafeUrl reference
-- [Server](./server.md) � bot-aware delivery in practice
+- [Security Policy](../SECURITY.md) � reporting and response timelines
+- [Document Model](./document-model.md) � escaping and SafeUrl reference
+- [Server](./server.md) � bot-aware delivery in practice

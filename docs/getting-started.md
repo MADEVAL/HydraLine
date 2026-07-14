@@ -4,7 +4,7 @@
 
 - **Dart SDK** ≥ 3.9
 - **Flutter SDK** ≥ 3.35 (only for `hydraline_flutter`; core and server work with plain Dart)
-- A **Dart server** (shelf, Dart Frog) for SSR — or static hosting for SSG
+- A **Dart server** (shelf, Dart Frog) for SSR - or static hosting for SSG
 - A **Flutter Web** application to add SEO to
 
 ## Installation
@@ -28,13 +28,13 @@ If you only need server-side rendering with pure-Dart builders, you can skip
 
 `DocumentNode` is the central data model. It's a tree of semantic HTML nodes
 (headings, paragraphs, links, images, lists, tables, island placeholders, etc.).
-Everything — SSR, SSG, and the serializer — works from this single tree.
+Everything - SSR, SSG, and the serializer - works from this single tree.
 
 The tree is built one of two ways:
 
-- **Pure-Dart builders** (surface B) — construct nodes directly. Works on the
+- **Pure-Dart builders** (surface B) - construct nodes directly. Works on the
   server and in tests without Flutter.
-- **Flutter widgets** (surface A) — `Seo.text()`, `Seo.image()`, `Island()` etc.
+- **Flutter widgets** (surface A) - `Seo.text()`, `Seo.image()`, `Island()` etc.
   self-register into a collector during SSG extraction.
 
 Both surfaces produce an identical `DocumentNode`. One serializer handles both.
@@ -56,9 +56,9 @@ Modes are configured per-route in `hydraline.routes.yaml`.
 An **island** is an isolated interactive zone on an otherwise static page. Three
 types exist:
 
-- **Vanilla** — lightweight JS widgets (accordions, tabs, carousels). ~8 KB, no Flutter.
-- **HTMX** — server-driven HTML fragments (forms, lazy loading). ~14 KB, no Flutter.
-- **Flutter** — complex CanvasKit-rendered widgets. Engine loaded on trigger.
+- **Vanilla** - lightweight JS widgets (accordions, tabs, carousels). ~8 KB, no Flutter.
+- **HTMX** - server-driven HTML fragments (forms, lazy loading). ~14 KB, no Flutter.
+- **Flutter** - complex CanvasKit-rendered widgets. Engine loaded on trigger.
 
 Islands hydrate according to a **hydration directive**:
 
@@ -75,9 +75,9 @@ Islands hydrate according to a **hydration directive**:
 
 Hydraline supports two delivery paths:
 
-- **SSG (Static Site Generation)** — HTML is generated at build time.
+- **SSG (Static Site Generation)** - HTML is generated at build time.
   Outputs a `dist/` directory ready for static hosting.
-- **SSR (Server-Side Rendering)** — HTML is generated at request time from
+- **SSR (Server-Side Rendering)** - HTML is generated at request time from
   pure-Dart builders. Supports streaming delivery.
 
 ## Minimal Static Site (SSG)
@@ -188,9 +188,9 @@ dart run hydraline:audit --server-integration http://localhost:8080/  # anti-clo
 
 ## Next Steps
 
-- [Full-stack showcase](../example/README.md) — runnable demo of all three packages
-- [Document Model](./document-model.md) — full `DocumentNode` reference
-- [Server](./server.md) — SSR, streaming, HTMX, caching
-- [Flutter Widgets](./flutter-widgets.md) — widget API reference
-- [Configuration](./configuration.md) — route manifest, islands, SEO settings
-- [Security](./security.md) — escaping, SafeUrl, CSP, anti-cloaking
+- [Full-stack showcase](../example/README.md) - runnable demo of all three packages
+- [Document Model](./document-model.md) - full `DocumentNode` reference
+- [Server](./server.md) - SSR, streaming, HTMX, caching
+- [Flutter Widgets](./flutter-widgets.md) - widget API reference
+- [Configuration](./configuration.md) - route manifest, islands, SEO settings
+- [Security](./security.md) - escaping, SafeUrl, CSP, anti-cloaking

@@ -2,7 +2,7 @@
 library;
 
 const hostingFirebase = r'''
-# Firebase Hosting — hydraline SSG deploy
+# Firebase Hosting - hydraline SSG deploy
 
 ## 1. Build
 dart run hydraline_flutter:build hydraline.routes.yaml dist
@@ -24,7 +24,7 @@ firebase deploy --only hosting
 ''';
 
 const hostingNetlify = r'''
-# Netlify — hydraline SSG deploy
+# Netlify - hydraline SSG deploy
 
 ## 1. Build
 dart run hydraline_flutter:build hydraline.routes.yaml dist
@@ -40,7 +40,7 @@ dart run hydraline_flutter:build hydraline.routes.yaml dist
 ''';
 
 const hostingCloudflare = r'''
-# Cloudflare Pages — hydraline SSG deploy
+# Cloudflare Pages - hydraline SSG deploy
 
 ## 1. Build command
 dart run hydraline_flutter:build hydraline.routes.yaml dist
@@ -52,7 +52,7 @@ dart run hydraline_flutter:build hydraline.routes.yaml dist
 ''';
 
 const hostingGitHubPages = r'''
-# GitHub Pages — hydraline SSG deploy
+# GitHub Pages - hydraline SSG deploy
 
 ## 1. Build
 dart run hydraline_flutter:build hydraline.routes.yaml dist

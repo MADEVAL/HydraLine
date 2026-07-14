@@ -1,4 +1,4 @@
-// Hydraline showcase — the Flutter Web side.
+// Hydraline showcase - the Flutter Web side.
 //
 // The same widgets render the visual UI at runtime and register semantic
 // HTML during SSG extraction. Nothing here replaces MaterialApp or your
@@ -57,7 +57,7 @@ class ProductPage extends StatelessWidget {
     body: HydraApp(
       child: ListView(
         children: [
-          Seo.head(SeoMeta(title: 'Product — $id')),
+          Seo.head(SeoMeta(title: 'Product - $id')),
           Seo.heading('Product: $id', level: 1),
           Seo.image(
             '/img/$id.jpg',

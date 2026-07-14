@@ -19,7 +19,7 @@ import 'package:shelf/shelf.dart';
 /// Asset endpoints and Flutter-asset inlining.
 abstract final class Assets {
   /// Serves `robots.txt`, `sitemap.xml` and the L0–L1 core JS assets
-  /// (`vanilla-islands.js`, `htmx-glue.js`) — first-party, CSP-compatible.
+  /// (`vanilla-islands.js`, `htmx-glue.js`) - first-party, CSP-compatible.
   ///
   /// [sitemapXml] and [robotsTxt] override the served content; without a
   /// [sitemapXml] the `sitemap.xml` endpoint responds 404.

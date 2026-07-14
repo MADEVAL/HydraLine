@@ -24,7 +24,7 @@ class _CalculatorIslandState extends State<CalculatorIsland> {
             icon: const Icon(Icons.remove),
             onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
           ),
-          Text('$_quantity pcs — total ${_quantity * widget.price}'),
+          Text('$_quantity pcs - total ${_quantity * widget.price}'),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => setState(() => _quantity++),

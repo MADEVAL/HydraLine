@@ -12,7 +12,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
-/// Placeholder factories — developers replace these with their actual deferred
+/// Placeholder factories - developers replace these with their actual deferred
 /// island constructors.
 final Map<String, IslandFactory> islandFactories = {};
 

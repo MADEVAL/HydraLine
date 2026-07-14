@@ -157,7 +157,7 @@ routes:
 
   group('DocumentBuilder UA-blind contract', () {
     test('typedef excludes User-Agent as a direct parameter', () {
-      // The DocumentBuilder type is (Request request, Object? data) — no
+      // The DocumentBuilder type is (Request request, Object? data) - no
       // User-Agent or UA-specific parameter.
 
       // A function matching the typedef must be assignable:
@@ -187,7 +187,7 @@ routes:
         // botUserAgentPattern lives on HydralineConfig (transport layer).
         expect(config.botUserAgentPattern, isNotNull);
 
-        // DocumentBuilder has no access to botUserAgentPattern — it is not a
+        // DocumentBuilder has no access to botUserAgentPattern - it is not a
         // parameter. The builder receives (Request, Object?) only.
         final DocumentBuilder builder = _buildEmptyPage;
         expect(builder, isA<DocumentBuilder>());

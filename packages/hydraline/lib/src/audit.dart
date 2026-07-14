@@ -19,7 +19,7 @@ abstract final class Audit {
   static const int _titleMaxLength = 70;
   static const int _descriptionMaxLength = 160;
 
-  /// Standalone: audits the raw HTML a crawler would see — title,
+  /// Standalone: audits the raw HTML a crawler would see - title,
   /// meta description, Open Graph, canonical, headings and image alt.
   static AuditReport auditHtml(String source) {
     final document = html.parse(source);
@@ -131,7 +131,7 @@ abstract final class Audit {
         severity: ValidationSeverity.error,
         code: 'body_mismatch',
         message:
-            'buffered body differs from concatenated chunks — cloaking risk.',
+            'buffered body differs from concatenated chunks - cloaking risk.',
       ),
     ];
     return AuditReport(issues: issues, exitCode: _exitCode(issues));

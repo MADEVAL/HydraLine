@@ -1,4 +1,4 @@
-/// HTMX bootstrap glue — loads the self-hosted HTMX runtime on pages that
+/// HTMX bootstrap glue - loads the self-hosted HTMX runtime on pages that
 /// contain HTMX islands. First-party, CSP-compatible. Budget: ≤ 14 KB
 /// (the vendored HTMX ~14 KB is referenced, not inlined; this glue is < 1 KB).
 library;

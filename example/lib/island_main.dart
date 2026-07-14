@@ -1,4 +1,4 @@
-// Hydraline showcase — the island entry-point.
+// Hydraline showcase - the island entry-point.
 //
 // Built separately so the island bundle stays small:
 //   flutter build web --target=lib/island_main.dart

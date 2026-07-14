@@ -1,5 +1,5 @@
 /// `Seo.*` widgets (surface A): self-registering Flutter widgets with dual
-/// nature — they render a visual and register semantic info into the nearest
+/// nature - they render a visual and register semantic info into the nearest
 /// [SsgCollector] via [HydraScope].
 ///
 /// Registration happens unconditionally on each build; the collector handles

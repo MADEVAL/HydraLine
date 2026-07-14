@@ -73,7 +73,7 @@ Response faqEndpoint(Request request) {
       DetailsNode(
         summary: SummaryNode(children: [TextNode('Is it a framework?')]),
         children: [
-          ParagraphNode(children: [TextNode('No — a set of libraries.')]),
+          ParagraphNode(children: [TextNode('No - a set of libraries.')]),
         ],
       ),
     ],
@@ -95,7 +95,7 @@ Future<void> main() async {
     manifest: manifest,
     builders: {'/': buildHome, '/product/:id': buildProduct},
     // Transport-only bot detection: bots get buffered delivery, users get
-    // chunked streaming — the body bytes are identical either way.
+    // chunked streaming - the body bytes are identical either way.
     botUserAgentPattern: RegExp(
       r'Googlebot|bingbot|Twitterbot|facebookexternalhit',
     ),

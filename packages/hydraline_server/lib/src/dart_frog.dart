@@ -1,4 +1,4 @@
-/// Dart Frog adapter — wraps [hydralineMiddleware] so it plugs into a Dart Frog
+/// Dart Frog adapter - wraps [hydralineMiddleware] so it plugs into a Dart Frog
 /// server with the same configuration.
 library;
 

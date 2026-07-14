@@ -1,4 +1,4 @@
-/// IslandHost — root multi-view widget for the island engine.
+/// IslandHost - root multi-view widget for the island engine.
 ///
 /// One Flutter engine instance hosts N islands in N views. The `factories`
 /// map island IDs to async builder functions; heavy islands use deferred
@@ -79,8 +79,8 @@ class IslandHost extends StatelessWidget {
 /// Builds one [View] per `FlutterView` reported by the platform dispatcher
 /// and rebuilds when views are added or removed (the dispatcher's
 /// `addView()`/`removeView()` calls). For every view it first resolves the
-/// island binding — from [IslandViewRegistry], or from the platform
-/// `initialData` on the web — and then delegates to [IslandHost].
+/// island binding - from [IslandViewRegistry], or from the platform
+/// `initialData` on the web - and then delegates to [IslandHost].
 class IslandMultiViewApp extends StatefulWidget {
   const IslandMultiViewApp({required this.factories, super.key});
 

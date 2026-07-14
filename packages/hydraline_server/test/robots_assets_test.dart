@@ -69,7 +69,7 @@ routes:
     });
   });
 
-  group('Assets.serveCoreAssets — L0/L1 JS', () {
+  group('Assets.serveCoreAssets - L0/L1 JS', () {
     test('serves the vanilla islands bundle', () async {
       final handler = Assets.serveCoreAssets();
       final response = await httpGet(handler, '/vanilla-islands.js');

@@ -23,7 +23,7 @@ void main() {
     err.clear();
   });
 
-  group('runAuditCli — standalone', () {
+  group('runAuditCli - standalone', () {
     test('passing file returns 0 and prints a summary', () async {
       final file = File(
         '${Directory.systemTemp.createTempSync('hydraline_audit_').path}'
@@ -75,7 +75,7 @@ void main() {
     });
   });
 
-  group('runAuditCli — server integration', () {
+  group('runAuditCli - server integration', () {
     test('identical bot/user bodies pass', () async {
       final code = await runAuditCli(
         ['--server-integration', 'https://x.example/'],
@@ -118,7 +118,7 @@ void main() {
     });
   });
 
-  group('runAuditCli — arguments', () {
+  group('runAuditCli - arguments', () {
     test('no arguments prints usage and returns 64', () async {
       final code = await runAuditCli([], out: out, err: err);
       expect(code, 64);

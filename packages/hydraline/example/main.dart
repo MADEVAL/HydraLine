@@ -13,7 +13,7 @@ Future<void> main() async {
     lang: 'en',
     head: buildHead(
       SeoMeta(
-        title: 'Espresso Machine — Barista Shop',
+        title: 'Espresso Machine - Barista Shop',
         description: 'Compact 15-bar espresso machine with a milk frother.',
         canonical: SafeUrl.parse('https://shop.example/espresso'),
         openGraph: OpenGraph(
@@ -39,7 +39,7 @@ Future<void> main() async {
           const HeadingNode(level: 1, children: [TextNode('Espresso Machine')]),
           const ParagraphNode(
             children: [
-              TextNode('Real HTML for crawlers — <escaped> & safe by default.'),
+              TextNode('Real HTML for crawlers - <escaped> & safe by default.'),
             ],
           ),
           ImageNode(
@@ -74,13 +74,13 @@ Future<void> main() async {
 
   const serializer = HtmlSerializer();
 
-  // 2a. Buffered — a complete HTML string (bots, SSG files).
+  // 2a. Buffered - a complete HTML string (bots, SSG files).
   final html = serializer.serialize(page);
   stdout
     ..writeln('--- buffered (${html.length} chars) ---')
     ..writeln(html);
 
-  // 2b. Streaming — same bytes, delivered progressively (SSR).
+  // 2b. Streaming - same bytes, delivered progressively (SSR).
   final chunks = await serializer.serializeToStream(page).toList();
   assert(chunks.join() == html, 'stream must equal buffered output');
   stdout.writeln('--- streamed as ${chunks.length} chunks, identical bytes');

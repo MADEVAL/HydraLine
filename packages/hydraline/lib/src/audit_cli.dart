@@ -1,4 +1,4 @@
-/// Entry point for `dart run hydraline:audit` — see `runAuditCli`.
+/// Entry point for `dart run hydraline:audit` - see `runAuditCli`.
 library;
 
 import 'dart:convert';
@@ -108,7 +108,7 @@ Future<int> _serverIntegration(
 
   final report = Audit.compareBodies(bufferedBody, [chunkedBody]);
   if (report.exitCode == 0) {
-    out.writeln('bot and user document bodies are identical — no cloaking.');
+    out.writeln('bot and user document bodies are identical - no cloaking.');
   }
   _printReport(report, out);
   return report.exitCode;

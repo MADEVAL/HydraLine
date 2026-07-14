@@ -15,7 +15,7 @@ void main() {
     });
   });
 
-  group('buildHead — core meta', () {
+  group('buildHead - core meta', () {
     test('minimal head: charset, title, viewport', () {
       expect(
         head(const SeoMeta(title: 'Home')),
@@ -67,7 +67,7 @@ void main() {
     });
   });
 
-  group('buildHead — Open Graph', () {
+  group('buildHead - Open Graph', () {
     test('emits present og fields in order', () {
       final html = head(
         SeoMeta(
@@ -101,7 +101,7 @@ void main() {
     });
   });
 
-  group('buildHead — Twitter Card', () {
+  group('buildHead - Twitter Card', () {
     test('summary_large_image with fields', () {
       final html = head(
         SeoMeta(
@@ -123,7 +123,7 @@ void main() {
     });
   });
 
-  group('buildHead — i18n and extras', () {
+  group('buildHead - i18n and extras', () {
     test('hreflang alternates', () {
       final html = head(
         SeoMeta(

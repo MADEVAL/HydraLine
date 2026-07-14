@@ -7,12 +7,12 @@ import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('product card (hybrid) golden — deterministic HTML', () {
+  test('product card (hybrid) golden - deterministic HTML', () {
     final html = const HtmlSerializer().serialize(_productCard());
     _expectGolden('product_card.html', html);
   });
 
-  test('HTMX fragment golden — no document shell', () {
+  test('HTMX fragment golden - no document shell', () {
     final fragment = const HtmlSerializer().serializeFragment(
       _reviewsFragment(),
     );
@@ -60,7 +60,7 @@ DocumentRootNode _productCard() => DocumentRootNode(
   head: HeadNode(
     children: [
       const MetaNode(charset: 'utf-8'),
-      const TitleNode('iPhone 15 — Store'),
+      const TitleNode('iPhone 15 - Store'),
       const MetaNode(name: 'description', content: 'Apple iPhone 15, 128 GB'),
       const MetaNode(property: 'og:title', content: 'iPhone 15'),
       const MetaNode(property: 'og:image', content: '/img/iphone15.jpg'),

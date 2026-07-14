@@ -1,7 +1,7 @@
 # Configuration
 
-Hydraline is configured through two primary manifests — the route manifest and
-the island manifest — plus additional settings for SEO, performance, caching,
+Hydraline is configured through two primary manifests - the route manifest and
+the island manifest - plus additional settings for SEO, performance, caching,
 and security.
 
 ## Route Manifest
@@ -145,7 +145,7 @@ programmatically as `IslandSpec` / `IslandManifest` for tooling.
 | `renderMode` | `ssr` (semantic fallback) or `skeletonOnly` (placeholder only) |
 | `styleMode` | `shadow` (isolated) or `scoped` (shared styles) |
 | `size` | `{width, height}` in px for anti-CLS reservation |
-| `state` | `Map<String, Object?>` — props passed to the island (JSON-safe types only) |
+| `state` | `Map<String, Object?>` - props passed to the island (JSON-safe types only) |
 | `mediaQuery` | CSS media query for `hydrateOnMedia` (serialized as `data-media`) |
 | `mountSelector` | CSS selector for conditional mounting |
 
@@ -232,7 +232,7 @@ validated with `const SeoValidator().validate(target)`.
 ### JS Budgets
 
 The runtime JS ships pretty and branded (readable source, no build step);
-raw sizes are hard limits enforced by tests. Serve with gzip/brotli — the
+raw sizes are hard limits enforced by tests. Serve with gzip/brotli - the
 compressed footprint stays small:
 
 | Asset | Budget (raw) | Level |
@@ -325,7 +325,7 @@ The validator warns when `UnsafeHtmlNode` is used without a sanitizer.
 
 ## Environment Variables
 
-Hydraline itself does not use environment variables — all configuration is
+Hydraline itself does not use environment variables - all configuration is
 through manifests and builder code. However, the server middleware and SSG
 runner operate within the host's environment:
 
@@ -333,11 +333,11 @@ runner operate within the host's environment:
 |---|---|
 | Port binding | User's shelf/Dart Frog setup |
 | Database connections | User's builder functions |
-| API keys / secrets | User's configuration — never logged by Hydraline |
+| API keys / secrets | User's configuration - never logged by Hydraline |
 
 ## See Also
 
-- [Getting Started](./getting-started.md) — installation, minimal examples
-- [Server](./server.md) — how the manifest drives SSR
-- [Flutter Widgets](./flutter-widgets.md) — how the manifest drives SSG
-- [Security](./security.md) — CSP, SafeUrl, data-state contract
+- [Getting Started](./getting-started.md) - installation, minimal examples
+- [Server](./server.md) - how the manifest drives SSR
+- [Flutter Widgets](./flutter-widgets.md) - how the manifest drives SSG
+- [Security](./security.md) - CSP, SafeUrl, data-state contract

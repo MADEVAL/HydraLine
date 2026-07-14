@@ -1,4 +1,4 @@
-# hydraline.routes.yaml — the single source of truth for routes and modes.
+# hydraline.routes.yaml - the single source of truth for routes and modes.
 version: "1"
 base_url: https://demo.example
 
