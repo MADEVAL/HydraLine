@@ -5,5 +5,8 @@
 /// `melos run boundaries`.
 library;
 
+export 'src/delivery.dart' show ResponseDelivery;
+export 'src/htmx.dart' show Htmx, HtmxResponse, HtmxTrigger;
 export 'src/http_semantics.dart' show Http, RedirectException;
-export 'src/middleware.dart';
+export 'src/middleware.dart'
+    show DocumentBuilder, HydralineConfig, hydralineMiddleware;
