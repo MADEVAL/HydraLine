@@ -57,7 +57,8 @@ class _HtmlSerializer implements HtmlSerializer {
   @override
   Stream<String> serializeToStream(DocumentNode root) async* {
     if (root is DocumentRootNode) {
-      final shell = StringBuffer('<!DOCTYPE html><html>');
+      final shell = StringBuffer();
+      _writeDoctype(root.lang, shell);
       final head = root.head;
       if (head != null) {
         _write(head, shell);
@@ -80,7 +81,7 @@ class _HtmlSerializer implements HtmlSerializer {
   void _write(DocumentNode node, StringSink out) {
     switch (node) {
       case final DocumentRootNode n:
-        out.write('<!DOCTYPE html><html>');
+        _writeDoctype(n.lang, out);
         final head = n.head;
         if (head != null) {
           _write(head, out);
@@ -232,6 +233,11 @@ class _HtmlSerializer implements HtmlSerializer {
         _writeVanillaIsland(n, out);
       case final UnsafeHtmlNode n:
         out.write(n.sanitize());
+      case final JsonLdNode n:
+        out
+          ..write('<script type="application/ld+json">')
+          ..write(_encodeJsonLd(n.json))
+          ..write('</script>');
     }
   }
 
@@ -240,6 +246,24 @@ class _HtmlSerializer implements HtmlSerializer {
       _write(node, out);
     }
   }
+
+  void _writeDoctype(String? lang, StringSink out) {
+    out.write('<!DOCTYPE html><html');
+    if (lang != null) {
+      out
+        ..write(' lang="')
+        ..write(escapeHtmlAttribute(lang))
+        ..write('"');
+    }
+    out.write('>');
+  }
+
+  /// Encodes JSON-LD, escaping `<`, `>` and `&` as `\uXXXX` so the payload can
+  /// never break out of the surrounding `<script>` element (S2/S4).
+  String _encodeJsonLd(Map<String, Object?> json) => jsonEncode(json)
+      .replaceAll('<', r'\u003c')
+      .replaceAll('>', r'\u003e')
+      .replaceAll('&', r'\u0026');
 
   void _writeMeta(MetaNode m, StringSink out) {
     out.write('<meta');

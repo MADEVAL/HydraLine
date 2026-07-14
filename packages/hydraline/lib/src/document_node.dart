@@ -20,10 +20,13 @@ sealed class DocumentNode {
 
 /// The document root: an optional `<head>` plus a body.
 final class DocumentRootNode extends DocumentNode {
-  const DocumentRootNode({this.head, required this.body});
+  const DocumentRootNode({this.head, required this.body, this.lang});
 
   final HeadNode? head;
   final List<DocumentNode> body;
+
+  /// Optional `lang` for the `<html>` element (SEO-8).
+  final String? lang;
 
   @override
   List<DocumentNode> get children => [if (head != null) head!, ...body];
@@ -329,6 +332,19 @@ final class UnsafeHtmlNode extends DocumentNode {
   /// Returns [sanitizer] applied to [rawHtml], or the raw HTML unchanged when
   /// no sanitizer was provided.
   String sanitize() => sanitizer?.call(rawHtml) ?? rawHtml;
+
+  @override
+  List<DocumentNode> get children => const [];
+}
+
+/// A `<script type="application/ld+json">` structured-data block (SEO-4).
+///
+/// This is the only `<script>` the serializer emits; its content is JSON data
+/// (not executable code) and is escaped to prevent `</script>` breakout.
+final class JsonLdNode extends DocumentNode {
+  const JsonLdNode(this.json);
+
+  final Map<String, Object?> json;
 
   @override
   List<DocumentNode> get children => const [];
