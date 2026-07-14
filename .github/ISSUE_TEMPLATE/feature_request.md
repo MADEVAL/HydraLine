@@ -10,16 +10,10 @@ labels: enhancement
 
 ## Proposed solution
 
-## Spec alignment
-- [ ] Does not violate non-goals (project spec: not a framework, no auto-conversion
-      of widgets, no cloaking, no C/C++/FFI)
-- [ ] Not in the list of consciously rejected ideas — or there is a new rationale
-
-## Package / phase
+## Package
 - Package: core / server / flutter
-- Expected phase: MVP (0–4) / post-MVP
 
 ## Acceptance criteria
-<!-- Which test/invariant/acceptance scenario confirms the feature -->
+<!-- Which test/scenario confirms the feature -->
 
 ## Alternatives

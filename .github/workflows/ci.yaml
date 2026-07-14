@@ -10,9 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Pure-Dart core + server across both OSes (line-ending / golden stability, R8/I10).
-  # Flutter is installed only to resolve the pub workspace; purity is enforced by
-  # the boundaries gate (I1), not by the absence of Flutter on the runner.
   core-server:
     name: core+server (${{ matrix.os }})
     strategy:
@@ -32,14 +29,13 @@ jobs:
         run: dart run melos:melos run analyze
       - name: test (dart)
         run: dart run melos:melos run test:dart
-      - name: golden (I4/I10)
+      - name: golden
         run: dart run melos:melos run test:golden
-      - name: security fuzz (I2/S4)
+      - name: security fuzz
         run: dart run melos:melos run test:security
-      - name: coverage gate (I9)
+      - name: coverage
         run: dart run melos:melos run test:coverage
 
-  # Flutter widget tests on the minimum supported and latest stable SDKs.
   flutter:
     name: flutter ${{ matrix.flutter }}
     strategy:
@@ -56,7 +52,6 @@ jobs:
       - name: flutter tests
         run: dart run melos:melos run test:flutter
 
-  # Known-regression SDK (#185034, R1): informational only, never blocks merges.
   flutter-known-issue:
     name: flutter 3.41.x (informational)
     runs-on: ubuntu-latest

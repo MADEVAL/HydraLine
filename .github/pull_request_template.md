@@ -1,31 +1,29 @@
-<!-- PR-шаблон Hydraline. Заполните все разделы; удалите неприменимые чекбоксы. -->
+<!-- Hydraline PR template. Fill in all sections; remove inapplicable checkboxes. -->
 
-## Что и зачем
-<!-- Краткое описание изменения и мотивация. -->
+## What and why
+<!-- Brief description of the change and motivation. -->
 
 Closes #
 
-## Тип
+## Type
 - [ ] feat  - [ ] fix  - [ ] docs  - [ ] test  - [ ] refactor  - [ ] perf  - [ ] build  - [ ] ci  - [ ] chore
 
-## Пакет
-- Пакет(ы): core / server / flutter / web / docs
+## Package
+- Package(s): core / server / flutter / web / docs
 
 ## Definition of Done
-- [ ] TDD: тесты предшествуют коду
-- [ ] `dart analyze` без ошибок; `dart format` проходит
-- [ ] Все тесты проходят
-- [ ] Обновлены example/ + dartdoc + CHANGELOG
+- [ ] TDD: tests precede code
+- [ ] `dart analyze` clean; `dart format` clean
+- [ ] All tests pass
+- [ ] Updated dartdoc + CHANGELOG
 
-## Затронутые инварианты
+## Public API changes
+- [ ] No
+- [ ] Yes
 
-## Изменения публичного API
-- [ ] Нет
-- [ ] Да → обновлены `packages/*/api/`
+## Security
+- [ ] Does not affect security
+- [ ] Affects → regression test added for the vector
 
-## Безопасность
-- [ ] Не затрагивает security
-- [ ] Затрагивает → добавлен регрессионный тест на вектор
-
-## Как проверить
-<!-- Команды/шаги для ревьюера -->
+## How to verify
+<!-- Commands/steps for reviewer -->
