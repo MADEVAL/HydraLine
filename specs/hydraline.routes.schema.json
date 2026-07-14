@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://hydraline.dev/schemas/hydraline.routes.schema.json",
+  "title": "Hydraline Route Manifest",
+  "description": "Схема канонического route-манифеста hydraline.routes.yaml (C-8, RM1). Валидируется в CI. Соответствует ARCHITECTURE.md §8.1 и packages/hydraline/api/manifests.dart.",
+  "type": "object",
+  "required": ["routes"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "description": "Версия схемы манифеста (SemVer). Опционально.",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
+    },
+    "base_url": {
+      "description": "Абсолютный базовый URL сайта для canonical/sitemap (SEO-7).",
+      "type": "string",
+      "format": "uri"
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/route" }
+    }
+  },
+  "$defs": {
+    "route": {
+      "type": "object",
+      "required": ["path", "mode"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "Путь маршрута (path-routing, без hash). Сегменты :name — динамические.",
+          "type": "string",
+          "pattern": "^/[^#]*$"
+        },
+        "mode": {
+          "description": "Режим рендера маршрута (WebRouteRenderMode).",
+          "type": "string",
+          "enum": ["app", "document", "hybrid"]
+        },
+        "metadata": { "$ref": "#/$defs/metadata" },
+        "content_source": {
+          "description": "Источник контента: 'widget' или 'widget:<Id>' (поверхность A, извлечение из Flutter-виджетов в build-time; :<Id> — опциональный page-builder) или 'dart_builder:<Id>' (поверхность B, pure-Dart билдер). Для mode=app не требуется.",
+          "type": "string",
+          "pattern": "^(widget(:[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*)?|dart_builder:[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*)$"
+        },
+        "dynamic_segments": {
+          "description": "Значения динамических сегментов для SSG (W-15). Ключ = имя сегмента без ':'.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1
+          }
+        },
+        "noindex": {
+          "description": "Явный noindex (meta + X-Robots-Tag). Для mode=app по умолчанию true (§4.1).",
+          "type": "boolean"
+        },
+        "sitemap": {
+          "description": "Включать ли маршрут в sitemap. Для mode=app по умолчанию false (§4.1).",
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "description": "document/hybrid требуют content_source.",
+          "if": { "properties": { "mode": { "enum": ["document", "hybrid"] } } },
+          "then": { "required": ["content_source"] }
+        }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 70 },
+        "description": { "type": "string", "maxLength": 320 },
+        "canonical": { "type": "string", "format": "uri-reference" },
+        "lang": { "type": "string" },
+        "robots": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "noindex": { "type": "boolean" },
+            "nofollow": { "type": "boolean" }
+          }
+        },
+        "open_graph": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "type": { "type": "string" },
+            "image": { "type": "string", "format": "uri-reference" },
+            "url": { "type": "string", "format": "uri-reference" },
+            "locale": { "type": "string" },
+            "site_name": { "type": "string" }
+          }
+        },
+        "twitter": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "card": { "type": "string", "enum": ["summary", "summary_large_image"] },
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "image": { "type": "string", "format": "uri-reference" },
+            "site": { "type": "string" },
+            "creator": { "type": "string" }
+          }
+        },
+        "hreflang": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["hreflang", "href"],
+            "additionalProperties": false,
+            "properties": {
+              "hreflang": { "type": "string" },
+              "href": { "type": "string", "format": "uri-reference" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
