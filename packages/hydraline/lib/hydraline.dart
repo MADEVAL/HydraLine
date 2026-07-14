@@ -8,4 +8,6 @@ library;
 export 'src/document_node.dart';
 export 'src/escaping.dart';
 export 'src/html_serializer.dart';
+export 'src/metadata.dart';
+export 'src/structured_data.dart';
 export 'src/validators.dart';
