@@ -3,7 +3,7 @@
 | Поле | Значение |
 |---|---|
 | Назначение | 4 эталонных приложения: демонстрация + **E2E-фикстуры** + материал adoption |
-| Базис | `HYDRALINE_SPEC_V3.md` §17 (A1–A10), `PHASE_4_PLAN.md` (P4-15) |
+| Базис | `HYDRALINE_SPEC_V3.md` §17 (A1–A10) |
 | Размещение | `packages/hydraline_flutter/example/<name>/` (+ серверные — `packages/hydraline_server/example/`) |
 | Двойная роль | Каждый пример покрывает конкретные приёмочные сценарии и режимы |
 

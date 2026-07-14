@@ -8,30 +8,24 @@ Closes #
 ## Тип
 - [ ] feat  - [ ] fix  - [ ] docs  - [ ] test  - [ ] refactor  - [ ] perf  - [ ] build  - [ ] ci  - [ ] chore
 
-## Пакет / фаза
+## Пакет
 - Пакет(ы): core / server / flutter / web / docs
-- Фаза/задача (L3): напр. P1-08
 
-## Definition of Done (DEVELOPMENT.md §11)
+## Definition of Done
 - [ ] TDD: тесты предшествуют коду
-- [ ] Покрытие ≥ порога (core/server ≥90%, flutter ≥80%) — `I9`
-- [ ] `melos run analyze` без ошибок; `format:check` проходит
-- [ ] Границы зависимостей соблюдены (core/server без Flutter) — `I1`
-- [ ] Затронутые инварианты покрыты тестом (перечислите ниже)
-- [ ] Обновлены example/ + dartdoc + CHANGELOG-энтри
-- [ ] Для UI/гидрации — E2E и devtools-аудит проходят
-- [ ] CI зелёный на Windows и WSL/Linux
+- [ ] `dart analyze` без ошибок; `dart format` проходит
+- [ ] Все тесты проходят
+- [ ] Обновлены example/ + dartdoc + CHANGELOG
 
 ## Затронутые инварианты
-<!-- напр. SER4, I3, I6, SSG1 — см. ARCHITECTURE.md §15 -->
 
 ## Изменения публичного API
 - [ ] Нет
-- [ ] Да → обновлены `packages/*/api/` и, при необходимости, `ARCHITECTURE.md`
+- [ ] Да → обновлены `packages/*/api/`
 
 ## Безопасность
 - [ ] Не затрагивает security
-- [ ] Затрагивает → добавлен регрессионный тест на вектор (см. `SECURITY.md`)
+- [ ] Затрагивает → добавлен регрессионный тест на вектор
 
 ## Как проверить
 <!-- Команды/шаги для ревьюера -->

@@ -66,35 +66,27 @@ Flutter Web рендерит UI в `<canvas>`. Первый HTTP-ответ — 
 
 ## Карта документации
 
-**Спецификация и исследования**
+**Спецификация**
 - `HYDRALINE_SPEC_V3.md` — **итоговое ТЗ v3.6** (единственный источник истины по продукту)
-- `HYDRALINE_SPEC.md`, `MITIGATION_PLAN.md`, `RISK_ANALYSIS.md`, `ADR_OPEN_QUESTIONS.md`,
-  `INDUSTRY_IDEAS.md`, `ALTERNATIVES_AND_ADJACENT.md` — исходные исследования
 
-**Инженерная документация (реализация)**
+**Инженерная документация**
 - `ARCHITECTURE.md` — **L1**: компоненты, контракты, инварианты, потоки данных
-- `DEVELOPMENT.md` — **L2**: среда, melos, тесты, CI, TDD, DoD
-- `PHASE_0..4_PLAN.md` — **L3**: 69 задач с приёмкой и оценками
 - `packages/*/api/` — **L4**: замороженные API-контракты + `JS_RUNTIME_CONTRACT.md`
 
 **Качество и трассируемость**
-- `REQUIREMENTS_TRACEABILITY.md` — покрытие всех требований (100%)
+- `REQUIREMENTS_TRACEABILITY.md` — покрытие всех требований
 - `ACCEPTANCE_TESTS.md` — сценарии A1–A10
 - `PERFORMANCE.md` — бюджеты и их измерение
 - `SECURITY.md` — модель угроз и политика раскрытия
 - `EXAMPLES.md` — 4 эталонных примера (они же E2E-фикстуры)
-
-**Процесс**
-- `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `docs/adr/` — вклад и решения
 
 ## С чего начать разработчику Hydraline
 
 ```powershell
 dart pub global activate melos
 melos bootstrap
-melos run precommit    # analyze + format + test + boundaries
+melos run test          # все тесты
 ```
-Подробнее — `DEVELOPMENT.md §3`.
 
 ## Дорожная карта
 
@@ -116,4 +108,4 @@ HTML-renderer.
 
 ---
 
-*Обратная связь и баги — через issues (см. `CONTRIBUTING.md`). Лицензия — MIT.*
+*Обратная связь и баги — через issues. Лицензия — MIT.*

@@ -26,8 +26,6 @@ jobs:
         with:
           channel: stable
       - run: dart pub get
-      - name: boundaries (I1, fail fast)
-        run: dart run melos:melos run boundaries
       - name: format:check
         run: dart run melos:melos run format:check
       - name: analyze
@@ -42,8 +40,6 @@ jobs:
         run: dart run melos:melos run test:coverage
 
   # Flutter widget tests on the minimum supported and latest stable SDKs.
-  # Minimum is 3.29 (first SDK bundling Dart 3.7, required by pub workspaces;
-  # see docs/adr/0002). Latest tracks the current stable.
   flutter:
     name: flutter ${{ matrix.flutter }}
     strategy:

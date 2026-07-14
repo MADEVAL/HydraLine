@@ -1,8 +1,7 @@
 /// Hydraline server — pure-Dart SSR, streaming, HTMX helpers and bot-aware
 /// delivery.
 ///
-/// This package must not import `package:flutter/*`; enforced by
-/// `melos run boundaries`.
+/// This package must not import `package:flutter/*`.
 library;
 
 export 'src/assets.dart' show Assets, defaultMetadataForRoute;

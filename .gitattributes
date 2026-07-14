@@ -1,4 +1,4 @@
-# Hydraline — line-ending and binary policy (DEVELOPMENT.md §8; XP1/XP4, R8).
+# Hydraline — line-ending and binary policy.
 
 # Normalize all text files to LF in the repository and on checkout.
 * text=auto eol=lf
