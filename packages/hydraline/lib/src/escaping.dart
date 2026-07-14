@@ -128,8 +128,7 @@ abstract final class Csp {
   /// Value for the `Content-Security-Policy` header.
   static String recommendedHeaderValue({
     List<String> extraDirectives = const [],
-  }) =>
-      [..._directives, ...extraDirectives].join('; ');
+  }) => [..._directives, ...extraDirectives].join('; ');
 
   /// `<meta http-equiv="Content-Security-Policy" content="...">`.
   static String metaTag({List<String> extraDirectives = const []}) {

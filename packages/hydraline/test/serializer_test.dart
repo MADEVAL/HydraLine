@@ -16,9 +16,7 @@ void main() {
         frag(
           AnchorNode(
             href: SafeUrl.parse('/a'),
-            children: const [
-              TextNode('L'),
-            ],
+            children: const [TextNode('L')],
           ),
         ),
         '<a href="/a">L</a>',
@@ -69,10 +67,7 @@ void main() {
     test('SectionNode roles map to semantic tags', () {
       expect(
         frag(
-          const SectionNode(
-            role: SectionRole.main,
-            children: [TextNode('m')],
-          ),
+          const SectionNode(role: SectionRole.main, children: [TextNode('m')]),
         ),
         '<main>m</main>',
       );
@@ -123,10 +118,7 @@ void main() {
     test('TimeNode', () {
       expect(
         frag(
-          const TimeNode(
-            dateTime: '2026-07-14',
-            children: [TextNode('Jul')],
-          ),
+          const TimeNode(dateTime: '2026-07-14', children: [TextNode('Jul')]),
         ),
         '<time datetime="2026-07-14">Jul</time>',
       );

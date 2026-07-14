@@ -13,7 +13,7 @@ topics:
   - prerender
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.7.0
 
 resolution: workspace
 

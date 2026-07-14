@@ -12,7 +12,8 @@ void main() {
     });
 
     test('sums records across files', () {
-      const lcov = 'SF:lib/a.dart\nLF:10\nLH:10\nend_of_record\n'
+      const lcov =
+          'SF:lib/a.dart\nLF:10\nLH:10\nend_of_record\n'
           'SF:lib/b.dart\nLF:10\nLH:0\nend_of_record\n';
       expect(lineCoverage(lcov), 50);
     });

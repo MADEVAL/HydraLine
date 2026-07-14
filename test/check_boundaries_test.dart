@@ -25,48 +25,51 @@ void main() {
     test('allows non-forbidden imports', () {
       const source = "import 'dart:async';\nimport 'package:meta/meta.dart';";
       expect(
-        findForbiddenImports(
-          source,
-          const ['package:flutter/', 'dart:ui', 'dart:html'],
-        ),
+        findForbiddenImports(source, const [
+          'package:flutter/',
+          'dart:ui',
+          'dart:html',
+        ]),
         isEmpty,
       );
     });
 
     test('does not false-positive on comments or string literals', () {
-      const source = "// import 'package:flutter/material.dart';\n"
+      const source =
+          "// import 'package:flutter/material.dart';\n"
           "const s = 'package:flutter/x.dart';";
-      expect(
-        findForbiddenImports(source, const ['package:flutter/']),
-        isEmpty,
-      );
+      expect(findForbiddenImports(source, const ['package:flutter/']), isEmpty);
     });
   });
 
   group('runCheck (invariant I1 — negative test)', () {
-    test('returns non-zero when a rule dir contains a forbidden import',
-        () async {
-      final tmp = await Directory.systemTemp.createTemp('hydraline_bnd_');
-      addTearDown(() => tmp.deleteSync(recursive: true));
-      File('${tmp.path}/offender.dart')
-          .writeAsStringSync("import 'package:flutter/widgets.dart';");
+    test(
+      'returns non-zero when a rule dir contains a forbidden import',
+      () async {
+        final tmp = await Directory.systemTemp.createTemp('hydraline_bnd_');
+        addTearDown(() => tmp.deleteSync(recursive: true));
+        File(
+          '${tmp.path}/offender.dart',
+        ).writeAsStringSync("import 'package:flutter/widgets.dart';");
 
-      final code = runCheck([
-        BoundaryRule(
-          name: 'core',
-          dir: tmp.path,
-          forbidden: const ['package:flutter/'],
-        ),
-      ]);
+        final code = runCheck([
+          BoundaryRule(
+            name: 'core',
+            dir: tmp.path,
+            forbidden: const ['package:flutter/'],
+          ),
+        ]);
 
-      expect(code, isNonZero);
-    });
+        expect(code, isNonZero);
+      },
+    );
 
     test('returns zero when every rule dir is clean', () async {
       final tmp = await Directory.systemTemp.createTemp('hydraline_bnd_');
       addTearDown(() => tmp.deleteSync(recursive: true));
-      File('${tmp.path}/clean.dart')
-          .writeAsStringSync("import 'dart:async';\nvoid main() {}");
+      File(
+        '${tmp.path}/clean.dart',
+      ).writeAsStringSync("import 'dart:async';\nvoid main() {}");
 
       final code = runCheck([
         BoundaryRule(

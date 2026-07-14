@@ -362,11 +362,11 @@ class _HtmlSerializer implements HtmlSerializer {
   }
 
   String _directiveAttr(HydrationDirective directive) => switch (directive) {
-        HydrationDirective.onLoad => 'hydrateOnLoad',
-        HydrationDirective.onIdle => 'hydrateOnIdle',
-        HydrationDirective.onVisible => 'hydrateOnVisible',
-        HydrationDirective.onInteraction => 'hydrateOnInteraction',
-        HydrationDirective.onMedia => 'hydrateOnMedia',
-        HydrationDirective.manual => 'hydrateManual',
-      };
+    HydrationDirective.onLoad => 'hydrateOnLoad',
+    HydrationDirective.onIdle => 'hydrateOnIdle',
+    HydrationDirective.onVisible => 'hydrateOnVisible',
+    HydrationDirective.onInteraction => 'hydrateOnInteraction',
+    HydrationDirective.onMedia => 'hydrateOnMedia',
+    HydrationDirective.manual => 'hydrateManual',
+  };
 }
