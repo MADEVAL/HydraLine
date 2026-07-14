@@ -72,7 +72,7 @@ melos:
 
     test:golden:
       description: Run only golden-tagged tests (line endings normalized to \n).
-      run: melos exec --no-flutter --dir-exists=test -- dart test --tags golden
+      run: melos exec --dir-exists=test/goldens -- dart test --tags golden
 
     boundaries:
       description: Scan for forbidden imports (invariant I1).
