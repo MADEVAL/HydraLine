@@ -30,20 +30,29 @@ class Violation {
   String toString() => '[$rule] $file imports $import';
 }
 
+/// A whole `import`/`export` directive, possibly spanning multiple lines
+/// (conditional imports), up to its terminating `;`.
 final RegExp _directive = RegExp(
-  r'''^\s*(?:import|export)\s+['"]([^'"]+)['"]''',
+  r'^\s*(?:import|export)\s+[^;]+;',
   multiLine: true,
 );
 
+/// A quoted URI inside a directive - the default one and every
+/// `if (dart.library.x) 'uri'` alternative.
+final RegExp _quotedUri = RegExp('''['"]([^'"]+)['"]''');
+
 /// Returns the URIs imported/exported by [source] that start with any of the
 /// [forbidden] prefixes. Comments and string literals are ignored because only
-/// leading `import`/`export` directives are matched.
+/// leading `import`/`export` directives are matched. Conditional directives
+/// contribute every alternative URI, not just the default one.
 List<String> findForbiddenImports(String source, List<String> forbidden) {
   final hits = <String>[];
   for (final match in _directive.allMatches(source)) {
-    final uri = match.group(1)!;
-    if (forbidden.any(uri.startsWith)) {
-      hits.add(uri);
+    for (final uriMatch in _quotedUri.allMatches(match.group(0)!)) {
+      final uri = uriMatch.group(1)!;
+      if (forbidden.any(uri.startsWith)) {
+        hits.add(uri);
+      }
     }
   }
   return hits;

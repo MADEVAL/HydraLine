@@ -54,9 +54,10 @@ Seo.image(
 })
 ```
 
-Registers an `ImageNode` (with `SafeUrl` validation). At runtime, renders a
-`SizedBox` with the given dimensions. If `src` is not a valid URL, registration
-is silently skipped.
+Registers an `ImageNode` (with `SafeUrl` validation). At runtime, renders an
+`Image.network` with `alt` as the semantic label; when the image cannot load
+it degrades to a `SizedBox` with the given dimensions. If `src` is not a
+valid URL, registration is silently skipped.
 
 ### Seo.link
 
@@ -64,14 +65,17 @@ is silently skipped.
 Seo.link({
   required String href,
   required Widget child,
+  VoidCallback? onTap,
   Key? key,
 })
 ```
 
 Registers an `AnchorNode`. When `child` is a `Text` widget, its string becomes
 the link label visible to crawlers; for other child widgets the label is empty
-- add `Seo.text` nearby for crawler-visible copy. At runtime, renders a
-`GestureDetector` wrapping `child`.
+- add `Seo.text` nearby for crawler-visible copy. At runtime the link is
+tappable and exposes link semantics: `onTap` wins when provided; otherwise
+internal hrefs (starting with `/`) navigate via `Navigator.pushNamed`.
+External hrefs need an explicit `onTap` (for example with `url_launcher`).
 
 ### Seo.section
 
@@ -165,6 +169,8 @@ Island({
   Widget? placeholder,
   Widget? errorFallback,
   String? mediaQuery,
+  String? kind,                       // required for IslandType.vanilla
+  String? endpoint,                   // required for IslandType.htmx
 })
 ```
 
@@ -176,10 +182,12 @@ Island({
 | `directive` | When the island hydrates (default: `onIdle`) |
 | `renderMode` | `ssr` (semantic fallback in HTML) or `skeletonOnly` (skeleton only) |
 | `styleMode` | `shadow` (isolated Shadow DOM) or `scoped` (CSS `@scope`, best for many identical islands) |
-| `width` / `height` | Reserved space in px - prevents Cumulative Layout Shift |
+| `width` / `height` | Reserved space in px - prevents Cumulative Layout Shift, serialized as `data-size` |
 | `placeholder` | Widget shown before hydration (default: sized `SizedBox`) |
 | `errorFallback` | Reserved for a future release; on failure the SSR fallback stays visible |
 | `mediaQuery` | CSS media query for `hydrateOnMedia` - serialized as `data-media` |
+| `kind` | Vanilla handler name (`data-island` attribute): `accordion`, `tabs`, ... - asserted non-null for vanilla islands |
+| `endpoint` | HTMX fragment endpoint (`hx-get`) - asserted non-null for htmx islands |
 
 ### Island Types
 
@@ -533,7 +541,7 @@ class ProductPage extends StatelessWidget {
       const Island(
         id: 'faq',
         type: IslandType.vanilla,
-        props: {'kind': 'accordion'},
+        kind: 'accordion',
       ),
     ]),
   );

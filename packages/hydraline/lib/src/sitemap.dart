@@ -164,8 +164,12 @@ abstract final class Sitemap {
     return b.endsWith('/') ? '$b$name' : '$b/$name';
   }
 
+  /// Escapes text and attribute values for XML output. `"` and `'` are
+  /// included so the same escaper is safe inside quoted attributes.
   static String _escape(String s) => s
       .replaceAll('&', '&amp;')
       .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;');
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&apos;');
 }

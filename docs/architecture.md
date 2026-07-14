@@ -27,7 +27,7 @@ needed to build and serialize semantic HTML:
 - Route manifest and island manifest
 - `SsgCollector` for widget extraction
 - SEO validators and CLI audit tools
-- Level 0–1 web assets (vanilla islands, HTMX glue)
+- Level 0-1 web assets (vanilla islands, HTMX glue)
 
 ### `hydraline_server`
 
@@ -41,7 +41,7 @@ or Dart Frog:
 - HTMX helpers (`renderFragment`, `HtmxResponse`, `HtmxTrigger`)
 - HTTP semantics (status codes, redirects, `X-Robots-Tag`)
 - Caching (in-memory, pluggable)
-- Asset serving (sitemap, robots, L0–L1 JS)
+- Asset serving (sitemap, robots, L0-L1 JS)
 
 ### `hydraline_flutter`
 
@@ -220,8 +220,8 @@ Build-time static site generation:
       Seo.* widgets self-register into SsgCollector (SsgSandbox harness)
    c. Fallback: metadata-only shell from the manifest
 3. Serialize DocumentNode → HTML files in dist/
-4. Generate sitemap.xml + robots.txt
-5. Copy island runtime assets into dist/ (only if Flutter islands exist)
+4. Generate sitemap.xml (absolute URLs from base_url) + robots.txt
+5. Write island runtime JS into dist/ (only if Flutter islands exist)
 6. Output: self-contained dist/ ready for static hosting
 ```
 

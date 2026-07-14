@@ -3,6 +3,10 @@
 /// The hierarchy is `sealed`, so the serializer walks it with an exhaustive
 /// `switch` (no external visitor). Invariants: immutable, text stored raw (escaped only on serialization),
 /// URL fields are always [SafeUrl], deterministic, tree without cycles.
+///
+/// Nodes have `const` constructors and store the child lists they are given
+/// without copying; callers must not mutate a list after passing it in
+/// (prefer `const` literals or freshly built lists).
 library;
 
 import 'escaping.dart' show SafeUrl;

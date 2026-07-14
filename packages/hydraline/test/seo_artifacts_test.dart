@@ -88,6 +88,23 @@ void main() {
         ),
       );
     });
+
+    test('escapes double quotes in alternate href attributes', () async {
+      final source = _ListSource([
+        SitemapEntry(
+          loc: SafeUrl.parse('https://x.example/p'),
+          alternates: [
+            (hreflang: 'en', href: SafeUrl.parse('https://x.example/p?q="x"')),
+          ],
+        ),
+      ]);
+      final xml = (await Sitemap.generate(
+        source,
+        baseUrl: base,
+      )).files['sitemap.xml']!;
+      expect(xml, contains('href="https://x.example/p?q=&quot;x&quot;"'));
+      expect(xml, isNot(contains('q="x"')));
+    });
   });
 
   group('Sitemap.generate - autosplit', () {
@@ -139,6 +156,26 @@ void main() {
       );
       expect(txt, contains('User-agent: *'));
       expect(txt, contains('User-agent: Googlebot'));
+    });
+
+    test('rejects a user agent containing a line break', () {
+      expect(
+        () => Robots.generate(
+          rules: const [RobotsRule(userAgent: '*\nDisallow: /')],
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects a path containing a line break', () {
+      expect(
+        () => Robots.generate(
+          rules: const [
+            RobotsRule(userAgent: '*', disallow: ['/a\r\nAllow: /secret']),
+          ],
+        ),
+        throwsArgumentError,
+      );
     });
   });
 }

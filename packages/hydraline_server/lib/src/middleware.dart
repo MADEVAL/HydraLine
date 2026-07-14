@@ -30,12 +30,15 @@ class HydralineConfig {
 
   final RouteManifest manifest;
 
-  /// Per-path pure-Dart [DocumentNode] builders (surface B).
+  /// Pure-Dart [DocumentNode] builders (surface B), keyed by the route path
+  /// exactly as it appears in the manifest - including dynamic patterns such
+  /// as `/product/:id`. The matched route's pattern selects the builder; the
+  /// concrete request path is available on the [Request] passed to it.
   final Map<String, DocumentBuilder> builders;
 
   /// Optional server-side HTML cache. When set, rendered pages are stored
-  /// per path, responses carry an `ETag`, and `If-None-Match` revalidation
-  /// returns `304 Not Modified`.
+  /// per canonical path + query string, responses carry an `ETag`, and
+  /// `If-None-Match` revalidation returns `304 Not Modified`.
   final HydralineCache? cache;
 
   /// TTL for cached entries; also emitted as
@@ -71,7 +74,9 @@ Middleware hydralineMiddleware(HydralineConfig config) {
 
   return (Handler inner) {
     return (Request request) async {
-      final path = request.url.path.isEmpty ? '/' : '/${request.url.path}';
+      final path = Http.canonicalizePath(
+        request.url.path.isEmpty ? '/' : '/${request.url.path}',
+      );
       final match = _matchRoute(routes, path);
 
       if (match == null) {
@@ -86,21 +91,24 @@ Middleware hydralineMiddleware(HydralineConfig config) {
         case RouteMode.document:
         case RouteMode.hybrid:
           final robotsHeaders = _robotsHeaders(match);
+          final builder = builders[match.path];
 
           if (cache != null) {
-            final cached = await cache.get(path);
+            final query = request.url.query;
+            final cacheKey = query.isEmpty ? path : '$path?$query';
+            final cached = await cache.get(cacheKey);
             String html;
             if (cached != null) {
               html = cached;
             } else {
               final DocumentNode root;
               try {
-                root = await _buildRoot(builders[path], request);
+                root = await _buildRoot(builder, request);
               } on RedirectException catch (e) {
                 return _redirectResponse(e);
               }
               html = const HtmlSerializer().serialize(root);
-              await cache.set(path, html, ttl: cacheTtl);
+              await cache.set(cacheKey, html, ttl: cacheTtl);
             }
             return _cachedResponse(
               request,
@@ -113,7 +121,7 @@ Middleware hydralineMiddleware(HydralineConfig config) {
 
           final DocumentNode root;
           try {
-            root = await _buildRoot(builders[path], request);
+            root = await _buildRoot(builder, request);
           } on RedirectException catch (e) {
             return _redirectResponse(e);
           }
@@ -152,7 +160,7 @@ Map<String, String> _robotsHeaders(RouteEntry route) {
     return const {};
   }
   final values = [if (noindex) 'noindex', if (nofollow) 'nofollow'].join(', ');
-  return {'X-Robots-Tag': values};
+  return {'x-robots-tag': values};
 }
 
 Response _cachedResponse(
@@ -166,10 +174,11 @@ Response _cachedResponse(
   final headers = <String, String>{
     ...robotsHeaders,
     'ETag': etag,
+    'Vary': 'Accept-Encoding',
     if (cacheTtl != null)
       'Cache-Control': 'public, max-age=${cacheTtl.inSeconds}',
   };
-  if (request.headers['if-none-match'] == etag) {
+  if (_ifNoneMatchContains(request.headers['if-none-match'], etag)) {
     return Response(304, headers: headers);
   }
   return Response(
@@ -179,14 +188,38 @@ Response _cachedResponse(
   );
 }
 
-/// Deterministic FNV-1a hash over the HTML - stable across process restarts.
+/// RFC 9110 `If-None-Match`: a comma-separated list of entity tags, each
+/// optionally prefixed with the weak validator marker `W/`, or `*`.
+bool _ifNoneMatchContains(String? headerValue, String etag) {
+  if (headerValue == null) {
+    return false;
+  }
+  if (headerValue.trim() == '*') {
+    return true;
+  }
+  for (final candidate in headerValue.split(',')) {
+    var value = candidate.trim();
+    if (value.startsWith('W/')) {
+      value = value.substring(2);
+    }
+    if (value == etag) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Deterministic 64-bit FNV-1a hash over the HTML - stable across process
+/// restarts, formatted as 16 lowercase hex digits.
 String _etag(String html) {
-  var hash = 0x811c9dc5;
+  var hash = 0xcbf29ce484222325;
   for (final unit in html.codeUnits) {
     hash ^= unit;
-    hash = (hash * 0x01000193) & 0xFFFFFFFF;
+    hash *= 0x100000001b3;
   }
-  return '"${hash.toRadixString(16)}"';
+  final high = (hash >>> 32).toRadixString(16).padLeft(8, '0');
+  final low = (hash & 0xFFFFFFFF).toRadixString(16).padLeft(8, '0');
+  return '"$high$low"';
 }
 
 bool _isBotRequest(Request request, Pattern? botUserAgentPattern) {

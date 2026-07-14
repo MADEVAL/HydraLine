@@ -1,9 +1,14 @@
 name: CI
 
+# Temporarily disabled: manual trigger only. Restore the push/pull_request
+# triggers below to re-enable.
+#
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}

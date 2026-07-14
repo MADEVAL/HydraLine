@@ -1,3 +1,21 @@
+## 0.0.2
+
+- **Breaking:** `HtmlSerializer()` no longer takes `SerializerOptions`; the
+  dead `pretty` option is removed.
+- **Breaking:** `SsgCollector.addIsland` throws `ArgumentError` for an htmx
+  spec without `endpoint` or a vanilla spec without `kind` (previously
+  produced dead `hx-get=""` / `data-island=""` islands silently).
+- **Breaking:** `Robots.generate` throws `ArgumentError` when a user agent or
+  path contains a line break (robots.txt directive injection guard).
+- Flutter island placeholders now serialize their reserved size as a
+  `data-size="w,h"` attribute (consumed by the client runtime for anti-CLS).
+- `RouteManifest.baseUrl` exposes the parsed `base_url`.
+- Sitemap XML now escapes `"`/`'` in attribute values (`xhtml:link href`).
+- Audit CLI: the default HTTP fetcher (`defaultHtmlFetcher`, now public)
+  applies a 30 s timeout and fails on non-2xx responses instead of auditing
+  error pages.
+- Escaping fast-path regexes are compiled once (hot-path micro-optimisation).
+
 ## 0.0.1
 
 Initial release.
@@ -25,5 +43,5 @@ Initial release.
 - `SeoValidator` + `Audit` - SEO/safety validation and crawler-view audit.
 - `dart run hydraline:audit` - CLI: standalone page audit and
   `--server-integration` buffered↔chunked body-identity check.
-- Level 0–1 web assets: `vanillaIslandsJs` (≤ 8 KB), `htmxGlueJs` (< 1 KB).
+- Level 0-1 web assets: `vanillaIslandsJs` (≤ 8 KB), `htmxGlueJs` (< 1 KB).
 - `Csp` - recommended Content-Security-Policy helper.

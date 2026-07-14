@@ -37,10 +37,16 @@ routes:
     });
 
     test('path with trailing slash is matched via normalisation', () async {
-      final response = await httpGet(handler, '/blog/');
-      // The raw path '/' + 'blog/' - middleware sees '/blog/' which doesn't
-      // exactly match. But /blog is a prefix match for /blog/:slug.
+      final response = await httpGet(handler, '/deep/nested/');
+      // '/deep/nested/' canonicalizes to '/deep/nested' (exact match).
       expect(response.statusCode, 200);
+    });
+
+    test('trailing slash never matches a dynamic segment as empty', () async {
+      final response = await httpGet(handler, '/blog/');
+      // '/blog/' canonicalizes to '/blog'; there is no '/blog' route and an
+      // empty ':slug' segment must not match.
+      expect(response.statusCode, 404);
     });
 
     test('app route passes through, returning inner handler content', () async {

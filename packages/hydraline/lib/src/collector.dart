@@ -106,10 +106,25 @@ DocumentNode _islandNode(IslandSpec spec) => switch (spec.type) {
     state: spec.state,
     mediaQuery: spec.mediaQuery,
   ),
-  IslandType.htmx => HtmxIslandNode(id: spec.id, endpoint: spec.endpoint ?? ''),
+  IslandType.htmx => HtmxIslandNode(
+    id: spec.id,
+    endpoint:
+        spec.endpoint ??
+        (throw ArgumentError.value(
+          spec.endpoint,
+          'spec.endpoint',
+          'an htmx island requires an endpoint',
+        )),
+  ),
   IslandType.vanilla => VanillaIslandNode(
     id: spec.id,
-    kind: spec.kind ?? '',
+    kind:
+        spec.kind ??
+        (throw ArgumentError.value(
+          spec.kind,
+          'spec.kind',
+          'a vanilla island requires a kind',
+        )),
     children: const [],
   ),
 };

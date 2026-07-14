@@ -32,6 +32,16 @@ void main() {
       expect(jsCustomElement, contains('shadow'));
       expect(jsCustomElement, contains('style'));
     });
+
+    test('DSD fallback adopts the server-rendered template content', () {
+      expect(jsCustomElement, contains('template[shadowrootmode]'));
+      expect(jsCustomElement, isNot(contains("this.innerHTML = ''")));
+    });
+
+    test('data-size reserves dimensions on the host element', () {
+      expect(jsCustomElement, contains(':host{width:'));
+      expect(jsCustomElement, isNot(contains('.host{width:')));
+    });
   });
 
   group('Virtual Views JS', () {
@@ -93,6 +103,14 @@ void main() {
 
     test('carries the Hydraline banner', () {
       expect(jsDispatcher, contains('HYDRALINE'));
+    });
+
+    test('does not re-wire when evaluated twice', () {
+      expect(jsDispatcher, contains('if (window.hydraline)'));
+    });
+
+    test('dehydrate guards against removing a re-hydrated view', () {
+      expect(jsDispatcher, contains('islandViews[id] !== viewId'));
     });
   });
 

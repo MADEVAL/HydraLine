@@ -191,6 +191,6 @@ advisory and a regression test for the specific vector.
 
 ## See Also
 
-- [Security Policy](../SECURITY.md) � reporting and response timelines
-- [Document Model](./document-model.md) � escaping and SafeUrl reference
-- [Server](./server.md) � bot-aware delivery in practice
+- [Security Policy](../SECURITY.md) - reporting and response timelines
+- [Document Model](./document-model.md) - escaping and SafeUrl reference
+- [Server](./server.md) - bot-aware delivery in practice

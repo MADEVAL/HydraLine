@@ -5,9 +5,11 @@ A minimal full-stack demo of all three Hydraline packages working together:
 | File | Shows |
 |---|---|
 | [`lib/main.dart`](lib/main.dart) | Flutter app with `Seo.*` widgets and `Island` zones - [`hydraline_flutter`](../packages/hydraline_flutter/) |
+| [`lib/content.dart`](lib/content.dart) | Pure-Dart page builders (surface B) shared by SSR and SSG |
 | [`lib/island_main.dart`](lib/island_main.dart) | Island entry-point: `IslandMultiViewApp` + deferred island factories |
 | [`web/flutter_bootstrap.js`](web/flutter_bootstrap.js) | Custom bootstrap exposing `window._hydralineApp` (multi-view engine contract) |
 | [`bin/server.dart`](bin/server.dart) | SSR server: streaming, bot-aware delivery, caching - [`hydraline_server`](../packages/hydraline_server/) |
+| [`bin/build.dart`](bin/build.dart) | SSG build: manifest + the same builders -> static `dist/` |
 | [`hydraline.routes.yaml`](hydraline.routes.yaml) | Route manifest: `document` / `hybrid` / `app` modes - [`hydraline`](../packages/hydraline/) |
 
 ## Run the SSR server
@@ -26,9 +28,11 @@ curl http://localhost:8080/robots.txt
 
 ```bash
 cd example
-dart run hydraline_flutter:build hydraline.routes.yaml dist
+dart run hydraline_example:build hydraline.routes.yaml dist
 # dist/: index.html, product/espresso.html, product/grinder.html,
-#        sitemap.xml, robots.txt
+#        sitemap.xml, robots.txt, hydraline-*.js runtime assets.
+# bin/build.dart feeds the manifest + the pure-Dart builders from
+# lib/content.dart into runSsgCli - full page content, not just metadata.
 ```
 
 ## Run the Flutter app

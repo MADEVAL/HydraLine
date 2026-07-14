@@ -16,9 +16,22 @@ class DemoShopApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'Hydraline Demo Shop',
-    routes: {
-      '/': (_) => const HomePage(),
-      '/product': (_) => const ProductPage(id: 'espresso'),
+    onGenerateRoute: (settings) {
+      final name = settings.name ?? '/';
+      if (name == '/') {
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const HomePage(),
+        );
+      }
+      final product = RegExp(r'^/product/([^/]+)$').firstMatch(name);
+      if (product != null) {
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ProductPage(id: product.group(1)!),
+        );
+      }
+      return null;
     },
   );
 }
@@ -78,11 +91,7 @@ class ProductPage extends StatelessWidget {
           ),
 
           // Level 1 island: vanilla JS accordion, no Flutter engine at all.
-          Island(
-            id: 'faq-$id',
-            type: IslandType.vanilla,
-            props: const {'kind': 'accordion'},
-          ),
+          Island(id: 'faq-$id', type: IslandType.vanilla, kind: 'accordion'),
         ],
       ),
     ),

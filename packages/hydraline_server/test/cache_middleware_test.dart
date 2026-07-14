@@ -86,6 +86,135 @@ void main() {
       expect(response.headers.containsKey('etag'), isFalse);
       expect(response.contentLength, isNull);
     });
+
+    test('different query strings are cached separately', () async {
+      const manifestYaml = '''
+routes:
+  - path: /search
+    mode: document
+''';
+      final handler = hydralineMiddleware(
+        HydralineConfig(
+          manifest: RouteManifest.parseYaml(manifestYaml),
+          builders: {
+            '/search': (request, _) => DocumentRootNode(
+              body: [
+                ParagraphNode(
+                  children: [TextNode('q=${request.url.queryParameters['q']}')],
+                ),
+              ],
+            ),
+          },
+          cache: HydralineCache.inMemory(),
+        ),
+      )((_) async => Response.notFound(''));
+
+      final first = await httpGet(handler, '/search?q=alpha');
+      final second = await httpGet(handler, '/search?q=beta');
+      expect(await bodyOf(first), contains('q=alpha'));
+      expect(await bodyOf(second), contains('q=beta'));
+    });
+
+    test('cacheable responses carry a Vary header', () async {
+      final handler = hydralineMiddleware(
+        HydralineConfig(
+          manifest: RouteManifest.parseYaml(_manifestYaml),
+          builders: {'/': (_, _) => const DocumentRootNode(body: [])},
+          cache: HydralineCache.inMemory(),
+          cacheTtl: const Duration(minutes: 5),
+        ),
+      )((_) async => Response.notFound(''));
+
+      final response = await httpGet(handler, '/');
+      expect(response.headers['vary'], 'Accept-Encoding');
+    });
+
+    test('If-None-Match with an ETag list returns 304', () async {
+      final handler = hydralineMiddleware(
+        HydralineConfig(
+          manifest: RouteManifest.parseYaml(_manifestYaml),
+          builders: {'/': (_, _) => const DocumentRootNode(body: [])},
+          cache: HydralineCache.inMemory(),
+        ),
+      )((_) async => Response.notFound(''));
+
+      final first = await httpGet(handler, '/');
+      final etag = first.headers['etag']!;
+
+      final second = await httpGet(
+        handler,
+        '/',
+        headers: {'If-None-Match': '"stale-etag", $etag'},
+      );
+      expect(second.statusCode, 304);
+    });
+
+    test('If-None-Match with a weak validator returns 304', () async {
+      final handler = hydralineMiddleware(
+        HydralineConfig(
+          manifest: RouteManifest.parseYaml(_manifestYaml),
+          builders: {'/': (_, _) => const DocumentRootNode(body: [])},
+          cache: HydralineCache.inMemory(),
+        ),
+      )((_) async => Response.notFound(''));
+
+      final first = await httpGet(handler, '/');
+      final etag = first.headers['etag']!;
+
+      final second = await httpGet(
+        handler,
+        '/',
+        headers: {'If-None-Match': 'W/$etag'},
+      );
+      expect(second.statusCode, 304);
+    });
+
+    test('ETag is a 64-bit hash (16 hex digits)', () async {
+      final handler = hydralineMiddleware(
+        HydralineConfig(
+          manifest: RouteManifest.parseYaml(_manifestYaml),
+          builders: {'/': (_, _) => const DocumentRootNode(body: [])},
+          cache: HydralineCache.inMemory(),
+        ),
+      )((_) async => Response.notFound(''));
+
+      final response = await httpGet(handler, '/');
+      expect(response.headers['etag'], matches(r'^"[0-9a-f]{16}"$'));
+    });
+
+    test(
+      'trailing slash and duplicate slashes hit the same cache entry',
+      () async {
+        const manifestYaml = '''
+routes:
+  - path: /page
+    mode: document
+''';
+        var builds = 0;
+        final handler = hydralineMiddleware(
+          HydralineConfig(
+            manifest: RouteManifest.parseYaml(manifestYaml),
+            builders: {
+              '/page': (_, _) {
+                builds++;
+                return const DocumentRootNode(
+                  body: [
+                    ParagraphNode(children: [TextNode('canonical page')]),
+                  ],
+                );
+              },
+            },
+            cache: HydralineCache.inMemory(),
+          ),
+        )((_) async => Response.notFound(''));
+
+        final first = await httpGet(handler, '/page/');
+        final second = await httpGet(handler, '//page');
+        expect(builds, 1);
+        expect(await bodyOf(first), contains('canonical page'));
+        expect(await bodyOf(second), contains('canonical page'));
+      },
+    );
   });
 
   group('HydralineCache', () {

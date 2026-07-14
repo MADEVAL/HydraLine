@@ -1,3 +1,18 @@
+## 0.0.2
+
+- **Fixed:** builders registered under dynamic route patterns
+  (`/product/:id`) are now invoked for matching concrete paths; previously
+  dynamic routes silently rendered empty pages.
+- **Fixed:** the HTML cache key now includes the query string;
+  `/page?a=1` and `/page?a=2` no longer share one entry.
+- Request paths are canonicalised (duplicate/trailing slashes) before route
+  matching and cache lookup.
+- ETag upgraded to 64-bit FNV-1a; `If-None-Match` handles ETag lists, weak
+  validators (`W/`) and `*` per RFC 9110.
+- Cacheable responses carry `Vary: Accept-Encoding`.
+- **Breaking:** `HydralineCache.set` lost its unused `etag` parameter.
+- `X-Robots-Tag` header name is emitted lowercase consistently.
+
 ## 0.0.1
 
 Initial release.
@@ -20,7 +35,7 @@ Initial release.
   `trigger`, `redirect` (`HX-Redirect`), plus `HtmxResponse` with
   retarget/reswap headers.
 - `Assets.serveCoreAssets` - robots.txt, sitemap.xml and the first-party
-  L0–L1 JS bundles (`vanilla-islands.js`, `htmx-glue.js`).
+  L0-L1 JS bundles (`vanilla-islands.js`, `htmx-glue.js`).
 - `Assets.injectFlutterAssets` - Flutter script injection for island routes.
 - `Http` - status helpers, path canonicalization, `withRobots`.
 - `DartFrogAdapter` - Dart Frog integration.

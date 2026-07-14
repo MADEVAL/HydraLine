@@ -34,16 +34,16 @@ top.** No new framework. No rewrite. One route at a time.
   `og:*`/`twitter:*` tags, JSON-LD - all present in `view-source`, no
   JavaScript required.
 - **Three interactivity levels.** Static HTML (no JS) → vanilla + HTMX
-  islands (~8–14 KB, no Flutter engine) → full Flutter islands (engine loads
+  islands (~8-14 KB, no Flutter engine) → full Flutter islands (engine loads
   only when an island actually triggers). ~80% of content-page interactivity
   never needs the engine at all.
 - **Zero cloaking, by architecture.** Content builders physically cannot see
   the `User-Agent` - bots and users get byte-identical bodies, only the
   transport differs (buffered vs streamed). Verifiable with one CLI command.
 - **Safe by the type system.** All text is contextually escaped; URLs must
-  pass the `SafeUrl` scheme allowlist (`javascript:`/`data:` blocked at
-  compile time); raw HTML requires an explicit `UnsafeHtmlNode` opt-in.
-  Backed by a million-input XSS fuzz suite.
+  pass the `SafeUrl` scheme allowlist (`javascript:`/`data:` rejected at
+  construction - no node can hold an unchecked URL); raw HTML requires an
+  explicit `UnsafeHtmlNode` opt-in. Backed by a million-input XSS fuzz suite.
 - **Zero layout shift.** Islands reserve exact pixel dimensions with
   Declarative Shadow DOM skeletons - CLS ≈ 0.
 - **SSR and SSG from one model.** The same `DocumentNode` tree streams from a
@@ -58,9 +58,9 @@ top.** No new framework. No rewrite. One route at a time.
 ```yaml
 # pubspec.yaml
 dependencies:
-  hydraline: ^0.0.1           # core - pure Dart
-  hydraline_server: ^0.0.1    # SSR - pure Dart (shelf / Dart Frog)
-  hydraline_flutter: ^0.0.1   # widgets + SSG + web runtime
+  hydraline: ^0.0.2           # core - pure Dart
+  hydraline_server: ^0.0.2    # SSR - pure Dart (shelf / Dart Frog)
+  hydraline_flutter: ^0.0.2   # widgets + SSG + web runtime
 ```
 
 Build a page in pure Dart:
@@ -103,11 +103,28 @@ final handler = const Pipeline()
     .addHandler((req) => Response.ok('app shell'));
 ```
 
-Or ship it static:
+Or ship it static - a tiny `bin/build.dart` registers the same builders for
+the SSG pipeline (full version: [example/bin/build.dart](example/bin/build.dart)):
+
+```dart
+import 'package:hydraline_flutter/build.dart'; // pure-Dart build surface
+
+void main(List<String> args) async {
+  await runSsgCli(
+    manifestPath: 'hydraline.routes.yaml',
+    outputDir: 'dist',
+    adapter: Navigator2Adapter([]),
+    islandFactories: {'calculator': IslandType.flutter},
+    builders: {'/': (path) => page},
+  );
+}
+```
 
 ```bash
-dart run hydraline_flutter:build hydraline.routes.yaml dist
-# dist/: HTML pages + sitemap.xml + robots.txt - ready for any static host
+dart run your_app:build
+# dist/: HTML pages + sitemap.xml + robots.txt - ready for any static host.
+# (dart run hydraline_flutter:build <manifest> <dist> renders metadata-only
+#  shells when you have no builders yet.)
 ```
 
 And prove there's no cloaking:
@@ -131,7 +148,7 @@ hybrid     HTML + Flutter islands      product page + calculator
 Interactivity levels
 ────────────────────
 L0  static HTML             0 KB JS      <details>, :target, loading=lazy
-L1  vanilla + HTMX          ~8–14 KB     tabs, forms, search - no engine
+L1  vanilla + HTMX          ~8-14 KB     tabs, forms, search - no engine
 L2  Flutter islands         on trigger   charts, configurators, 3D
 ```
 

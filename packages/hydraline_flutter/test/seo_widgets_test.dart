@@ -47,6 +47,16 @@ void main() {
       expect(node.width, 640);
       expect(node.height, 480);
     });
+
+    testWidgets('renders an Image widget at runtime', (tester) async {
+      await tester.pumpWidget(
+        sandbox(Seo.image('/img/a.png', alt: 'A', width: 64, height: 48)),
+      );
+      await tester.pump();
+      expect(find.byType(Image), findsOneWidget);
+      final image = tester.widget<Image>(find.byType(Image));
+      expect(image.semanticLabel, 'A');
+    });
   });
 
   group('Seo.link', () {
@@ -65,6 +75,51 @@ void main() {
       final node = seal().body[0] as AnchorNode;
       final html = const HtmlSerializer().serializeFragment(node);
       expect(html, '<a href="/about">About me</a>');
+    });
+
+    testWidgets('tap invokes the provided onTap callback', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HydraApp(
+            child: Seo.link(
+              href: '/about',
+              onTap: () => tapped = true,
+              child: const Text('About'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('About'));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('tap navigates to an internal href by default', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          routes: {
+            '/': (_) => HydraApp(
+              child: Seo.link(href: '/about', child: const Text('About')),
+            ),
+            '/about': (_) => const Text('about page'),
+          },
+        ),
+      );
+      await tester.tap(find.text('About'));
+      await tester.pumpAndSettle();
+      expect(find.text('about page'), findsOneWidget);
+    });
+
+    testWidgets('exposes link semantics', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HydraApp(
+            child: Seo.link(href: '/about', child: const Text('About')),
+          ),
+        ),
+      );
+      final semantics = tester.getSemantics(find.text('About'));
+      expect(semantics.flagsCollection.isLink, isTrue);
     });
   });
 
@@ -175,6 +230,40 @@ void main() {
       );
       final node = seal().body[0] as IslandPlaceholderNode;
       expect(node.renderMode, IslandRenderMode.skeletonOnly);
+    });
+
+    testWidgets('vanilla island registers its kind', (tester) async {
+      await tester.pumpWidget(
+        sandbox(Island(id: 'faq', type: IslandType.vanilla, kind: 'accordion')),
+      );
+      final node = seal().body[0] as VanillaIslandNode;
+      expect(node.kind, 'accordion');
+      final html = const HtmlSerializer().serializeFragment(node);
+      expect(html, contains('data-island="accordion"'));
+    });
+
+    testWidgets('htmx island registers its endpoint', (tester) async {
+      await tester.pumpWidget(
+        sandbox(
+          Island(id: 'reviews', type: IslandType.htmx, endpoint: '/api/r'),
+        ),
+      );
+      final node = seal().body[0] as HtmxIslandNode;
+      expect(node.endpoint, '/api/r');
+    });
+
+    test('vanilla island without a kind fails fast', () {
+      expect(
+        () => Island(id: 'faq', type: IslandType.vanilla),
+        throwsAssertionError,
+      );
+    });
+
+    test('htmx island without an endpoint fails fast', () {
+      expect(
+        () => Island(id: 'reviews', type: IslandType.htmx),
+        throwsAssertionError,
+      );
     });
   });
 }

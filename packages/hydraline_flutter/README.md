@@ -15,7 +15,8 @@ Re-exports the whole `hydraline` core: one import gives you the full API.
 | `IslandMultiViewApp` / `IslandHost` | Multi-view runtime - one engine, one FlutterView per island |
 | `IslandViewRegistry` | View → island bindings, populated automatically from `addView()` initialData |
 | `SsgRunner` | Build-time SSG - routes → HTML + sitemap + robots into `dist/` |
-| `dart run hydraline_flutter:build` | SSG CLI (plain Dart VM) |
+| `dart run hydraline_flutter:build` | SSG CLI (plain Dart VM) - metadata shells; register builders via `runSsgCli` for full pages |
+| `package:hydraline_flutter/build.dart` | Pure-Dart build surface for your own `bin/build.dart` (`runSsgCli`, adapters) |
 | `RouteAdapter` | go_router / Navigator 2.0 adapters for build-time route traversal |
 | `SsgSandbox` | Build-time stub ancestors (MediaQuery, Directionality) for extraction |
 | `SsgDevTools` | Island diagnostics - props size warnings, anti-CLS checks |
@@ -61,8 +62,10 @@ class ProductPage extends StatelessWidget {
 ```
 
 ```bash
-# Generate static HTML from the route manifest
+# Generate static HTML from the route manifest (metadata shells):
 dart run hydraline_flutter:build hydraline.routes.yaml dist
+# Full page bodies: call runSsgCli from your own bin/build.dart with
+# pure-Dart builders - see ../../example/bin/build.dart.
 ```
 
 Runnable example: [`example/lib/main.dart`](example/lib/main.dart) - a product

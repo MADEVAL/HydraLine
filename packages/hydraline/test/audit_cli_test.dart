@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:hydraline/hydraline.dart';
@@ -133,6 +134,57 @@ void main() {
       );
       expect(code, 64);
       expect(err.toString(), contains('Usage'));
+    });
+  });
+
+  group('defaultHtmlFetcher', () {
+    test(
+      'throws on a non-2xx response instead of auditing the error page',
+      () async {
+        final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+        addTearDown(() => server.close(force: true));
+        server.listen((request) {
+          request.response
+            ..statusCode = 404
+            ..write('<html><head><title>404</title></head></html>');
+          request.response.close();
+        });
+
+        final fetcher = defaultHtmlFetcher();
+        expect(
+          () => fetcher(Uri.parse('http://127.0.0.1:${server.port}/missing')),
+          throwsA(isA<HttpException>()),
+        );
+      },
+    );
+
+    test('times out when the server never responds', () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      addTearDown(() => server.close(force: true));
+      server.listen((request) {
+        // Never respond.
+      });
+
+      final fetcher = defaultHtmlFetcher(
+        timeout: const Duration(milliseconds: 200),
+      );
+      expect(
+        () => fetcher(Uri.parse('http://127.0.0.1:${server.port}/slow')),
+        throwsA(isA<TimeoutException>()),
+      );
+    });
+
+    test('returns the body of a 200 response', () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      addTearDown(() => server.close(force: true));
+      server.listen((request) {
+        request.response.write('<html>ok</html>');
+        request.response.close();
+      });
+
+      final fetcher = defaultHtmlFetcher();
+      final body = await fetcher(Uri.parse('http://127.0.0.1:${server.port}/'));
+      expect(body, '<html>ok</html>');
     });
   });
 }

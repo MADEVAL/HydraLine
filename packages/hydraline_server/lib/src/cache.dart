@@ -8,7 +8,7 @@ abstract interface class HydralineCache {
   factory HydralineCache.inMemory({int maxSize}) = InMemoryCache;
 
   Future<String?> get(String key);
-  Future<void> set(String key, String html, {Duration? ttl, String? etag});
+  Future<void> set(String key, String html, {Duration? ttl});
 
   /// Removes a cached entry (no-op when absent).
   Future<void> invalidate(String key);
@@ -37,18 +37,9 @@ class InMemoryCache implements HydralineCache {
   }
 
   @override
-  Future<void> set(
-    String key,
-    String html, {
-    Duration? ttl,
-    String? etag,
-  }) async {
+  Future<void> set(String key, String html, {Duration? ttl}) async {
     _store.remove(key);
-    _store[key] = _Entry(
-      html,
-      ttl != null ? DateTime.now().add(ttl) : null,
-      etag,
-    );
+    _store[key] = _Entry(html, ttl != null ? DateTime.now().add(ttl) : null);
     while (_store.length > maxSize) {
       _store.remove(_store.keys.first);
     }
@@ -61,9 +52,8 @@ class InMemoryCache implements HydralineCache {
 }
 
 class _Entry {
-  const _Entry(this.html, this.expiresAt, this.etag);
+  const _Entry(this.html, this.expiresAt);
 
   final String html;
   final DateTime? expiresAt;
-  final String? etag;
 }

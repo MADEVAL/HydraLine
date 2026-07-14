@@ -12,7 +12,8 @@ We aim to acknowledge reports within 48 hours and provide a fix within 7 days.
 
 | Version | Supported |
 |---|---|
-| latest | Yes |
+| 0.0.x (latest release) | Yes |
+| older releases | No |
 
 ## Security Model
 

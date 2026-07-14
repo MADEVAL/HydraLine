@@ -36,12 +36,18 @@ customElements.define(
         return;
       }
 
-      /* Reuse the declarative shadow root, or create one on the fly. */
+      /* Reuse the declarative shadow root, or create one on the fly. On
+       * browsers without DSD support the server-rendered <template> is
+       * still inert in the light DOM: adopt its content so the fallback
+       * markup and styles stay visible. */
       var shadow = this.shadowRoot;
       if (!shadow) {
         shadow = this.attachShadow({ mode: 'open' });
-        this.innerHTML = '';
-        this.appendChild(document.createElement('template').content);
+        var template = this.querySelector('template[shadowrootmode]');
+        if (template) {
+          shadow.appendChild(template.content);
+          this.removeChild(template);
+        }
       }
 
       /* Containment keeps island layout and paint isolated from the page. */
@@ -57,7 +63,7 @@ customElements.define(
       if (size) {
         var parts = size.split(',');
         style.textContent +=
-          '.host{width:' + parts[0] + 'px;height:' + parts[1] + 'px}';
+          ':host{width:' + parts[0] + 'px;height:' + parts[1] + 'px}';
       }
 
       /* Pin observed dimensions as explicit constraints (Flutter #185034). */

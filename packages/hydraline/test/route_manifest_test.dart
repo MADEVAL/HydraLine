@@ -54,6 +54,18 @@ void main() {
       expect(app.contentSource, isNull);
     });
 
+    test('exposes the parsed base_url', () {
+      final manifest = RouteManifest.parseYaml(_yaml);
+      expect(manifest.baseUrl, 'https://x.example');
+    });
+
+    test('baseUrl is null when the YAML omits base_url', () {
+      final manifest = RouteManifest.parseYaml(
+        'routes:\n  - path: /\n    mode: document\n',
+      );
+      expect(manifest.baseUrl, isNull);
+    });
+
     test('rejects a route without a path or mode', () {
       expect(
         () => RouteManifest.parseYaml('routes:\n  - mode: document\n'),

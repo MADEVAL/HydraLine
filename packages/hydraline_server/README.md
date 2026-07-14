@@ -13,7 +13,7 @@ and HTMX helpers for shelf and Dart Frog.
 | `Htmx` / `HtmxResponse` | Fragment rendering, `HX-Trigger`, `HX-Redirect`, retarget/reswap |
 | `RedirectException` | 301/302/custom + `.gone()` (410) from inside builders |
 | `Http` | Status helpers, `X-Robots-Tag`, path canonicalization |
-| `Assets` | robots.txt, sitemap.xml, first-party L0–L1 JS + Flutter asset injection |
+| `Assets` | robots.txt, sitemap.xml, first-party L0-L1 JS + Flutter asset injection |
 | `DartFrogAdapter` | Drop-in adapter for Dart Frog servers |
 
 ## Rules

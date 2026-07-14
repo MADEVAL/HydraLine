@@ -105,7 +105,7 @@ melos:
 
     audit:build:
       description: Generate the example static site into example/TEMP/audit-dist.
-      run: dart run melos:melos exec --scope=hydraline_example -- dart run hydraline_flutter:build hydraline.routes.yaml TEMP/audit-dist
+      run: dart run melos:melos exec --scope=hydraline_example -- dart run hydraline_example:build hydraline.routes.yaml TEMP/audit-dist
 
     audit:check:
       description: Run the SEO audit CLI against the generated home page.
@@ -118,3 +118,4 @@ melos:
         - format:check
         - test
         - boundaries
+        - audit

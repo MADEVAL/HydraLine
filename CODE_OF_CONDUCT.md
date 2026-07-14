@@ -33,8 +33,11 @@ Examples of unacceptable behavior:
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the project team. All complaints will be reviewed and investigated
-promptly and fairly.
+reported to the maintainer, Yevhen Leonidov, via the contact form at
+[leonidov.dev](https://leonidov.dev) or through a private
+[GitHub report](https://github.com/MADEVAL/HydraLine/issues/new) marked
+confidential. All complaints will be reviewed and investigated promptly and
+fairly.
 
 ## Attribution
 

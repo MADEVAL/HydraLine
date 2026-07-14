@@ -11,18 +11,10 @@ import 'dart:convert';
 import 'document_node.dart';
 import 'escaping.dart';
 
-/// Output options.
-class SerializerOptions {
-  const SerializerOptions({this.pretty = false});
-
-  /// Pretty vs minified (determinism preserved either way).
-  final bool pretty;
-}
-
 /// Serializes a [DocumentNode] tree to HTML.
 abstract interface class HtmlSerializer {
   /// Default implementation.
-  const factory HtmlSerializer([SerializerOptions options]) = _HtmlSerializer;
+  const factory HtmlSerializer() = _HtmlSerializer;
 
   /// Buffered HTML (bots / SSG file).
   String serialize(DocumentNode root);
@@ -35,10 +27,7 @@ abstract interface class HtmlSerializer {
 }
 
 class _HtmlSerializer implements HtmlSerializer {
-  const _HtmlSerializer([this.options = const SerializerOptions()]);
-
-  // ignore: unused_field
-  final SerializerOptions options;
+  const _HtmlSerializer();
 
   @override
   String serialize(DocumentNode root) {
@@ -333,13 +322,21 @@ class _HtmlSerializer implements HtmlSerializer {
         ..write(escapeHtmlAttribute(media))
         ..write('"');
     }
+    final size = n.size;
+    if (size != null) {
+      out
+        ..write(' data-size="')
+        ..write(size.width)
+        ..write(',')
+        ..write(size.height)
+        ..write('"');
+    }
     out
       ..write(' data-state="')
       ..write(escapeHtmlAttribute(jsonEncode(n.state)))
       ..write('" role="region" aria-busy="true">')
       ..write('<template shadowrootmode="open"><style>')
       ..write(':host{display:block;contain:layout style paint}');
-    final size = n.size;
     if (size != null) {
       out
         ..write('.host{width:')

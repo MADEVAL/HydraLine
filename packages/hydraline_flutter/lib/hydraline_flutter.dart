@@ -22,6 +22,7 @@ export 'src/island_host.dart'
 export 'src/route_adapter.dart'
     show GoRouterAdapter, Navigator2Adapter, RouteAdapter, RouteInfo;
 export 'src/seo_widgets.dart' show Seo;
+export 'src/ssg_cli.dart' show runSsgCli;
 export 'src/ssg_devtools.dart';
 export 'src/ssg_dom_diff.dart';
 export 'src/ssg_runner.dart'

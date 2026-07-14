@@ -47,6 +47,26 @@ void main() {
       expect(root.body[2], isA<VanillaIslandNode>());
     });
 
+    test('addIsland rejects an htmx spec without an endpoint', () {
+      final collector = SsgCollector('/r');
+      expect(
+        () => collector.addIsland(
+          const IslandSpec(id: 'h', type: IslandType.htmx),
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('addIsland rejects a vanilla spec without a kind', () {
+      final collector = SsgCollector('/r');
+      expect(
+        () => collector.addIsland(
+          const IslandSpec(id: 'v', type: IslandType.vanilla),
+        ),
+        throwsArgumentError,
+      );
+    });
+
     test('addIsland carries mediaQuery through to the serialized HTML', () {
       final root = sealed((c) {
         c.addIsland(

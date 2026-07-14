@@ -4,12 +4,15 @@
 /// zero XSS on fuzzing, CSP helper.
 library;
 
+final RegExp _textSpecials = RegExp('[&<>]');
+final RegExp _attributeSpecials = RegExp('[&<>"\']');
+
 /// Escapes text content: `&`, `<`, `>` become entities.
 ///
 /// Quotes are intentionally left untouched - text and attribute contexts use
 /// different escapers so they can never be confused (see [escapeHtmlAttribute]).
 String escapeHtmlText(String input) {
-  if (!input.contains(RegExp('[&<>]'))) {
+  if (!input.contains(_textSpecials)) {
     return input;
   }
   final buffer = StringBuffer();
@@ -30,7 +33,7 @@ String escapeHtmlText(String input) {
 
 /// Escapes an attribute value: `&`, `<`, `>`, `"`, `'` become entities.
 String escapeHtmlAttribute(String input) {
-  if (!input.contains(RegExp('[&<>"\']'))) {
+  if (!input.contains(_attributeSpecials)) {
     return input;
   }
   final buffer = StringBuffer();
@@ -66,8 +69,8 @@ abstract interface class SafeUrl {
   /// (`/`, `./`, `#`, `?`, bare paths). Blocked: everything else, including
   /// `javascript:`, `data:`, `vbscript:`.
   static SafeUrl? tryParse(String raw) {
-    final cleaned = raw.replaceAll(RegExp('[\u0000-\u001F\u007F]'), '').trim();
-    final scheme = RegExp(r'^([a-zA-Z][a-zA-Z0-9+.\-]*):').firstMatch(cleaned);
+    final cleaned = raw.replaceAll(_controlChars, '').trim();
+    final scheme = _schemePattern.firstMatch(cleaned);
     if (scheme != null &&
         !_allowedSchemes.contains(scheme.group(1)!.toLowerCase())) {
       return null;
@@ -86,6 +89,9 @@ abstract interface class SafeUrl {
 }
 
 const Set<String> _allowedSchemes = {'http', 'https', 'mailto', 'tel'};
+
+final RegExp _controlChars = RegExp('[\u0000-\u001F\u007F]');
+final RegExp _schemePattern = RegExp(r'^([a-zA-Z][a-zA-Z0-9+.\-]*):');
 
 final class _SafeUrl implements SafeUrl {
   const _SafeUrl(this.value);

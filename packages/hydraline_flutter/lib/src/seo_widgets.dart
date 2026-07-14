@@ -41,12 +41,21 @@ abstract final class Seo {
     key: key ?? ValueKey('seo-img-$src'),
   );
 
-  static Widget link({required String href, required Widget child, Key? key}) =>
-      _SeoLink(
-        href: href,
-        child: child,
-        key: key ?? ValueKey('seo-link-$href'),
-      );
+  /// A link with dual nature: registers an `<a href>` for extraction and is
+  /// tappable at runtime. When [onTap] is omitted, internal hrefs (starting
+  /// with `/`) navigate via `Navigator.pushNamed`; external hrefs need an
+  /// explicit [onTap] (for example with `url_launcher`).
+  static Widget link({
+    required String href,
+    required Widget child,
+    VoidCallback? onTap,
+    Key? key,
+  }) => _SeoLink(
+    href: href,
+    onTap: onTap,
+    child: child,
+    key: key ?? ValueKey('seo-link-$href'),
+  );
 
   static Widget section({
     required SectionRole role,
@@ -124,15 +133,29 @@ class _SeoImage extends StatelessWidget {
         context,
       ).collector?.addImage(url, alt, width: width, height: height);
     }
-    return SizedBox(width: width?.toDouble(), height: height?.toDouble());
+    final w = width?.toDouble();
+    final h = height?.toDouble();
+    return Image.network(
+      src,
+      width: w,
+      height: h,
+      semanticLabel: alt,
+      errorBuilder: (_, _, _) => SizedBox(width: w, height: h),
+    );
   }
 }
 
 class _SeoLink extends StatelessWidget {
-  const _SeoLink({required this.href, required this.child, super.key});
+  const _SeoLink({
+    required this.href,
+    required this.child,
+    this.onTap,
+    super.key,
+  });
 
   final String href;
   final Widget child;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +167,24 @@ class _SeoLink extends StatelessWidget {
       };
       HydraScope.of(context).collector?.addLink(url, label);
     }
-    return GestureDetector(child: child);
+    return Semantics(
+      link: true,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap ?? () => _navigate(context),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  void _navigate(BuildContext context) {
+    if (!href.startsWith('/')) {
+      return;
+    }
+    Navigator.maybeOf(context)?.pushNamed(href);
   }
 }
 

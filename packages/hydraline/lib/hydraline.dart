@@ -7,7 +7,7 @@ library;
 export 'src/assets/htmx_glue.dart' show htmxGlueJs;
 export 'src/assets/vanilla_islands.dart' show vanillaIslandsJs;
 export 'src/audit.dart';
-export 'src/audit_cli.dart' show HtmlFetcher, runAuditCli;
+export 'src/audit_cli.dart' show HtmlFetcher, defaultHtmlFetcher, runAuditCli;
 export 'src/collector.dart';
 export 'src/document_node.dart';
 export 'src/escaping.dart';

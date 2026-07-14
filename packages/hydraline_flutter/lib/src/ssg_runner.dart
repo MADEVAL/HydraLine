@@ -4,10 +4,13 @@
 library;
 
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:hydraline/hydraline.dart';
 
+import 'assets/js_custom_element.dart' show jsCustomElement;
+import 'assets/js_dispatcher.dart' show jsDispatcher;
+import 'assets/js_service_worker.dart' show jsServiceWorker;
+import 'assets/js_virtual_views.dart' show jsVirtualViews;
 import 'route_adapter.dart' show RouteAdapter;
 
 /// Generates the default [SeoMeta] for a route when no explicit metadata is
@@ -36,11 +39,15 @@ class SsgResult {
 /// concrete path expanded from the route pattern it is registered under.
 typedef SsgPageBuilder = DocumentNode Function(String path);
 
-/// MUST be executed inside a flutter_tester harness
-/// (`flutter test --tags ssg`). Never plain `dart run`.
+/// Runs on the plain Dart VM (`dart run hydraline_flutter:build` or a custom
+/// `bin/build.dart`). Page content comes from registered pure-Dart
+/// [SsgPageBuilder]s (surface B); routes without a builder produce a
+/// metadata-only shell from the manifest. Widget-based extraction (surface A)
+/// happens separately via `SsgCollector` inside a `flutter test --tags ssg`
+/// harness.
 abstract interface class SsgRunner {
   factory SsgRunner({
-    required Object routeManifest,
+    required RouteManifest routeManifest,
     required RouteAdapter routeAdapter,
     required Map<String, Object?> islandFactories,
     Map<String, SsgPageBuilder> builders,
@@ -64,12 +71,12 @@ class _SsgRunner implements SsgRunner {
        _builders = builders;
 
   factory _SsgRunner.create({
-    required Object routeManifest,
+    required RouteManifest routeManifest,
     required RouteAdapter routeAdapter,
     required Map<String, Object?> islandFactories,
     Map<String, SsgPageBuilder> builders = const {},
   }) => _SsgRunner(
-    manifest: routeManifest as RouteManifest,
+    manifest: routeManifest,
     adapter: routeAdapter,
     islandFactories: islandFactories,
     builders: builders,
@@ -90,6 +97,10 @@ class _SsgRunner implements SsgRunner {
     if (!await dir.exists()) {
       await dir.create(recursive: true);
     }
+
+    // Sitemap origin: the manifest base_url wins; the localhost fallback
+    // keeps output valid for local previews when no base_url is configured.
+    final baseUrl = SafeUrl.parse(_origin(_manifest.baseUrl));
 
     final entries = <SitemapEntry>[];
     var pagesWritten = 0;
@@ -116,14 +127,13 @@ class _SsgRunner implements SsgRunner {
         final canonical = route.metadata?.canonical;
         entries.add(
           SitemapEntry(
-            loc: canonical ?? SafeUrl.parse('https://localhost$concretePath'),
+            loc: canonical ?? SafeUrl.parse('${baseUrl.value}$concretePath'),
           ),
         );
       }
     }
 
     // Sitemap
-    final baseUrl = SafeUrl.parse('https://localhost');
     final sitemapOutput = await Sitemap.generate(
       _ListSource(entries),
       baseUrl: baseUrl,
@@ -168,33 +178,22 @@ class _SsgRunner implements SsgRunner {
     );
   }
 
+  /// The first-party runtime files, written from the inline constants that
+  /// are byte-identical to this package's `web/` sources (locked by test).
+  /// The application's own `web/` host files (`index.html`,
+  /// `flutter_bootstrap.js`, ...) are never touched - copying them would
+  /// overwrite the generated pages.
+  static const Map<String, String> _runtimeAssets = {
+    'hydraline-dispatcher.js': jsDispatcher,
+    'hydraline-island.js': jsCustomElement,
+    'hydraline-virtual-views.js': jsVirtualViews,
+    'service-worker.js': jsServiceWorker,
+  };
+
   Future<void> _copyAssets(String outputDir) async {
-    final webDir = await _findWebDir();
-    if (webDir == null) return;
-
-    await for (final entity in webDir.list()) {
-      if (entity is File) {
-        final name = entity.uri.pathSegments.last;
-        await entity.copy('$outputDir/$name');
-      }
+    for (final asset in _runtimeAssets.entries) {
+      await File('$outputDir/${asset.key}').writeAsString(asset.value);
     }
-  }
-
-  Future<Directory?> _findWebDir() async {
-    final cwdWeb = Directory('web');
-    if (await cwdWeb.exists()) return cwdWeb;
-
-    try {
-      final libUri = await Isolate.resolvePackageUri(
-        Uri.parse('package:hydraline_flutter/hydraline_flutter.dart'),
-      );
-      if (libUri != null) {
-        final resolved = Directory.fromUri(libUri.resolve('../../web/'));
-        if (await resolved.exists()) return resolved;
-      }
-    } catch (_) {}
-
-    return null;
   }
 
   String _filePath(String outputDir, String routePath) {
@@ -204,6 +203,12 @@ class _SsgRunner implements SsgRunner {
     }
     path = path.replaceAll(':', '-');
     return '$outputDir$path';
+  }
+
+  /// Strips a trailing slash so `origin + path` never doubles the separator.
+  static String _origin(String? baseUrl) {
+    final base = baseUrl ?? 'https://localhost';
+    return base.endsWith('/') ? base.substring(0, base.length - 1) : base;
   }
 }
 
@@ -217,13 +222,42 @@ class _ListSource implements SitemapSource {
 
 /// Expands dynamic segment patterns into concrete paths.
 abstract final class DynamicSegments {
+  /// [segments] maps a route pattern (e.g. `/blog/:category/:slug`) to its
+  /// per-segment values. Every named segment is replaced by each of its
+  /// values; multiple segments expand as a cartesian product in declaration
+  /// order. Throws [ArgumentError] when a named segment has no values.
   static List<String> expand(Map<String, Map<String, List<String>>> segments) {
     final expanded = <String>[];
     for (final entry in segments.entries) {
-      for (final value in entry.value.values.expand((v) => v)) {
-        expanded.add(entry.key.replaceFirst(RegExp(r':[^/]+'), value));
-      }
+      expanded.addAll(_expandPattern(entry.key, entry.value));
     }
     return expanded;
+  }
+
+  static List<String> _expandPattern(
+    String pattern,
+    Map<String, List<String>> values,
+  ) {
+    final parts = pattern.split('/');
+    var paths = <List<String>>[parts];
+    for (var i = 0; i < parts.length; i++) {
+      if (!parts[i].startsWith(':')) {
+        continue;
+      }
+      final name = parts[i].substring(1);
+      final segmentValues = values[name];
+      if (segmentValues == null || segmentValues.isEmpty) {
+        throw ArgumentError.value(
+          values,
+          'segments',
+          'no values for ":$name" in "$pattern"',
+        );
+      }
+      paths = [
+        for (final path in paths)
+          for (final value in segmentValues) List.of(path)..[i] = value,
+      ];
+    }
+    return [for (final path in paths) path.join('/')];
   }
 }

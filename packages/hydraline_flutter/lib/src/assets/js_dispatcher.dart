@@ -58,6 +58,11 @@ const jsDispatcher =
 (function () {
   'use strict';
 
+  /* Re-evaluating the script must not wire duplicate listeners. */
+  if (window.hydraline) {
+    return;
+  }
+
   var doc = document;
   var win = window;
 
@@ -276,12 +281,18 @@ const jsDispatcher =
     var el = find(id);
     var viewId = islandViews[id];
     if (viewId !== undefined && enginePromise) {
+      delete islandViews[id];
       enginePromise.then(function (app) {
-        if (app && typeof app.removeView === 'function') {
+        /* Skip removal if the island re-hydrated onto this view id in the
+         * meantime - never tear down a freshly mounted view. */
+        if (
+          app &&
+          typeof app.removeView === 'function' &&
+          islandViews[id] !== viewId
+        ) {
           app.removeView(viewId);
         }
       });
-      delete islandViews[id];
     }
     if (el) {
       setState(el, 'pending');
@@ -319,14 +330,21 @@ const jsDispatcher =
       hydrate(el.id);
       return;
     }
+    var remove = function (listener) {
+      if (mql.removeEventListener) {
+        mql.removeEventListener('change', listener);
+      } else {
+        mql.removeListener(listener);
+      }
+    };
     var listener = function (event) {
+      if (!find(el.id)) {
+        remove(listener); /* island left the DOM: stop listening */
+        return;
+      }
       if (event.matches) {
         hydrate(el.id);
-        if (mql.removeEventListener) {
-          mql.removeEventListener('change', listener);
-        } else {
-          mql.removeListener(listener);
-        }
+        remove(listener);
       }
     };
     if (mql.addEventListener) {
@@ -395,7 +413,7 @@ const jsDispatcher =
   /* -- public API ---------------------------------------------------------------- */
 
   win.hydraline = {
-    version: '0.0.1',
+    version: '0.0.2',
     config: config,
     views: islandViews,
     hydrate: hydrate,

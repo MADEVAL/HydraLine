@@ -58,6 +58,10 @@ class RouteEntry {
 abstract interface class RouteManifest {
   List<RouteEntry> get routes;
 
+  /// Absolute site origin from `base_url`, used for generated absolute URLs
+  /// (e.g. sitemap `loc` values). `null` when the YAML omits it.
+  String? get baseUrl;
+
   /// Parses the canonical YAML.
   static RouteManifest parseYaml(String yaml) => _parseYaml(yaml);
 
@@ -93,6 +97,8 @@ class _RouteManifest implements RouteManifest {
   final List<RouteEntry> routes;
 
   final String? version;
+
+  @override
   final String? baseUrl;
 
   @override

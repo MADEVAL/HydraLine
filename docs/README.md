@@ -41,7 +41,7 @@ Level 1  Vanilla (~8 KB) + HTMX (~14 KB)     TTI ~50 ms, no Flutter
 Level 2  Flutter islands (CanvasKit)          engine loaded on island trigger
 ```
 
-80% of interactivity on content pages is covered by levels 0–1 without loading
+80% of interactivity on content pages is covered by levels 0-1 without loading
 the Flutter engine at all.
 
 ## Route Modes (per-route, coexist in one app)
@@ -78,7 +78,7 @@ Worker caches the engine, making warm visits ~1 second TTI.
 
 | Package | Role | Requires Flutter? |
 |---|---|---|
-| `hydraline` | Pure-Dart core: DocumentNode, HTML serializer, escaping, metadata, JSON-LD, sitemap, robots, manifests, validators, audit CLI, L0–L1 web assets | No |
+| `hydraline` | Pure-Dart core: DocumentNode, HTML serializer, escaping, metadata, JSON-LD, sitemap, robots, manifests, validators, audit CLI, L0-L1 web assets | No |
 | `hydraline_server` | Pure-Dart server: shelf/Dart Frog middleware, SSR handler, streaming delivery, HTMX helpers, caching, HTTP semantics | No |
 | `hydraline_flutter` | Flutter package: `Seo.*` widgets, `Island` widget, `HydraApp`, `IslandHost`, SSG runner, go_router adapter, L2 web runtime (Custom Element, dispatcher, Service Worker) | Yes |
 
@@ -97,9 +97,9 @@ This invariant is verified in CI.
 ```yaml
 # pubspec.yaml
 dependencies:
-  hydraline: ^0.0.1
-  hydraline_server: ^0.0.1    # for SSR
-  hydraline_flutter: ^0.0.1   # for widgets / SSG
+  hydraline: ^0.0.2
+  hydraline_server: ^0.0.2    # for SSR
+  hydraline_flutter: ^0.0.2   # for widgets / SSG
 ```
 
 ```dart

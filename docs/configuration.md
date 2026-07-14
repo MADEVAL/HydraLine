@@ -57,7 +57,7 @@ routes:
 | Field | Type | Description |
 |---|---|---|
 | `version` | string | Manifest schema version |
-| `base_url` | string | Base URL for generating absolute canonical URLs |
+| `base_url` | string | Site origin for generated absolute URLs (sitemap `loc`, canonicals). Exposed as `RouteManifest.baseUrl`; the SSG runner falls back to `https://localhost` when omitted |
 | `routes` | list | Array of route entries |
 
 #### Route Entry
@@ -268,8 +268,8 @@ compressed footprint stays small:
 
 | Scenario | TTI |
 |---|---|
-| Cold cache, 4G | ~3–5 seconds |
-| Cold cache, 3G | ~10–19 seconds |
+| Cold cache, 4G | ~3-5 seconds |
+| Cold cache, 3G | ~10-19 seconds |
 | Warm cache (Service Worker) | ~1 second |
 
 ## Security Settings

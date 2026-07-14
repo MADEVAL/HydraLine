@@ -40,6 +40,27 @@ void main() {
           "const s = 'package:flutter/x.dart';";
       expect(findForbiddenImports(source, const ['package:flutter/']), isEmpty);
     });
+
+    test('flags the alternative URI of a conditional import', () {
+      const source =
+          "import 'stub.dart' if (dart.library.html) 'dart:html';\n"
+          'void main() {}';
+      expect(
+        findForbiddenImports(source, const ['dart:html']),
+        contains('dart:html'),
+      );
+    });
+
+    test('flags a conditional export alternative spanning lines', () {
+      const source =
+          "export 'stub.dart'\n"
+          "    if (dart.library.ui) 'dart:ui'\n"
+          "    if (dart.library.html) 'dart:html';";
+      expect(
+        findForbiddenImports(source, const ['dart:ui', 'dart:html']),
+        containsAll(<String>['dart:ui', 'dart:html']),
+      );
+    });
   });
 
   group('runCheck (invariant I1 - negative test)', () {

@@ -15,9 +15,14 @@ import 'package:hydraline/hydraline.dart'
 
 import 'hydra_app.dart' show HydraScope;
 
-/// A declarative island zone. In SSG mode it self-registers an
-/// `IslandPlaceholderNode`; at runtime the actual inter-activity is driven by
-/// the Hydraline dispatcher JS.
+/// A declarative island zone. In SSG mode it self-registers an island node
+/// matching its [type]; at runtime the actual interactivity is driven by
+/// the Hydraline dispatcher JS (flutter), the vanilla runtime (vanilla) or
+/// HTMX (htmx).
+///
+/// The island spec is captured once, at first registration into the
+/// enclosing collector. During extraction each route is built fresh, so
+/// this is the value the generated HTML carries.
 class Island extends StatefulWidget {
   const Island({
     required this.id,
@@ -31,8 +36,17 @@ class Island extends StatefulWidget {
     this.placeholder,
     this.errorFallback,
     this.mediaQuery,
+    this.kind,
+    this.endpoint,
     super.key,
-  });
+  }) : assert(
+         type != IslandType.vanilla || kind != null,
+         'a vanilla island requires a kind (e.g. kind: "accordion")',
+       ),
+       assert(
+         type != IslandType.htmx || endpoint != null,
+         'an htmx island requires an endpoint (e.g. endpoint: "/api/x")',
+       );
 
   final String id;
   final IslandType type;
@@ -45,6 +59,13 @@ class Island extends StatefulWidget {
   final Widget? placeholder;
   final Widget? errorFallback;
   final String? mediaQuery;
+
+  /// Vanilla island handler name (`data-island` attribute), for example
+  /// `accordion`, `tabs`, `carousel`. Required when [type] is vanilla.
+  final String? kind;
+
+  /// HTMX fragment endpoint (`hx-get`). Required when [type] is htmx.
+  final String? endpoint;
 
   @override
   State<Island> createState() => _IslandState();
@@ -80,6 +101,8 @@ class _IslandState extends State<Island> {
           : null,
       state: widget.props,
       mediaQuery: widget.mediaQuery,
+      kind: widget.kind,
+      endpoint: widget.endpoint,
     );
   }
 

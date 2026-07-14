@@ -1,6 +1,7 @@
 /// Entry point for `dart run hydraline:audit` - see `runAuditCli`.
 library;
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -40,7 +41,7 @@ Future<int> runAuditCli(
 }) async {
   final o = out ?? stdout;
   final e = err ?? stderr;
-  final fetcher = fetch ?? _httpFetch;
+  final fetcher = fetch ?? defaultHtmlFetcher();
 
   if (args.isEmpty) {
     e.writeln(_usage);
@@ -127,6 +128,19 @@ void _printReport(AuditReport report, StringSink out) {
   out.writeln('audit: $errors error(s), $warnings warning(s)');
 }
 
+/// The default `dart:io` [HtmlFetcher] used when none is injected.
+///
+/// Fails loudly instead of auditing garbage: throws [TimeoutException] when
+/// the server does not answer within [timeout] and [HttpException] on a
+/// non-2xx status (a 404 page with pretty meta tags must not pass an audit).
+HtmlFetcher defaultHtmlFetcher({
+  Duration timeout = const Duration(seconds: 30),
+}) {
+  return (Uri uri, {Map<String, String> headers = const {}}) {
+    return _httpFetch(uri, headers: headers).timeout(timeout);
+  };
+}
+
 Future<String> _httpFetch(
   Uri uri, {
   Map<String, String> headers = const {},
@@ -136,7 +150,11 @@ Future<String> _httpFetch(
     final request = await client.getUrl(uri);
     headers.forEach(request.headers.set);
     final response = await request.close();
-    return response.transform(utf8.decoder).join();
+    final body = await response.transform(utf8.decoder).join();
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw HttpException('unexpected status ${response.statusCode}', uri: uri);
+    }
+    return body;
   } finally {
     client.close();
   }

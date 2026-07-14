@@ -1,7 +1,7 @@
 name: hydraline_example
 description: Full-stack Hydraline showcase - Flutter Web app + SSR server + SSG.
 publish_to: none
-version: 0.0.1
+version: 0.0.2
 
 environment:
   sdk: ^3.9.0
@@ -12,10 +12,12 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  hydraline: ^0.0.1
-  hydraline_flutter: ^0.0.1
-  hydraline_server: ^0.0.1
+  hydraline: ^0.0.2
+  hydraline_flutter: ^0.0.2
+  hydraline_server: ^0.0.2
   shelf: ^1.4.1
 
 dev_dependencies:
   flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter

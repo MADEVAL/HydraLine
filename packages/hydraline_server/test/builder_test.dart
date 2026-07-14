@@ -31,6 +31,63 @@ routes:
     });
 
     test(
+      'builder registered under a pattern runs for a concrete path',
+      () async {
+        const manifestYaml = '''
+routes:
+  - path: /product/:id
+    mode: document
+''';
+        final handler = hydralineMiddleware(
+          HydralineConfig(
+            manifest: RouteManifest.parseYaml(manifestYaml),
+            builders: {
+              '/product/:id': (request, __) => DocumentRootNode(
+                body: [
+                  ParagraphNode(
+                    children: [TextNode('product ${request.url.path}')],
+                  ),
+                ],
+              ),
+            },
+          ),
+        )((_) async => Response.ok('fallback'));
+
+        final response = await httpGet(handler, '/product/42');
+        expect(await bodyOf(response), contains('product product/42'));
+      },
+    );
+
+    test('pattern builder also runs on the cached code path', () async {
+      const manifestYaml = '''
+routes:
+  - path: /blog/:slug
+    mode: document
+''';
+      var builds = 0;
+      final handler = hydralineMiddleware(
+        HydralineConfig(
+          manifest: RouteManifest.parseYaml(manifestYaml),
+          builders: {
+            '/blog/:slug': (_, __) {
+              builds++;
+              return const DocumentRootNode(
+                body: [
+                  ParagraphNode(children: [TextNode('post body')]),
+                ],
+              );
+            },
+          },
+          cache: HydralineCache.inMemory(),
+        ),
+      )((_) async => Response.ok('fallback'));
+
+      final response = await httpGet(handler, '/blog/first-post');
+      expect(builds, 1);
+      expect(await bodyOf(response), contains('post body'));
+    });
+
+    test(
       'builder throwing RedirectException with 301 produces a 301',
       () async {
         const manifestYaml = '''

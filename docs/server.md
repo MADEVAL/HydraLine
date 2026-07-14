@@ -284,10 +284,16 @@ HydralineConfig(
 
 When a cache is configured the middleware:
 
-- stores rendered HTML keyed by path and serves subsequent requests from it;
-- adds a deterministic `ETag` and answers `If-None-Match` revalidation with
+- stores rendered HTML keyed by the canonical path plus query string and
+  serves subsequent requests from it;
+- adds a deterministic 64-bit `ETag` and answers `If-None-Match`
+  revalidation (including ETag lists, weak validators and `*`) with
   `304 Not Modified`;
-- emits `Cache-Control: public, max-age=<ttl>` when `cacheTtl` is set.
+- emits `Vary: Accept-Encoding`, and `Cache-Control: public, max-age=<ttl>`
+  when `cacheTtl` is set.
+
+Request paths are canonicalised before route matching and cache lookup:
+`/page/`, `//page` and `/page` are the same route and the same cache entry.
 
 The `HydralineCache` interface is pluggable (implement it over Redis, files,
 etc.):
@@ -295,7 +301,7 @@ etc.):
 | Method | Description |
 |---|---|
 | `get(String key)` | Returns the cached HTML or null |
-| `set(String key, String html, {Duration? ttl, String? etag})` | Stores with optional TTL |
+| `set(String key, String html, {Duration? ttl})` | Stores with optional TTL |
 | `invalidate(String key)` | Removes a cached entry |
 
 `HydralineCache.inMemory({int maxSize = 500})` evicts the oldest entry past
@@ -303,7 +309,7 @@ etc.):
 
 ## Asset Serving
 
-### L0–L1 JS Assets, robots.txt, sitemap.xml
+### L0-L1 JS Assets, robots.txt, sitemap.xml
 
 Vanilla islands and the HTMX glue are served as first-party assets straight
 from the `hydraline` package - no CDN, compatible with

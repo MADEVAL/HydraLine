@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:hydraline_flutter/hydraline_flutter.dart';
-import 'package:hydraline_flutter/src/ssg_cli.dart';
 import 'package:test/test.dart';
 
 class _TestAdapter implements RouteAdapter {

@@ -24,11 +24,14 @@ abstract final class Robots {
   }) {
     final groups = <String>[];
     for (final rule in rules) {
+      _requireSingleLine(rule.userAgent, 'userAgent');
       final lines = <String>['User-agent: ${rule.userAgent}'];
       for (final path in rule.disallow) {
+        _requireSingleLine(path, 'disallow');
         lines.add('Disallow: $path');
       }
       for (final path in rule.allow) {
+        _requireSingleLine(path, 'allow');
         lines.add('Allow: $path');
       }
       groups.add(lines.join('\n'));
@@ -43,5 +46,13 @@ abstract final class Robots {
     }
     buffer.write('\n');
     return buffer.toString();
+  }
+
+  /// A value containing a line break would inject extra robots.txt
+  /// directives; fail loudly instead of emitting a corrupted file.
+  static void _requireSingleLine(String value, String name) {
+    if (value.contains('\n') || value.contains('\r')) {
+      throw ArgumentError.value(value, name, 'must not contain line breaks');
+    }
   }
 }

@@ -5,69 +5,27 @@
 //           curl -A Googlebot http://localhost:8080/      (buffered, same bytes)
 //           curl http://localhost:8080/product/espresso   (hybrid page)
 //           curl http://localhost:8080/robots.txt
+//
+// Page content lives in lib/content.dart - the same pure-Dart builders feed
+// the static build (bin/build.dart).
 import 'dart:io';
 
 import 'package:hydraline/hydraline.dart';
+import 'package:hydraline_example/content.dart';
 import 'package:hydraline_server/hydraline_server.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
-
-DocumentNode buildHome(Request request, Object? data) => DocumentRootNode(
-  lang: 'en',
-  head: buildHead(
-    const SeoMeta(
-      title: 'Hydraline Demo Shop',
-      description: 'A Flutter Web shop with real, crawlable HTML.',
-    ),
-  ),
-  body: [
-    SectionNode(
-      role: SectionRole.main,
-      children: [
-        const HeadingNode(
-          level: 1,
-          children: [TextNode('Hydraline Demo Shop')],
-        ),
-        const ParagraphNode(
-          children: [
-            TextNode('Static HTML loads instantly; islands hydrate on demand.'),
-          ],
-        ),
-        AnchorNode(
-          href: SafeUrl.parse('/product/espresso'),
-          children: const [TextNode('Espresso')],
-        ),
-      ],
-    ),
-  ],
-);
-
-DocumentNode buildProduct(Request request, Object? data) {
-  final id = request.url.pathSegments.last;
-  return DocumentRootNode(
-    lang: 'en',
-    head: buildHead(
-      SeoMeta(title: 'Product - $id'),
-      structuredData: [JsonLd.product(name: id, price: 249, currency: 'EUR')],
-    ),
-    body: [
-      HeadingNode(level: 1, children: [TextNode('Product: $id')]),
-      IslandPlaceholderNode(
-        id: 'calculator-$id',
-        directive: HydrationDirective.onVisible,
-        size: const IslandSize(width: 640, height: 320),
-        state: const {'price': 249},
-      ),
-    ],
-  );
-}
 
 Future<void> main() async {
   final manifestYaml = await File('hydraline.routes.yaml').readAsString();
 
   final config = HydralineConfig(
     manifest: RouteManifest.parseYaml(manifestYaml),
-    builders: {'/': buildHome, '/product/:id': buildProduct},
+    builders: {
+      '/': (request, data) => homePage(),
+      '/product/:id': (request, data) =>
+          productPage(request.url.pathSegments.last),
+    },
     botUserAgentPattern: RegExp(r'Googlebot|bingbot|Twitterbot'),
     cache: HydralineCache.inMemory(maxSize: 100),
     cacheTtl: const Duration(minutes: 5),

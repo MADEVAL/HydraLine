@@ -249,6 +249,7 @@ void main() {
         frag(island),
         '<hydraline-island id="calc" data-directive="hydrateOnVisible" '
         'data-render-mode="skeletonOnly" data-style-mode="scoped" '
+        'data-size="640,480" '
         'data-state="{&quot;price&quot;:100}" role="region" aria-busy="true">'
         '<template shadowrootmode="open">'
         '<style>:host{display:block;contain:layout style paint}'

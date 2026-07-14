@@ -13,9 +13,9 @@ Add the packages you need to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  hydraline: ^0.0.1           # always needed
-  hydraline_server: ^0.0.1    # for SSR / HTMX
-  hydraline_flutter: ^0.0.1   # for Flutter widgets / SSG
+  hydraline: ^0.0.2           # always needed
+  hydraline_server: ^0.0.2    # for SSR / HTMX
+  hydraline_flutter: ^0.0.2   # for Flutter widgets / SSG
 ```
 
 If you only need a static site (SSG, no server), you can skip `hydraline_server`.
@@ -86,6 +86,7 @@ Describe your routes:
 
 ```yaml
 # hydraline.routes.yaml
+base_url: https://example.com   # used for absolute sitemap URLs
 routes:
   - path: /
     mode: document

@@ -123,6 +123,77 @@ void main() {
       expect(expanded, contains('/blog/post-2'));
       expect(expanded, hasLength(2));
     });
+
+    test('expands multiple segments as a cartesian product', () {
+      const segments = {
+        'category': ['tech', 'life'],
+        'slug': ['a', 'b'],
+      };
+      final expanded = DynamicSegments.expand({
+        '/blog/:category/:slug': segments,
+      });
+      expect(expanded, [
+        '/blog/tech/a',
+        '/blog/tech/b',
+        '/blog/life/a',
+        '/blog/life/b',
+      ]);
+    });
+
+    test('correlates values with their segment names', () {
+      const segments = {
+        'slug': ['about'],
+        'lang': ['en', 'de'],
+      };
+      final expanded = DynamicSegments.expand({'/:lang/:slug': segments});
+      expect(expanded, ['/en/about', '/de/about']);
+    });
+
+    test('throws when a named segment has no values', () {
+      expect(
+        () => DynamicSegments.expand({
+          '/blog/:category/:slug': {
+            'category': ['tech'],
+          },
+        }),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('SSG runner sitemap base URL', () {
+    late Directory tmpDir;
+
+    setUp(() {
+      tmpDir = Directory.systemTemp.createTempSync('hydraline_ssg_');
+    });
+
+    tearDown(() {
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    test('uses the manifest base_url for every sitemap entry', () async {
+      const manifestYaml = '''
+base_url: https://demo.example
+routes:
+  - path: /
+    mode: document
+  - path: /blog/:slug
+    mode: document
+    dynamic_segments:
+      slug: [first]
+''';
+      final runner = SsgRunner(
+        routeManifest: RouteManifest.parseYaml(manifestYaml),
+        routeAdapter: _TestAdapter([]),
+        islandFactories: {},
+      );
+      await runner.run(outputDir: tmpDir.path);
+      final xml = await File('${tmpDir.path}/sitemap.xml').readAsString();
+      expect(xml, contains('<loc>https://demo.example/</loc>'));
+      expect(xml, contains('<loc>https://demo.example/blog/first</loc>'));
+      expect(xml, isNot(contains('localhost')));
+    });
   });
 
   group('SsgResult', () {
@@ -197,7 +268,7 @@ void main() {
       );
     });
 
-    test('copies assets via package URI when web dir does not exist', () async {
+    test('writes runtime assets even when no web/ dir exists', () async {
       final adapter = _TestAdapter([const RouteInfo(path: '/')]);
       final webDir = Directory('web');
       final renamed = Directory('web_tmp');
@@ -219,11 +290,64 @@ void main() {
           islandFactories: {'my-island': IslandType.flutter},
         );
         await runner.run(outputDir: tmpDir.path);
+        expect(
+          await File('${tmpDir.path}/hydraline-island.js').exists(),
+          isTrue,
+        );
       } finally {
         if (await renamed.exists()) {
           await renamed.rename(webDir.path);
         }
       }
+    });
+
+    test('never copies app web/ host files over generated pages', () async {
+      // Simulate an application project: the cwd has a web/ dir with an
+      // index.html host page and a custom bootstrap.
+      final appDir = Directory.systemTemp.createTempSync('hydraline_app_');
+      Directory('${appDir.path}/web').createSync();
+      File(
+        '${appDir.path}/web/index.html',
+      ).writeAsStringSync('<html>host page</html>');
+      File(
+        '${appDir.path}/web/flutter_bootstrap.js',
+      ).writeAsStringSync('// app bootstrap');
+      final previous = Directory.current;
+      Directory.current = appDir;
+      try {
+        final manifest = RouteManifest.builder()
+            .route(
+              const RouteEntry(
+                path: '/',
+                mode: RouteMode.hybrid,
+                contentSource: WidgetContent(),
+              ),
+            )
+            .build();
+        final runner = SsgRunner(
+          routeManifest: manifest,
+          routeAdapter: _TestAdapter([]),
+          islandFactories: {'my-island': IslandType.flutter},
+        );
+        await runner.run(outputDir: tmpDir.path);
+      } finally {
+        Directory.current = previous;
+        appDir.deleteSync(recursive: true);
+      }
+
+      final html = File('${tmpDir.path}/index.html').readAsStringSync();
+      expect(html, contains('<!DOCTYPE html>'));
+      expect(html, isNot(contains('host page')));
+      expect(
+        File('${tmpDir.path}/flutter_bootstrap.js').existsSync(),
+        isFalse,
+        reason: 'app host files are not runtime assets',
+      );
+      expect(
+        File('${tmpDir.path}/hydraline-island.js').existsSync(),
+        isTrue,
+        reason: 'runtime assets come from the hydraline_flutter package',
+      );
     });
   });
 
