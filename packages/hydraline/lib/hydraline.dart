@@ -5,6 +5,7 @@
 /// (invariant I1); enforced by `melos run boundaries`.
 library;
 
+export 'src/audit.dart';
 export 'src/collector.dart';
 export 'src/document_node.dart';
 export 'src/escaping.dart';
