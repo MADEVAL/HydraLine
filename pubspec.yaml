@@ -74,6 +74,10 @@ melos:
       description: Run only golden-tagged tests (line endings normalized to \n).
       run: dart run melos:melos exec --dir-exists=test/goldens -- dart test --tags golden
 
+    test:security:
+      description: Property/fuzz XSS suite (I2/S4).
+      run: dart run melos:melos exec --dir-exists=test/security -- dart test --tags security
+
     boundaries:
       description: Scan for forbidden imports (invariant I1).
       run: dart run tool/check_boundaries.dart
