@@ -19,6 +19,7 @@ TEMP/
 # Opencode / AGENTS
 AGENTS.md
 .opencode/
+opencode.json
 
 # IDE
 .idea/
