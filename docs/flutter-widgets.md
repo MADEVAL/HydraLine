@@ -286,29 +286,39 @@ void main() {
 
 ## IslandHost and IslandViewRegistry
 
-The Dart-side counterpart of the JavaScript dispatcher. `IslandHost` is the
-root widget for the island entry-point (`lib/island_main.dart`). One engine
-instance hosts N islands in N views.
+The Dart-side counterpart of the JavaScript dispatcher. One engine instance
+hosts N islands in N views:
 
 ```dart
 typedef IslandFactory = Future<Widget> Function(Map<String, Object?> props);
 
+// Multi-view root for the island entry-point (lib/island_main.dart):
+IslandMultiViewApp({
+  required Map<String, IslandFactory> factories,
+})
+
+// Per-view widget: resolves the island bound to the current view.
 IslandHost({
   required Map<String, IslandFactory> factories,
 })
 ```
 
-When the dispatcher hydrates an island it creates a `FlutterView` and registers
-the view → island binding:
+The flow on the web:
+
+1. The dispatcher hydrates an island and calls `app.addView()` with
+   `{ islandId, state }` as `initialData`.
+2. `IslandMultiViewApp` (a `runWidget` root observing view changes) reads
+   the `initialData` of every new view and registers the binding:
+   `IslandViewRegistry.register(viewId, islandId, state)` - automatic on
+   the web, no manual glue needed.
+3. `IslandHost` inside that view looks up the binding and mounts the
+   matching factory. Views without a binding render a neutral container.
+
+For tests or custom bootstraps you can register bindings manually:
 
 ```dart
-// Called from the web bootstrap glue when addView() fires:
 IslandViewRegistry.register(viewId, 'calculator', {'price': 89990});
 ```
-
-`IslandHost` looks up the binding for the view it is built in and mounts the
-matching factory. Views without a binding render a neutral full-viewport
-container.
 
 Each factory maps an island `id` to a builder function. Heavy islands use
 deferred imports (`deferred as` + `loadLibrary()`):
@@ -329,7 +339,7 @@ final factories = <String, IslandFactory>{
 };
 
 void main() {
-  runWidget(IslandHost(factories: factories));
+  runWidget(IslandMultiViewApp(factories: factories));
 }
 ```
 

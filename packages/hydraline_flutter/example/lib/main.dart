@@ -84,11 +84,11 @@ class ProductPage extends StatelessWidget {
 
 /// The island entry-point (built separately with
 /// `flutter build web --target=lib/island_main.dart`): one engine, N views.
-/// The dispatcher registers view → island bindings in [IslandViewRegistry];
-/// [IslandHost] resolves them and mounts the matching factory.
+/// The dispatcher calls `app.addView()` per island with `{ islandId, state }`
+/// initialData; [IslandMultiViewApp] mounts the matching factory per view.
 void islandMain() {
   runWidget(
-    IslandHost(
+    IslandMultiViewApp(
       factories: {
         'price-calculator': (props) async =>
             PriceCalculator(price: props['price']! as int),

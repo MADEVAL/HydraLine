@@ -65,6 +65,36 @@ void main() {
     });
   });
 
+  group('IslandMultiViewApp', () {
+    testWidgets('hosts one IslandHost per platform view', (tester) async {
+      IslandViewRegistry.register(tester.view.viewId, 'calc', {'price': 7});
+      await tester.pumpWidget(
+        IslandMultiViewApp(
+          factories: {
+            'calc': (props) async => Directionality(
+              textDirection: TextDirection.ltr,
+              child: Text('total ${props['price']}'),
+            ),
+          },
+        ),
+        wrapWithView: false,
+      );
+      await tester.pump();
+      expect(find.byType(IslandHost), findsOneWidget);
+      expect(find.text('total 7'), findsOneWidget);
+    });
+
+    testWidgets('renders the fallback for views without a binding', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const IslandMultiViewApp(factories: {}),
+        wrapWithView: false,
+      );
+      expect(find.byType(Container), findsOneWidget);
+    });
+  });
+
   group('island_main entry point', () {
     test('islandFactories is a map', () {
       expect(islandFactories, isA<Map<String, IslandFactory>>());

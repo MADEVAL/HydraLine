@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 import 'package:hydraline_flutter/island_main.dart' as island_entry;
 import 'package:test/test.dart';
@@ -21,12 +23,18 @@ void main() {
     test('includes ResizeObserver for view constraints', () {
       expect(jsCustomElement, contains('ResizeObserver'));
     });
+
+    test('carries the Hydraline banner', () {
+      expect(jsCustomElement, contains('HYDRALINE'));
+    });
   });
 
   group('Dispatcher JS', () {
     test('exposes hydraline API', () {
-      expect(jsDispatcher, contains('hydraline'));
+      expect(jsDispatcher, contains('window.hydraline'));
       expect(jsDispatcher, contains('hydrate'));
+      expect(jsDispatcher, contains('hydrateAll'));
+      expect(jsDispatcher, contains('dehydrate'));
     });
 
     test('manages data-hydration lifecycle states', () {
@@ -42,6 +50,30 @@ void main() {
     test('uses IntersectionObserver for hydrateOnVisible', () {
       expect(jsDispatcher, contains('IntersectionObserver'));
     });
+
+    test('mounts one FlutterView per island via addView', () {
+      expect(jsDispatcher, contains('addView'));
+      expect(jsDispatcher, contains('multiViewEnabled'));
+      expect(jsDispatcher, contains('viewConstraints'));
+    });
+
+    test('passes { islandId, state } as initialData', () {
+      expect(jsDispatcher, contains('initialData'));
+      expect(jsDispatcher, contains('islandId'));
+    });
+
+    test('supports the custom bootstrap contract (_hydralineApp)', () {
+      expect(jsDispatcher, contains('_hydralineApp'));
+    });
+
+    test('is configurable via HYDRALINE_CONFIG', () {
+      expect(jsDispatcher, contains('HYDRALINE_CONFIG'));
+      expect(jsDispatcher, contains('engineScript'));
+    });
+
+    test('carries the Hydraline banner', () {
+      expect(jsDispatcher, contains('HYDRALINE'));
+    });
   });
 
   group('Service Worker JS', () {
@@ -53,19 +85,44 @@ void main() {
     test('uses caches.open for the hydraline cache', () {
       expect(jsServiceWorker, contains('caches.open'));
     });
+
+    test('carries the Hydraline banner', () {
+      expect(jsServiceWorker, contains('HYDRALINE'));
+    });
   });
 
-  group('JS budget checks (NF-4)', () {
-    test('dispatcher JS is under 2 KB budget', () {
-      expect(jsDispatcher.codeUnits.length, lessThan(2048));
+  group('JS budget checks (pretty, unminified)', () {
+    test('dispatcher JS stays under 12 KB', () {
+      expect(jsDispatcher.codeUnits.length, lessThan(12288));
     });
 
-    test('custom element JS is under 2 KB budget', () {
-      expect(jsCustomElement.codeUnits.length, lessThan(2048));
+    test('custom element JS stays under 4 KB', () {
+      expect(jsCustomElement.codeUnits.length, lessThan(4096));
     });
 
-    test('service worker JS is under 2 KB budget', () {
-      expect(jsServiceWorker.codeUnits.length, lessThan(2048));
+    test('service worker JS stays under 4 KB', () {
+      expect(jsServiceWorker.codeUnits.length, lessThan(4096));
+    });
+  });
+
+  group('web/ assets stay in sync with the inline Dart constants', () {
+    String read(String name) =>
+        File('web/$name').readAsStringSync().replaceAll('\r\n', '\n');
+
+    test('hydraline-dispatcher.js == jsDispatcher', () {
+      expect(read('hydraline-dispatcher.js'), jsDispatcher);
+    });
+
+    test('hydraline-island.js == jsCustomElement', () {
+      expect(read('hydraline-island.js'), jsCustomElement);
+    });
+
+    test('service-worker.js == jsServiceWorker', () {
+      expect(read('service-worker.js'), jsServiceWorker);
+    });
+
+    test('hydraline-virtual-views.js == jsVirtualViews', () {
+      expect(read('hydraline-virtual-views.js'), jsVirtualViews);
     });
   });
 

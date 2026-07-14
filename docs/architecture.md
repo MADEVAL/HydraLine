@@ -176,17 +176,20 @@ The Flutter engine is loaded only when a level-2 island triggers hydration.
 The client-side runtime consists of:
 
 1. **Custom Element** `<hydraline-island>` with Declarative Shadow DOM.
-   Reserves exact pixel dimensions. Passes explicit `viewConstraints` to
-   `addView()` — avoiding multi-view sizing bugs.
-2. **Dispatcher** (~1.5 KB): A single global event listener (Qwikloader-style).
-   One `IntersectionObserver` for all `onVisible` islands, one
-   `requestIdleCallback` for all `onIdle`, one delegated event listener for
-   `onInteraction`. Loads the Flutter engine only on the first trigger.
-3. **IslandHost** (Dart side): The root multi-view widget. Maps each
-   `FlutterView` (created by JS via `addView()`) to the correct island widget
-   factory. One engine instance, N views.
-4. **Service Worker** (~2 KB): Caches `main.dart.js` and `canvaskit.wasm`.
-   Preloads via `WebAssembly.instantiateStreaming()`. Warm visits: ~1s TTI.
+   Reserves exact pixel dimensions and pins them with a ResizeObserver -
+   avoiding multi-view sizing bugs.
+2. **Dispatcher**: a single global script. One `IntersectionObserver` for
+   all `onVisible` islands, one `requestIdleCallback` for all `onIdle`, one
+   delegated event listener for `onInteraction`. Loads the Flutter engine
+   only on the first trigger, then mounts one `FlutterView` per island via
+   `app.addView()` with explicit `viewConstraints` and
+   `{ islandId, state }` as `initialData`.
+3. **IslandMultiViewApp / IslandHost** (Dart side): the multi-view root.
+   Turns the `initialData` of each view into an `IslandViewRegistry`
+   binding and mounts the matching island widget factory. One engine
+   instance, N views.
+4. **Service Worker**: caches `main.dart.js` and `canvaskit.wasm` with a
+   cache-first strategy. Warm visits: ~1s TTI.
 
 Island lifecycle states:
 
@@ -262,19 +265,45 @@ time. The same element is reused during hydration (no re-creation).
 
 ### Dispatcher
 
-A single global script (≤ 2 KB) that:
-- Observes all islands and triggers hydration per directive — one
+A single global script (`hydraline-dispatcher.js`, pretty and branded) that:
+- Observes all islands and triggers hydration per directive - one
   `IntersectionObserver` for all `onVisible` islands, one idle callback for
-  `onIdle`, one delegated listener for `onInteraction`
+  `onIdle`, one delegated listener for `onInteraction`, `matchMedia`
+  listeners for `onMedia`
 - Loads the Flutter engine once (on the first trigger)
+- Mounts one `FlutterView` per island via `app.addView()`, passing explicit
+  `viewConstraints` and `{ islandId, state }` as `initialData`
 - Manages `data-hydration` lifecycle states, timeouts and the
   `hydraline:island-error` event
-- Exposes `window.hydraline.hydrate(id)` / `hydrateAll()` for
-  `hydrateManual` islands
+- Exposes `window.hydraline` (`hydrate(id)`, `hydrateAll()`,
+  `dehydrate(id)`, `views`) and reads `window.HYDRALINE_CONFIG`
+  (`engineScript`, `timeoutMs`, `rootMargin`, `debug`)
 
-On the Dart side, view → island bindings are registered in
-`IslandViewRegistry` and resolved by `IslandHost` — one engine instance,
-N views (see [Flutter Widgets](./flutter-widgets.md#islandhost-and-islandviewregistry)).
+The engine contract is either of:
+
+1. `window._hydralineApp` - a Promise of the multi-view Flutter app handle,
+   exposed by a custom `flutter_bootstrap.js` (preferred):
+
+   ```js
+   {{flutter_js}}
+   {{flutter_build_config}}
+   window._hydralineApp = new Promise((resolve, reject) => {
+     _flutter.loader.load({
+       onEntrypointLoaded: async (init) => {
+         const engine = await init.initializeEngine({ multiViewEnabled: true });
+         resolve(await engine.runApp());
+       },
+     });
+   });
+   ```
+
+2. A bootstrap exposing `_flutter.loader.load()`, which the dispatcher
+   drives itself with `{ multiViewEnabled: true }`.
+
+On the Dart side, `IslandMultiViewApp` reads each view's `initialData`,
+registers the binding in `IslandViewRegistry` and `IslandHost` mounts the
+matching island widget - one engine instance, N views (see
+[Flutter Widgets](./flutter-widgets.md#islandhost-and-islandviewregistry)).
 
 ### Service Worker
 

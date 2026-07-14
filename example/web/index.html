@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+  HYDRALINE showcase - island entry-point host page.
+
+  In production the Hydraline SSG/SSR emits real semantic HTML; this file
+  only hosts the island runtime for `flutter build web`:
+
+    hydraline-island.js       the <hydraline-island> custom element
+    hydraline-dispatcher.js   directive wiring + engine + addView()
+    flutter_bootstrap.js      custom bootstrap exposing window._hydralineApp
+
+  The runtime JS files are copied next to the pages by the SSG runner
+  (`dart run hydraline_flutter:build`).
+====================================================================== -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/">
+  <title>Hydraline Demo Shop</title>
+</head>
+<body>
+  <script>
+    window.HYDRALINE_CONFIG = {
+      engineScript: 'flutter_bootstrap.js',
+      debug: true
+    };
+  </script>
+  <script src="hydraline-island.js" defer></script>
+  <script src="hydraline-dispatcher.js" defer></script>
+</body>
+</html>

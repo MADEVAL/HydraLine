@@ -11,9 +11,10 @@ Initial release.
   the collector; does not replace `MaterialApp`.
 - `SsgSandbox` — stub `MediaQuery`/`Directionality` ancestors for headless
   extraction.
-- `IslandHost` + `IslandViewRegistry` — multi-view island runtime: one engine
-  instance, view → island bindings, per-island async factories with deferred
-  imports.
+- `IslandMultiViewApp` + `IslandHost` + `IslandViewRegistry` — multi-view
+  island runtime: one engine instance, one FlutterView per island, bindings
+  populated automatically from `addView()` initialData on the web,
+  per-island async factories with deferred imports.
 - `SsgRunner` — build-time HTML generation from the route manifest with
   pure-Dart page builders, dynamic segment expansion, sitemap.xml, robots.txt
   and island asset copying.
@@ -22,8 +23,11 @@ Initial release.
 - `RouteAdapter` — `GoRouterAdapter` and `Navigator2Adapter`.
 - `SsgDevTools` — island diagnostics (props budget, anti-CLS warnings).
 - `SsgDomDiff` — SSG-HTML vs hydrated-DOM text divergence comparator.
-- Level-2 web runtime assets — `<hydraline-island>` Custom Element with
-  Declarative Shadow DOM, dispatcher (≤ 2 KB), Service Worker, virtual views.
+- Level-2 web runtime assets — pretty, branded, first-party JS:
+  `<hydraline-island>` Custom Element with Declarative Shadow DOM, island
+  dispatcher (directive wiring, engine loading, `app.addView()` per island
+  with `{ islandId, state }` initialData, `window.hydraline` API,
+  `window.HYDRALINE_CONFIG`), Service Worker, virtual views.
 - Hosting recipes for Firebase, Netlify, Cloudflare Pages and GitHub Pages.
 
 Minimum Flutter 3.35.

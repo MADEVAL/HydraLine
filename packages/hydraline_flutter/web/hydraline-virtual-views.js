@@ -1,13 +1,4 @@
-/// Virtual views manager (pretty, branded).
-///
-/// Shared IntersectionObserver dispatching segment enter/leave events for
-/// tall islands split into `hydraline-island-segment` elements.
-///
-/// Kept byte-identical to `web/hydraline-virtual-views.js` (verified by test).
-library;
-
-const jsVirtualViews =
-    r'''/*! ==========================================================================
+/*! ==========================================================================
  *  HYDRALINE - Virtual Views
  *
  *  Tall islands that exceed the browser's canvas size limit are split into
@@ -55,4 +46,3 @@ const jsVirtualViews =
     init();
   }
 })();
-''';

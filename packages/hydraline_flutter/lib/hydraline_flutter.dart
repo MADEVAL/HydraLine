@@ -13,7 +13,12 @@ export 'src/hosting_recipes.dart'
 export 'src/hydra_app.dart' show HydraApp, HydraScope;
 export 'src/island.dart' show Island;
 export 'src/island_host.dart'
-    show IslandFactory, IslandHost, IslandViewBinding, IslandViewRegistry;
+    show
+        IslandFactory,
+        IslandHost,
+        IslandMultiViewApp,
+        IslandViewBinding,
+        IslandViewRegistry;
 export 'src/route_adapter.dart'
     show GoRouterAdapter, Navigator2Adapter, RouteAdapter, RouteInfo;
 export 'src/seo_widgets.dart' show Seo;

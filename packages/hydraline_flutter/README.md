@@ -12,14 +12,15 @@ Re-exports the whole `hydraline` core: one import gives you the full API.
 | `Seo.*` widgets | Self-registering widgets — build UI and register semantic info simultaneously |
 | `Island` | Island zones with hydration directives, render/style modes, anti-CLS sizing |
 | `HydraApp` / `HydraScope` | Integration wrapper + InheritedWidget for SsgCollector access |
-| `IslandHost` / `IslandViewRegistry` | Multi-view runtime — one engine, view → island bindings |
+| `IslandMultiViewApp` / `IslandHost` | Multi-view runtime — one engine, one FlutterView per island |
+| `IslandViewRegistry` | View → island bindings, populated automatically from `addView()` initialData |
 | `SsgRunner` | Build-time SSG — routes → HTML + sitemap + robots into `dist/` |
 | `dart run hydraline_flutter:build` | SSG CLI (plain Dart VM) |
 | `RouteAdapter` | go_router / Navigator 2.0 adapters for build-time route traversal |
 | `SsgSandbox` | Build-time stub ancestors (MediaQuery, Directionality) for extraction |
 | `SsgDevTools` | Island diagnostics — props size warnings, anti-CLS checks |
 | `SsgDomDiff` | SSG-HTML vs hydrated DOM text-node divergence comparator |
-| Web runtime | `<hydraline-island>` Custom Element, dispatcher, Service Worker, virtual views |
+| Web runtime | Pretty, branded JS: `<hydraline-island>` element, dispatcher (engine + `addView()` per island), Service Worker, virtual views |
 
 ## Flutter version policy
 

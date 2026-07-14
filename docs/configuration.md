@@ -227,19 +227,20 @@ validated with `const SeoValidator().validate(target)`.
 
 ## Performance Budgets
 
-### JS Budgets (gzip)
+### JS Budgets
 
-Values are hard limits enforced in CI:
+The runtime JS ships pretty and branded (readable source, no build step);
+raw sizes are hard limits enforced by tests. Serve with gzip/brotli — the
+compressed footprint stays small:
 
-| Asset | Budget | Level |
+| Asset | Budget (raw) | Level |
 |---|---|---|
-| Dispatcher | ≤ 2 KB | 2 |
-| Custom Element | ≤ 2 KB | 2 |
-| Service Worker | ≤ 2 KB | 2 |
-| **Total baseline L2 JS** | **≤ 6 KB** | 2 |
+| Dispatcher | ≤ 12 KB (~3 KB gzip) | 2 |
+| Custom Element | ≤ 4 KB (~1.5 KB gzip) | 2 |
+| Service Worker | ≤ 4 KB (~1 KB gzip) | 2 |
+| Virtual Views manager | ≤ 4 KB (~1 KB gzip) | 2 (deferred) |
 | Vanilla Islands | ≤ 8 KB | 1 |
 | HTMX (self-hosted) | ~14 KB | 1 |
-| Virtual Views manager | ≤ 2 KB | 2 (deferred) |
 
 ### Island Bundle Budget
 

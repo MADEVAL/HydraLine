@@ -5,7 +5,8 @@ A minimal full-stack demo of all three Hydraline packages working together:
 | File | Shows |
 |---|---|
 | [`lib/main.dart`](lib/main.dart) | Flutter app with `Seo.*` widgets and `Island` zones — [`hydraline_flutter`](../packages/hydraline_flutter/) |
-| [`lib/island_main.dart`](lib/island_main.dart) | Island entry-point: `IslandHost` + deferred island factories |
+| [`lib/island_main.dart`](lib/island_main.dart) | Island entry-point: `IslandMultiViewApp` + deferred island factories |
+| [`web/flutter_bootstrap.js`](web/flutter_bootstrap.js) | Custom bootstrap exposing `window._hydralineApp` (multi-view engine contract) |
 | [`bin/server.dart`](bin/server.dart) | SSR server: streaming, bot-aware delivery, caching — [`hydraline_server`](../packages/hydraline_server/) |
 | [`hydraline.routes.yaml`](hydraline.routes.yaml) | Route manifest: `document` / `hybrid` / `app` modes — [`hydraline`](../packages/hydraline/) |
 
@@ -35,6 +36,16 @@ dart run hydraline_flutter:build hydraline.routes.yaml dist
 ```bash
 cd example
 flutter run -d chrome
+```
+
+## Build the island bundle (multi-view)
+
+```bash
+cd example
+flutter build web --target=lib/island_main.dart
+# The dispatcher loads flutter_bootstrap.js on the first island trigger and
+# calls app.addView() per island; see web/flutter_bootstrap.js for the
+# window._hydralineApp contract.
 ```
 
 ## Audit what a crawler sees

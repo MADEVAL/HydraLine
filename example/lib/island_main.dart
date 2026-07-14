@@ -3,8 +3,10 @@
 // Built separately so the island bundle stays small:
 //   flutter build web --target=lib/island_main.dart
 //
-// The JS dispatcher creates one FlutterView per hydrated island and registers
-// the binding in IslandViewRegistry; IslandHost mounts the right factory.
+// The dispatcher (hydraline-dispatcher.js) loads the engine on the first
+// island trigger and calls app.addView() per island with { islandId, state }
+// initialData; IslandMultiViewApp resolves the binding for every view and
+// mounts the matching factory.
 import 'package:flutter/material.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
@@ -12,7 +14,7 @@ import 'islands/calculator.dart' deferred as calculator;
 
 void main() {
   runWidget(
-    IslandHost(
+    IslandMultiViewApp(
       factories: {
         'calculator-espresso': _calculator,
         'calculator-grinder': _calculator,

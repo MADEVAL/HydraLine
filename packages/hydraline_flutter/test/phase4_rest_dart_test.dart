@@ -22,8 +22,8 @@ void main() {
       expect(jsVirtualViews, contains('hydraline-island-segment'));
     });
 
-    test('size is under 2 KB', () {
-      expect(jsVirtualViews.codeUnits.length, lessThan(2048));
+    test('size is under 4 KB (pretty, unminified)', () {
+      expect(jsVirtualViews.codeUnits.length, lessThan(4096));
     });
   });
 
