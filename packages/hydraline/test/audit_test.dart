@@ -64,6 +64,27 @@ void main() {
       );
       expect(report.issues.map((i) => i.code), contains('duplicate_canonical'));
     });
+
+    test('overly long title warns', () {
+      final report = Audit.auditHtml(
+        '<html><head><title>${"x" * 71}</title>'
+        '<meta name="description" content="d"></head>'
+        '<body><h1>H</h1></body></html>',
+      );
+      expect(report.issues.map((i) => i.code), contains('title_too_long'));
+    });
+
+    test('overly long meta description warns', () {
+      final report = Audit.auditHtml(
+        '<html><head><title>T</title>'
+        '<meta name="description" content="${"x" * 161}"></head>'
+        '<body><h1>H</h1></body></html>',
+      );
+      expect(
+        report.issues.map((i) => i.code),
+        contains('description_too_long'),
+      );
+    });
   });
 
   group('Audit.compareBodies', () {

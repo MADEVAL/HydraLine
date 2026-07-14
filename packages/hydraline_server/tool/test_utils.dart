@@ -7,9 +7,16 @@ import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_server/hydraline_server.dart';
 import 'package:shelf/shelf.dart';
 
-Handler createTestHandler(RouteManifest manifest) {
+Handler createTestHandler(
+  RouteManifest manifest, {
+  Pattern? botUserAgentPattern,
+}) {
   final middleware = hydralineMiddleware(
-    HydralineConfig(manifest: manifest, builders: const {}),
+    HydralineConfig(
+      manifest: manifest,
+      builders: const {},
+      botUserAgentPattern: botUserAgentPattern,
+    ),
   );
   // shelf.Middleware = Handler Function(Handler inner)
   // Apply it to a pass-through inner handler.
@@ -26,8 +33,13 @@ Handler createTestHandler(RouteManifest manifest) {
   };
 }
 
-Future<Response> httpGet(Handler handler, String path) async {
-  final request = Request('GET', Uri.parse('http://localhost$path'));
+Future<Response> httpGet(
+  Handler handler,
+  String path, {
+  Map<String, String>? headers,
+}) async {
+  final uri = Uri.parse('http://localhost$path');
+  final request = Request('GET', uri, headers: headers);
   final response = await handler(request);
   return response;
 }

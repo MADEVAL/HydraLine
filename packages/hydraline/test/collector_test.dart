@@ -59,6 +59,15 @@ void main() {
         contains('<title>Home</title>'),
       );
     });
+
+    test('addNode adds an arbitrary node', () {
+      final root = sealed((c) {
+        c.addNode(
+          const MetaNode(name: 'viewport', content: 'width=device-width'),
+        );
+      });
+      expect(root.body[0], isA<MetaNode>());
+    });
   });
 
   group('SsgCollector invariants', () {

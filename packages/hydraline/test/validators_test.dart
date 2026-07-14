@@ -7,6 +7,28 @@ void main() {
   List<String> codes(Object target) =>
       validator.validate(target).map((i) => i.code).toList();
 
+  group('ValidationIssue', () {
+    test('toString with location includes it', () {
+      const issue = ValidationIssue(
+        severity: ValidationSeverity.error,
+        code: 'test_code',
+        message: 'test message',
+        location: '/route',
+      );
+      expect(issue.toString(), contains('(/route)'));
+    });
+
+    test('toString without location does not contain empty parens', () {
+      const issue = ValidationIssue(
+        severity: ValidationSeverity.warning,
+        code: 'test_code',
+        message: 'test message',
+      );
+      expect(issue.toString(), isNot(contains('()')));
+      expect(issue.toString(), startsWith('[warning]'));
+    });
+  });
+
   group('SeoMeta validation', () {
     test('empty title is an error', () {
       final issues = validator.validate(const SeoMeta(title: ''));
@@ -93,5 +115,12 @@ void main() {
       );
       expect(codes(root), isNot(contains('unsafe_html_without_sanitizer')));
     });
+  });
+
+  test('validate throws ArgumentError for unsupported type', () {
+    expect(
+      () => validator.validate('not a valid target'),
+      throwsA(isA<ArgumentError>()),
+    );
   });
 }

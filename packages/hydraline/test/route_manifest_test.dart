@@ -100,4 +100,85 @@ void main() {
       expect(parsed.routes[0].contentSource, isA<WidgetContent>());
     });
   });
+
+  group('YAML serialisation details', () {
+    test('noindex and includeInSitemap appear in YAML output', () {
+      final manifest = RouteManifest.parseYaml('''
+routes:
+  - path: /hidden
+    mode: document
+    noindex: true
+    sitemap: false
+''');
+      final yaml = manifest.toYaml();
+      expect(yaml, contains('noindex: true'));
+      expect(yaml, contains('sitemap: false'));
+    });
+
+    test('widget with pageBuilderId round-trips', () {
+      final manifest = RouteManifest.parseYaml('''
+routes:
+  - path: /page
+    mode: document
+    content_source: widget:MyBuilder
+''');
+      final source = manifest.routes[0].contentSource! as WidgetContent;
+      expect(source.pageBuilderId, 'MyBuilder');
+      final yaml = manifest.toYaml();
+      expect(yaml, contains('content_source: "widget:MyBuilder"'));
+    });
+
+    test('invalid content_source throws FormatException', () {
+      expect(
+        () => RouteManifest.parseYaml('''
+routes:
+  - path: /x
+    mode: document
+    content_source: unknown_type
+'''),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('unknown route mode throws FormatException', () {
+      expect(
+        () => RouteManifest.parseYaml('''
+routes:
+  - path: /x
+    mode: invalid_mode
+'''),
+        throwsA(isA<FormatException>()),
+      );
+    });
+
+    test('robots directives appear in YAML output', () {
+      final manifest = RouteManifest.parseYaml('''
+routes:
+  - path: /no-robots
+    mode: document
+    metadata:
+      title: NoRobots
+      robots:
+        noindex: true
+        nofollow: true
+''');
+      final yaml = manifest.toYaml();
+      expect(yaml, contains('robots:'));
+      expect(yaml, contains('noindex: true'));
+      expect(yaml, contains('nofollow: true'));
+    });
+
+    test('_scalar escapes double-quotes and backslashes', () {
+      final manifest = RouteManifest.builder()
+        ..route(
+          const RouteEntry(
+            path: '/path',
+            mode: RouteMode.document,
+            metadata: SeoMeta(title: 'Title with "quotes"'),
+          ),
+        );
+      final yaml = manifest.build().toYaml();
+      expect(yaml, contains(r'\"quotes\"'));
+    });
+  });
 }

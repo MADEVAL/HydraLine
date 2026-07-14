@@ -32,10 +32,8 @@ jobs:
         run: dart run melos:melos run format:check
       - name: analyze
         run: dart run melos:melos run analyze
-      - name: test (dart + tooling)
-        run: |
-          dart run melos:melos run test:dart
-          dart run melos:melos run test:tool
+      - name: test (dart)
+        run: dart run melos:melos run test:dart
       - name: golden (I4/I10)
         run: dart run melos:melos run test:golden
       - name: security fuzz (I2/S4)

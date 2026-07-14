@@ -12,12 +12,9 @@ void main() {
       );
     });
 
-    test(
-      'TitleNode keeps its raw text (escaped only on serialization)',
-      () {
-        expect(const TitleNode('A & B').text, 'A & B');
-      },
-    );
+    test('TitleNode keeps its raw text (escaped only on serialization)', () {
+      expect(const TitleNode('A & B').text, 'A & B');
+    });
 
     test('MetaNode carries name/property/content/charset', () {
       const meta = MetaNode(property: 'og:title', content: 'Home');
@@ -57,6 +54,12 @@ void main() {
     test('nodes are DocumentNode subtypes (sealed hierarchy)', () {
       expect(const TitleNode('T'), isA<DocumentNode>());
       expect(const DocumentRootNode(body: []), isA<DocumentNode>());
+    });
+
+    test('JsonLdNode has empty const children list', () {
+      const node = JsonLdNode({'name': 'test'});
+      expect(node.children, isEmpty);
+      expect(node.children, isA<List<DocumentNode>>());
     });
   });
 }

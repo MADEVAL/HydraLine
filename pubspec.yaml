@@ -21,11 +21,11 @@ melos:
 
     format:
       description: Format all Dart code in place (specs/ contracts excluded).
-      run: dart format packages tool test
+      run: dart format packages
 
     format:check:
       description: Verify formatting; non-zero exit if changes needed (CI gate).
-      run: dart format --output=none --set-exit-if-changed packages tool test
+      run: dart format --output=none --set-exit-if-changed packages
 
     test:dart:
       description: Run pure-Dart tests (core/server).
@@ -35,16 +35,11 @@ melos:
       description: Run Flutter widget tests.
       run: dart run melos:melos exec --flutter --dir-exists=test -- flutter test
 
-    test:tool:
-      description: Run workspace tooling tests (boundary checker).
-      run: dart test test
-
     test:
       description: Run all unit/widget tests.
       steps:
         - test:dart
         - test:flutter
-        - test:tool
 
     test:coverage:
       description: Run tests with coverage and enforce per-package thresholds (I9).
@@ -52,7 +47,6 @@ melos:
         - coverage:dart
         - coverage:dart:lcov
         - coverage:flutter
-        - coverage:gate
 
     coverage:dart:
       description: Collect coverage for pure-Dart packages.

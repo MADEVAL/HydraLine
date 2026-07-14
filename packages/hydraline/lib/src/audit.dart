@@ -19,8 +19,8 @@ abstract final class Audit {
   static const int _titleMaxLength = 70;
   static const int _descriptionMaxLength = 160;
 
-/// Standalone: audits the raw HTML a crawler would see — title,
-/// meta description, Open Graph, canonical, headings and image alt.
+  /// Standalone: audits the raw HTML a crawler would see — title,
+  /// meta description, Open Graph, canonical, headings and image alt.
   static AuditReport auditHtml(String source) {
     final document = html.parse(source);
     final issues = <ValidationIssue>[];
@@ -118,9 +118,9 @@ abstract final class Audit {
     return AuditReport(issues: issues, exitCode: _exitCode(issues));
   }
 
-/// Server-integration comparator: the document body served buffered (to bots)
-/// must be byte-identical to the concatenation of the streamed chunks (to
-/// users).
+  /// Server-integration comparator: the document body served buffered (to bots)
+  /// must be byte-identical to the concatenation of the streamed chunks (to
+  /// users).
   static AuditReport compareBodies(String buffered, List<String> chunks) {
     final concatenated = chunks.join();
     if (buffered == concatenated) {

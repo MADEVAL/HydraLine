@@ -81,6 +81,33 @@ void main() {
         ),
       );
     });
+
+    test('SafeUrl equality and hashCode', () {
+      final a = SafeUrl.parse('https://example.com');
+      final b = SafeUrl.parse('https://example.com');
+      final c = SafeUrl.parse('https://other.com');
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+      expect(a, isNot(equals(c)));
+    });
+
+    test('SafeUrl.toString includes value', () {
+      final url = SafeUrl.parse('https://example.com');
+      expect(url.toString(), 'SafeUrl(https://example.com)');
+    });
+  });
+
+  group('UnsafeUrlException', () {
+    test('toString includes reason and raw url', () {
+      const ex = UnsafeUrlException(
+        'javascript:alert(1)',
+        'scheme not allowed',
+      );
+      expect(
+        ex.toString(),
+        'UnsafeUrlException: scheme not allowed (javascript:alert(1))',
+      );
+    });
   });
 
   group('Csp', () {

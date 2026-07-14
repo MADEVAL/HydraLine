@@ -5,15 +5,10 @@ library;
 import 'dart:async';
 
 import 'package:hydraline/hydraline.dart'
-    show
-        DocumentNode,
-        DocumentRootNode,
-        HtmlSerializer,
-        RouteEntry,
-        RouteManifest,
-        RouteMode;
+    show DocumentNode, DocumentRootNode, RouteEntry, RouteManifest, RouteMode;
 import 'package:shelf/shelf.dart';
 
+import 'delivery.dart' show ResponseDelivery;
 import 'http_semantics.dart' show RedirectException;
 
 /// The configuration for [hydralineMiddleware].
@@ -39,7 +34,7 @@ class HydralineConfig {
 
 /// A pure-Dart function that builds a [DocumentNode] for a given request and
 /// optional application data. The signature deliberately does **not** include
-  /// `User-Agent` — the builder is architecturally prevented from cloaking.
+/// `User-Agent` — the builder is architecturally prevented from cloaking.
 typedef DocumentBuilder =
     FutureOr<DocumentNode> Function(Request request, Object? data);
 
@@ -49,7 +44,8 @@ typedef DocumentBuilder =
 ///    or an empty page;
 /// 3. passes `app` routes through to the inner handler.
 Middleware hydralineMiddleware(HydralineConfig config) {
-  final serializer = const HtmlSerializer();
+  final delivery = const ResponseDelivery();
+  final botPattern = config.botUserAgentPattern;
   final routes = config.manifest.routes;
   final builders = config.builders;
 
@@ -80,14 +76,21 @@ Middleware hydralineMiddleware(HydralineConfig config) {
           } else {
             root = DocumentRootNode(body: []);
           }
-          final html = serializer.serialize(root);
-          return Response.ok(
-            html,
-            headers: {'Content-Type': 'text/html; charset=utf-8'},
-          );
+
+          if (_isBotRequest(request, botPattern)) {
+            return delivery.buffered(root);
+          }
+          return delivery.chunked(root);
       }
     };
   };
+}
+
+bool _isBotRequest(Request request, Pattern? botUserAgentPattern) {
+  if (botUserAgentPattern == null) return false;
+  final userAgent = request.headers['user-agent'];
+  if (userAgent == null) return false;
+  return botUserAgentPattern.allMatches(userAgent).isNotEmpty;
 }
 
 /// Returns the [RouteEntry] whose path matches [requestPath]. Supports exact

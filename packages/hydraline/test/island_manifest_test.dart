@@ -22,6 +22,24 @@ void main() {
       );
     });
 
+    test('rejects non-JSON-safe values nested in a list', () {
+      expect(
+        () => IslandStateCodec.encode({
+          'dates': [DateTime.utc(2026)],
+        }),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('rejects map with non-string keys', () {
+      expect(
+        () => IslandStateCodec.encode({
+          'map': {1: 'value'},
+        }),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
     test('byteSize reports the JSON payload size', () {
       expect(IslandStateCodec.byteSize({'a': 1}), '{"a":1}'.length);
     });

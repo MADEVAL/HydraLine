@@ -60,6 +60,61 @@ void main() {
       );
       expect(ssgMode, isFalse);
     });
+
+    testWidgets('updateShouldNotify returns true when collector changes', (
+      tester,
+    ) async {
+      final collector1 = SsgCollector('/a');
+      final collector2 = SsgCollector('/b');
+
+      await tester.pumpWidget(
+        HydraApp(collector: collector1, child: const SizedBox.shrink()),
+      );
+      final scope1 = tester.widget<HydraScope>(find.byType(HydraScope));
+
+      await tester.pumpWidget(
+        HydraApp(collector: collector2, child: const SizedBox.shrink()),
+      );
+      final scope2 = tester.widget<HydraScope>(find.byType(HydraScope));
+
+      expect(scope2.updateShouldNotify(scope1), isTrue);
+    });
+
+    testWidgets('updateShouldNotify returns true when isSsgMode changes', (
+      tester,
+    ) async {
+      final collector = SsgCollector('/');
+
+      final scope1 = HydraScope(
+        collector: collector,
+        isSsgMode: true,
+        child: const SizedBox.shrink(),
+      );
+      final scope2 = HydraScope(
+        collector: null,
+        isSsgMode: false,
+        child: const SizedBox.shrink(),
+      );
+
+      expect(scope2.updateShouldNotify(scope1), isTrue);
+    });
+
+    testWidgets('updateShouldNotify returns false when nothing changes', (
+      tester,
+    ) async {
+      const scope1 = HydraScope(
+        collector: null,
+        isSsgMode: false,
+        child: SizedBox.shrink(),
+      );
+      const scope2 = HydraScope(
+        collector: null,
+        isSsgMode: false,
+        child: SizedBox.shrink(),
+      );
+
+      expect(scope2.updateShouldNotify(scope1), isFalse);
+    });
   });
 
   group('SsgSandbox', () {

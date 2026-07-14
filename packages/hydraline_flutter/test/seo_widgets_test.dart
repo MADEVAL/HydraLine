@@ -122,5 +122,51 @@ void main() {
       );
       expect(find.byType(SizedBox), findsOneWidget);
     });
+
+    testWidgets('registers default hydration directive as onIdle', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        sandbox(Island(id: 'calc', type: IslandType.flutter)),
+      );
+      final node = seal().body[0] as IslandPlaceholderNode;
+      expect(node.directive, HydrationDirective.onIdle);
+    });
+
+    testWidgets('registers custom hydration directive', (tester) async {
+      await tester.pumpWidget(
+        sandbox(
+          Island(
+            id: 'calc',
+            type: IslandType.flutter,
+            directive: HydrationDirective.onLoad,
+          ),
+        ),
+      );
+      final node = seal().body[0] as IslandPlaceholderNode;
+      expect(node.directive, HydrationDirective.onLoad);
+    });
+
+    testWidgets('registers default render mode as ssr', (tester) async {
+      await tester.pumpWidget(
+        sandbox(Island(id: 'calc', type: IslandType.flutter)),
+      );
+      final node = seal().body[0] as IslandPlaceholderNode;
+      expect(node.renderMode, IslandRenderMode.ssr);
+    });
+
+    testWidgets('registers custom render mode', (tester) async {
+      await tester.pumpWidget(
+        sandbox(
+          Island(
+            id: 'calc',
+            type: IslandType.flutter,
+            renderMode: IslandRenderMode.skeletonOnly,
+          ),
+        ),
+      );
+      final node = seal().body[0] as IslandPlaceholderNode;
+      expect(node.renderMode, IslandRenderMode.skeletonOnly);
+    });
   });
 }

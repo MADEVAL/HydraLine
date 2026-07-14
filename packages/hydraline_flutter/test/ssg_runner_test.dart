@@ -67,4 +67,175 @@ void main() {
       expect(expanded, hasLength(2));
     });
   });
+
+  group('SSG runner asset copying', () {
+    late Directory tmpDir;
+
+    setUp(() {
+      tmpDir = Directory.systemTemp.createTempSync('hydraline_ssg_');
+    });
+
+    tearDown(() {
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    test(
+      'copies Flutter web assets when island factories are present',
+      () async {
+        final adapter = _TestAdapter([const RouteInfo(path: '/')]);
+        final manifest = RouteManifest.builder()
+            .route(
+              const RouteEntry(
+                path: '/',
+                mode: RouteMode.hybrid,
+                contentSource: WidgetContent(),
+              ),
+            )
+            .build();
+        final runner = SsgRunner(
+          routeManifest: manifest,
+          routeAdapter: adapter,
+          islandFactories: {'my-island': IslandType.flutter},
+        );
+        final result = await runner.run(outputDir: tmpDir.path);
+        expect(result.assetsCopied, isTrue);
+        expect(
+          await File('${tmpDir.path}/hydraline-island.js').exists(),
+          isTrue,
+        );
+        expect(
+          await File('${tmpDir.path}/hydraline-dispatcher.js').exists(),
+          isTrue,
+        );
+        expect(await File('${tmpDir.path}/service-worker.js').exists(), isTrue);
+      },
+    );
+
+    test('does not copy Flutter assets and marks assetsCopied false '
+        'when no islands are present', () async {
+      final adapter = _TestAdapter([const RouteInfo(path: '/about')]);
+      const manifestYaml = 'routes:\n  - path: /about\n    mode: document\n';
+      final runner = SsgRunner(
+        routeManifest: RouteManifest.parseYaml(manifestYaml),
+        routeAdapter: adapter,
+        islandFactories: {},
+      );
+      final result = await runner.run(outputDir: tmpDir.path);
+      expect(result.assetsCopied, isFalse);
+      expect(
+        await File('${tmpDir.path}/hydraline-island.js').exists(),
+        isFalse,
+      );
+      expect(
+        await File('${tmpDir.path}/flutter_bootstrap.js').exists(),
+        isFalse,
+      );
+    });
+
+    test('copies assets via package URI when web dir does not exist', () async {
+      final adapter = _TestAdapter([const RouteInfo(path: '/')]);
+      final webDir = Directory('web');
+      final renamed = Directory('web_tmp');
+      if (await webDir.exists()) {
+        await webDir.rename(renamed.path);
+      }
+      try {
+        final manifest = RouteManifest.builder()
+          ..route(
+            const RouteEntry(
+              path: '/',
+              mode: RouteMode.hybrid,
+              contentSource: WidgetContent(),
+            ),
+          );
+        final runner = SsgRunner(
+          routeManifest: manifest.build(),
+          routeAdapter: adapter,
+          islandFactories: {'my-island': IslandType.flutter},
+        );
+        await runner.run(outputDir: tmpDir.path);
+      } finally {
+        if (await renamed.exists()) {
+          await renamed.rename(webDir.path);
+        }
+      }
+    });
+  });
+
+  group('SSG runner dynamic segments integration', () {
+    late Directory tmpDir;
+
+    setUp(() {
+      tmpDir = Directory.systemTemp.createTempSync('hydraline_ssg_');
+    });
+
+    tearDown(() {
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    test(
+      'expands dynamic routes and generates HTML for each segment value',
+      () async {
+        final adapter = _TestAdapter([
+          const RouteInfo(path: '/blog/post-1'),
+          const RouteInfo(path: '/blog/post-2'),
+        ]);
+        final manifest = RouteManifest.builder()
+            .route(
+              const RouteEntry(
+                path: '/blog/:slug',
+                mode: RouteMode.document,
+                dynamicSegments: {
+                  'slug': ['post-1', 'post-2'],
+                },
+              ),
+            )
+            .build();
+        final runner = SsgRunner(
+          routeManifest: manifest,
+          routeAdapter: adapter,
+          islandFactories: {},
+        );
+        final result = await runner.run(outputDir: tmpDir.path);
+        expect(result.pagesWritten, 2);
+        final post1 = File('${tmpDir.path}/blog/post-1.html');
+        final post2 = File('${tmpDir.path}/blog/post-2.html');
+        expect(await post1.exists(), isTrue);
+        expect(await post2.exists(), isTrue);
+        final post1Content = await post1.readAsString();
+        expect(post1Content, contains('<!DOCTYPE html>'));
+        final post2Content = await post2.readAsString();
+        expect(post2Content, contains('<!DOCTYPE html>'));
+      },
+    );
+
+    test(
+      'skips route pattern path when dynamic segments are expanded',
+      () async {
+        final adapter = _TestAdapter([const RouteInfo(path: '/blog/post-1')]);
+        final manifest = RouteManifest.builder()
+            .route(
+              const RouteEntry(
+                path: '/blog/:slug',
+                mode: RouteMode.document,
+                dynamicSegments: {
+                  'slug': ['post-1'],
+                },
+              ),
+            )
+            .build();
+        final runner = SsgRunner(
+          routeManifest: manifest,
+          routeAdapter: adapter,
+          islandFactories: {},
+        );
+        await runner.run(outputDir: tmpDir.path);
+        expect(
+          await File('${tmpDir.path}/blog/-slug.html').exists(),
+          isFalse,
+          reason: 'the pattern path should not be written',
+        );
+      },
+    );
+  });
 }

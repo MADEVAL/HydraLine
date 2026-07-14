@@ -40,5 +40,23 @@ routes:
       final response = Http.notFound(body: root);
       expect(response.statusCode, 404);
     });
+
+    test('redirect with default 301 status', () {
+      final response = Http.redirect('/target');
+      expect(response.statusCode, 301);
+    });
+
+    test('redirect with 302 status', () {
+      final response = Http.redirect('/target', status: 302);
+      expect(response.statusCode, 302);
+    });
+  });
+
+  group('Assets', () {
+    test('serveCoreAssets returns 404 for unknown path', () async {
+      final handler = Assets.serveCoreAssets();
+      final response = await httpGet(handler, '/unknown-path');
+      expect(response.statusCode, 404);
+    });
   });
 }

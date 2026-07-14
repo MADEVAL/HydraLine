@@ -20,8 +20,8 @@ abstract final class IslandStateCodec {
   /// Soft budget (~10 KB) per island; devtools warns past this.
   static const int maxBytes = 10 * 1024;
 
-/// `jsonEncode` + HTML-attribute escape. Throws [ArgumentError] on a
-/// non-JSON-safe value (e.g. `DateTime`, `Uri`, functions, etc).
+  /// `jsonEncode` + HTML-attribute escape. Throws [ArgumentError] on a
+  /// non-JSON-safe value (e.g. `DateTime`, `Uri`, functions, etc).
   static String encode(IslandState state) {
     _validate(state, 'state');
     return escapeHtmlAttribute(jsonEncode(state));

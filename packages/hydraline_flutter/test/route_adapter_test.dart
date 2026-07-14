@@ -1,6 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
+class _MockGoRoute {
+  const _MockGoRoute(this.path);
+  final String path;
+}
+
+class _MockConfig {
+  const _MockConfig(this.routes);
+  final List<_MockGoRoute>? routes;
+}
+
+class _MockRouter {
+  const _MockRouter(this.configuration);
+  final _MockConfig configuration;
+}
+
 void main() {
   group('RouteAdapter', () {
     test('RouteInfo stores path and optional name', () {
@@ -29,5 +44,37 @@ void main() {
         expect(adapter, isA<RouteAdapter>());
       },
     );
+
+    test('GoRouterAdapter returns empty list when object has no routes', () {
+      final adapter = GoRouterAdapter(const Object());
+      expect(adapter.routes, isEmpty);
+    });
+
+    test('GoRouterAdapter.navigateToForExtraction completes', () async {
+      final adapter = GoRouterAdapter(const Object());
+      await adapter.navigateToForExtraction(const RouteInfo(path: '/'));
+    });
+
+    test('GoRouterAdapter.routes parses valid configuration', () {
+      final mockRoute = _MockGoRoute('/test');
+      final mockConfig = _MockConfig([mockRoute]);
+      final mockRouter = _MockRouter(mockConfig);
+      final adapter = GoRouterAdapter(mockRouter);
+      final routes = adapter.routes;
+      expect(routes, hasLength(1));
+      expect(routes[0].path, '/test');
+    });
+
+    test('GoRouterAdapter.routes returns empty for null routeList', () {
+      final mockConfig = _MockConfig(null);
+      final mockRouter = _MockRouter(mockConfig);
+      final adapter = GoRouterAdapter(mockRouter);
+      expect(adapter.routes, isEmpty);
+    });
+
+    test('Navigator2Adapter.navigateToForExtraction completes', () async {
+      final adapter = Navigator2Adapter([const RouteInfo(path: '/')]);
+      await adapter.navigateToForExtraction(const RouteInfo(path: '/'));
+    });
   });
 }

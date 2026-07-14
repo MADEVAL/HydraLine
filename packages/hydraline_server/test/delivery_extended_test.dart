@@ -47,5 +47,13 @@ void main() {
       expect(response.headers['hx-trigger'], isNull);
       expect(response.headers['hx-retarget'], isNull);
     });
+
+    test('emits HX-Reswap header when reswap is set', () {
+      final response = const HtmxResponse(
+        body: ParagraphNode(children: []),
+        reswap: 'outerHTML',
+      ).toResponse();
+      expect(response.headers['hx-reswap'], 'outerHTML');
+    });
   });
 }

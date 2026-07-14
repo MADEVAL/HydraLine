@@ -17,6 +17,19 @@ void main() {
       final cache = InMemoryCache();
       expect(await cache.get('nonexistent'), isNull);
     });
+
+    test('set with TTL stores entry that expires', () async {
+      final cache = InMemoryCache();
+      await cache.set('k', 'v', ttl: const Duration(milliseconds: 1));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(await cache.get('k'), isNull);
+    });
+
+    test('set with TTL stores entry that has not yet expired', () async {
+      final cache = InMemoryCache();
+      await cache.set('k', 'v', ttl: const Duration(hours: 1));
+      expect(await cache.get('k'), 'v');
+    });
   });
 
   group('Assets', () {

@@ -18,6 +18,15 @@ void main() {
       expect(json['datePublished'], '2026-07-14T00:00:00.000Z');
     });
 
+    test('article with image', () {
+      final json = JsonLd.article(
+        headline: 'Hello',
+        author: 'Jane',
+        image: SafeUrl.parse('https://x/img.jpg'),
+      ).toJson();
+      expect(json['image'], 'https://x/img.jpg');
+    });
+
     test('product with offer', () {
       final json = JsonLd.product(
         name: 'iPhone',
@@ -72,6 +81,98 @@ void main() {
       final json = JsonLd.raw({'@type': 'Thing', 'name': 'X'}).toJson();
       expect(json['@type'], 'Thing');
       expect(json['name'], 'X');
+    });
+
+    test('product with image', () {
+      final json = JsonLd.product(
+        name: 'Widget',
+        image: SafeUrl.parse('https://x/img.jpg'),
+      ).toJson();
+      expect(json['image'], 'https://x/img.jpg');
+      expect(json.containsKey('offers'), isFalse);
+    });
+
+    test('product with description', () {
+      final json = JsonLd.product(
+        name: 'Widget',
+        description: 'A great widget',
+      ).toJson();
+      expect(json['description'], 'A great widget');
+    });
+
+    test('webPage with all params', () {
+      final json = JsonLd.webPage(
+        name: 'Home',
+        url: SafeUrl.parse('https://x/'),
+        description: 'Home page',
+      ).toJson();
+      expect(json['@type'], 'WebPage');
+      expect(json['name'], 'Home');
+      expect(json['url'], 'https://x/');
+      expect(json['description'], 'Home page');
+    });
+
+    test('organization with logo and url', () {
+      final json = JsonLd.organization(
+        name: 'Acme',
+        url: SafeUrl.parse('https://acme.com'),
+        logo: SafeUrl.parse('https://acme.com/logo.png'),
+      ).toJson();
+      expect(json['@type'], 'Organization');
+      expect(json['name'], 'Acme');
+      expect(json['url'], 'https://acme.com');
+      expect(json['logo'], 'https://acme.com/logo.png');
+    });
+
+    test('event', () {
+      final json = JsonLd.event(
+        name: 'Conference',
+        startDate: DateTime.utc(2026, 7, 14),
+        endDate: DateTime.utc(2026, 7, 16),
+        location: 'Convention Center',
+      ).toJson();
+      expect(json['@type'], 'Event');
+      expect(json['name'], 'Conference');
+      expect(json['startDate'], '2026-07-14T00:00:00.000Z');
+      expect(json['endDate'], '2026-07-16T00:00:00.000Z');
+      expect((json['location']! as Map)['@type'], 'Place');
+      expect((json['location']! as Map)['name'], 'Convention Center');
+    });
+
+    test('event without optional fields', () {
+      final json = JsonLd.event(
+        name: 'Meeting',
+        startDate: DateTime.utc(2026, 1, 1),
+      ).toJson();
+      expect(json['@type'], 'Event');
+      expect(json.containsKey('endDate'), isFalse);
+      expect(json.containsKey('location'), isFalse);
+    });
+
+    test('recipe', () {
+      final json = JsonLd.recipe(
+        name: 'Pancakes',
+        ingredients: ['flour', 'milk'],
+        steps: ['mix', 'cook'],
+      ).toJson();
+      expect(json['@type'], 'Recipe');
+      expect(json['name'], 'Pancakes');
+      expect(json['recipeIngredient'], ['flour', 'milk']);
+      final instructions = json['recipeInstructions']! as List;
+      expect(instructions, hasLength(2));
+      expect((instructions[0] as Map)['@type'], 'HowToStep');
+    });
+
+    test('review without bestRating', () {
+      final json = JsonLd.review(itemName: 'Product', rating: 4).toJson();
+      expect(json['@type'], 'Review');
+      expect((json['reviewRating']! as Map)['ratingValue'], 4);
+    });
+
+    test('review without author', () {
+      final json = JsonLd.review(itemName: 'Product', rating: 3).toJson();
+      expect(json['@type'], 'Review');
+      expect(json.containsKey('author'), isFalse);
     });
   });
 

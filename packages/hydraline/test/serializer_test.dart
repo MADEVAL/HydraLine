@@ -268,6 +268,14 @@ void main() {
       expect(frag(island), contains('data-media="(min-width: 800px)"'));
     });
 
+    test('flutter island with manual directive', () {
+      const island = IslandPlaceholderNode(
+        id: 'manual1',
+        directive: HydrationDirective.manual,
+      );
+      expect(frag(island), contains('data-directive="hydrateManual"'));
+    });
+
     test('htmx island div with defaults', () {
       expect(
         frag(const HtmxIslandNode(id: 'reviews', endpoint: '/api/reviews')),

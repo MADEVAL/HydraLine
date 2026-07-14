@@ -15,3 +15,7 @@ final Map<String, IslandFactory> islandFactories = {};
 void main() {
   runWidget(IslandHost(factories: islandFactories));
 }
+
+void islandEntryPoint() {
+  main();
+}

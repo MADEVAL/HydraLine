@@ -4,6 +4,7 @@
 library;
 
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:hydraline/hydraline.dart';
 
@@ -41,6 +42,7 @@ abstract interface class SsgRunner {
   }) => _SsgRunner(
     manifest: routeManifest as RouteManifest,
     adapter: routeAdapter,
+    islandFactories: islandFactories,
   );
 
   /// The ONLY responsible for copying the island bundle + web/ assets
@@ -50,13 +52,20 @@ abstract interface class SsgRunner {
 }
 
 class _SsgRunner implements SsgRunner {
-  _SsgRunner({required RouteManifest manifest, required RouteAdapter adapter})
-    : _manifest = manifest,
-      _adapter = adapter;
+  _SsgRunner({
+    required RouteManifest manifest,
+    required RouteAdapter adapter,
+    required Map<String, Object?> islandFactories,
+  }) : _manifest = manifest,
+       _adapter = adapter,
+       _islandFactories = islandFactories;
 
   final RouteManifest _manifest;
   final RouteAdapter _adapter;
+  final Map<String, Object?> _islandFactories;
   final HtmlSerializer _serializer = const HtmlSerializer();
+
+  bool _hasFlutterIslands() => _islandFactories.isNotEmpty;
 
   @override
   Future<SsgResult> run({required String outputDir}) async {
@@ -74,27 +83,32 @@ class _SsgRunner implements SsgRunner {
         continue;
       }
 
-      // Build a minimal DocumentNode for the route.
-      final head = buildHead(route.metadata ?? defaultSeoMeta(route));
-      final root = DocumentRootNode(
-        head: head,
-        body: const [],
-        lang: route.metadata?.lang,
-      );
-      final html = _serializer.serialize(root);
+      final paths = route.dynamicSegments.isNotEmpty
+          ? DynamicSegments.expand({route.path: route.dynamicSegments})
+          : <String>[route.path];
 
-      final filePath = _filePath(outputDir, route.path);
-      final file = File(filePath);
-      await file.parent.create(recursive: true);
-      await file.writeAsString(html);
-      pagesWritten++;
+      for (final concretePath in paths) {
+        final head = buildHead(route.metadata ?? defaultSeoMeta(route));
+        final root = DocumentRootNode(
+          head: head,
+          body: const [],
+          lang: route.metadata?.lang,
+        );
+        final html = _serializer.serialize(root);
 
-      final canonical = route.metadata?.canonical;
-      entries.add(
-        SitemapEntry(
-          loc: canonical ?? SafeUrl.parse('https://localhost${route.path}'),
-        ),
-      );
+        final filePath = _filePath(outputDir, concretePath);
+        final file = File(filePath);
+        await file.parent.create(recursive: true);
+        await file.writeAsString(html);
+        pagesWritten++;
+
+        final canonical = route.metadata?.canonical;
+        entries.add(
+          SitemapEntry(
+            loc: canonical ?? SafeUrl.parse('https://localhost$concretePath'),
+          ),
+        );
+      }
     }
 
     // Sitemap
@@ -113,7 +127,41 @@ class _SsgRunner implements SsgRunner {
     );
     await File('$outputDir/robots.txt').writeAsString(robotsTxt);
 
-    return SsgResult(pagesWritten: pagesWritten, assetsCopied: false);
+    final assetsCopied = _hasFlutterIslands();
+    if (assetsCopied) {
+      await _copyAssets(outputDir);
+    }
+
+    return SsgResult(pagesWritten: pagesWritten, assetsCopied: assetsCopied);
+  }
+
+  Future<void> _copyAssets(String outputDir) async {
+    final webDir = await _findWebDir();
+    if (webDir == null) return;
+
+    await for (final entity in webDir.list()) {
+      if (entity is File) {
+        final name = entity.uri.pathSegments.last;
+        await entity.copy('$outputDir/$name');
+      }
+    }
+  }
+
+  Future<Directory?> _findWebDir() async {
+    final cwdWeb = Directory('web');
+    if (await cwdWeb.exists()) return cwdWeb;
+
+    try {
+      final libUri = await Isolate.resolvePackageUri(
+        Uri.parse('package:hydraline_flutter/hydraline_flutter.dart'),
+      );
+      if (libUri != null) {
+        final resolved = Directory.fromUri(libUri.resolve('../../web/'));
+        if (await resolved.exists()) return resolved;
+      }
+    } catch (_) {}
+
+    return null;
   }
 
   String _filePath(String outputDir, String routePath) {

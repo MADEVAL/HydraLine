@@ -105,4 +105,27 @@ void main() {
       },
     );
   });
+
+  group('Island widget SSG extraction', () {
+    testWidgets('Island with mediaQuery registers an island node', (
+      tester,
+    ) async {
+      final collector = SsgCollector('/test');
+      await tester.pumpWidget(
+        SsgSandbox(
+          collector: collector,
+          child: const Island(
+            id: 'responsive',
+            type: IslandType.flutter,
+            mediaQuery: '(min-width: 800px)',
+          ),
+        ),
+      );
+      await tester.pump();
+      final root = collector.seal() as DocumentRootNode;
+      expect(root.body, hasLength(1));
+      final island = root.body[0] as IslandPlaceholderNode;
+      expect(island.id, 'responsive');
+    });
+  });
 }
