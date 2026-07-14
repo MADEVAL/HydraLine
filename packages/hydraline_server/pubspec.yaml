@@ -3,7 +3,8 @@ description: >-
   Hydraline pure-Dart server: shelf/Dart Frog SSR, single-pass streaming, HTMX
   helpers, caching and bot-aware delivery with a byte-identical document body.
 version: 0.0.1
-repository: https://github.com/hydraline/hydraline
+repository: https://github.com/MADEVAL/HydraLine
+homepage: https://globus.studio
 topics:
   - seo
   - ssr

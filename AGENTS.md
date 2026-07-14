@@ -69,6 +69,13 @@ flutter test --tags ssg            # SSG-тесты (нужен flutter_tester)
 - **Комментарии** — только по необходимости; публичный API документируется dartdoc.
 - **Язык** - в репозитории пишем всё на английском языке и кратко!
 
+## Автор / атрибуция
+
+- **Автор:** Yevhen Leonidov — личный сайт https://leonidov.dev
+- **Студия:** Globus Studio — https://globus.studio
+- LICENSE (copyright holder), `homepage`/`repository` в pubspec и прочая
+  атрибуция — на эти данные.
+
 ## Git-конвенции
 
 - Ветки: `feat/<phase-id>-<slug>`, `fix/<slug>`, `docs/<slug>`, `chore/<slug>`.
@@ -76,6 +83,23 @@ flutter test --tags ssg            # SSG-тесты (нужен flutter_tester)
   (`type`: feat|fix|docs|test|refactor|perf|build|ci|chore;
   `scope`: core|server|flutter|web|ci|docs).
 - Коммит/пуш/PR — только по явной просьбе пользователя.
+- **Все правки фиксируются через PR, а не прямым коммитом в `main`:** ветка →
+  push → `gh pr create`. Прямой коммит/push в `main` не делать.
+- **Аутентификация `gh` через токен из Windows Credential Manager** (там его
+  хранит VS Code) — работает, даже если `gh` не залогинен отдельно:
+
+  ```powershell
+  # 1. Вытащить токен из Windows Credential Manager
+  $env:GH_TOKEN = (& {
+      "protocol=https`nhost=github.com" | git credential-manager get 2>$null
+  } | Where-Object { $_ -match 'password=' } | ForEach-Object { $_ -replace 'password=', '' })
+
+  # 2. Проверить
+  gh auth status
+
+  # 3. Дальше gh работает как обычно
+  gh pr create ...
+  ```
 
 ## Definition of Done
 
