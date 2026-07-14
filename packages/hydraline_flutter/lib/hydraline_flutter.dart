@@ -2,6 +2,9 @@
 /// and the level-2 web runtime assets.
 library;
 
+export 'src/assets/js_custom_element.dart' show jsCustomElement;
+export 'src/assets/js_dispatcher.dart' show jsDispatcher;
+export 'src/assets/js_service_worker.dart' show jsServiceWorker;
 export 'src/hydra_app.dart' show HydraApp, HydraScope;
 export 'src/island.dart' show Island;
 export 'src/island_host.dart' show IslandFactory, IslandHost;
