@@ -317,5 +317,34 @@ void main() {
         'data-island-level="vanilla">tab</div>',
       );
     });
+
+    test('vanilla island serializes non-empty config as data-config JSON', () {
+      const island = VanillaIslandNode(
+        id: 'carousel1',
+        kind: 'carousel',
+        config: {'autoplay': true, 'interval': 3000},
+        children: [],
+      );
+      expect(
+        frag(island),
+        '<div class="hydraline-island" data-island="carousel" '
+        'data-island-level="vanilla" '
+        'data-config="{&quot;autoplay&quot;:true,&quot;interval&quot;:3000}">'
+        '</div>',
+      );
+    });
+
+    test('vanilla island omits data-config when config is empty', () {
+      const island = VanillaIslandNode(id: 'x', kind: 'tabs', children: []);
+      expect(frag(island), isNot(contains('data-config')));
+    });
+
+    test('flutter island with non-JSON-safe state throws ArgumentError', () {
+      final island = IslandPlaceholderNode(
+        id: 'bad',
+        state: {'when': DateTime(2026)},
+      );
+      expect(() => frag(island), throwsArgumentError);
+    });
   });
 }

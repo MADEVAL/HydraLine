@@ -67,6 +67,21 @@ routes:
       final response = await httpGet(handler, '/app');
       expect(response.headers.containsKey('x-robots-tag'), isFalse);
     });
+
+    test('app route emits nofollow from metadata robots', () async {
+      final handler = _handler('''
+routes:
+  - path: /app
+    mode: app
+    noindex: false
+    metadata:
+      title: App
+      robots:
+        nofollow: true
+''');
+      final response = await httpGet(handler, '/app');
+      expect(response.headers['x-robots-tag'], 'nofollow');
+    });
   });
 
   group('Assets.serveCoreAssets - L0/L1 JS', () {

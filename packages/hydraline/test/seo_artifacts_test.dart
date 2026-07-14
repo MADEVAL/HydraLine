@@ -105,6 +105,23 @@ void main() {
       expect(xml, contains('href="https://x.example/p?q=&quot;x&quot;"'));
       expect(xml, isNot(contains('q="x"')));
     });
+
+    test('escapes single quotes as &#39; for HTML4 compatibility', () async {
+      final source = _ListSource([
+        SitemapEntry(
+          loc: SafeUrl.parse('https://x.example/p'),
+          alternates: [
+            (hreflang: 'en', href: SafeUrl.parse("https://x.example/p?q='x'")),
+          ],
+        ),
+      ]);
+      final xml = (await Sitemap.generate(
+        source,
+        baseUrl: base,
+      )).files['sitemap.xml']!;
+      expect(xml, contains('&#39;x&#39;'));
+      expect(xml, isNot(contains('&apos;')));
+    });
   });
 
   group('Sitemap.generate - autosplit', () {

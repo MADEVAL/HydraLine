@@ -111,6 +111,18 @@ void main() {
       expect(parsed.routes.map((r) => r.path), ['/', '/app']);
       expect(parsed.routes[0].contentSource, isA<WidgetContent>());
     });
+
+    test('baseUrl and version set on the builder round-trip through YAML', () {
+      final manifest =
+          (RouteManifest.builder()
+                ..version('2')
+                ..baseUrl('https://example.com')
+                ..route(const RouteEntry(path: '/', mode: RouteMode.document)))
+              .build();
+      expect(manifest.baseUrl, 'https://example.com');
+      final parsed = RouteManifest.parseYaml(manifest.toYaml());
+      expect(parsed.baseUrl, 'https://example.com');
+    });
   });
 
   group('YAML serialisation details', () {

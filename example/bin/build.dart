@@ -17,7 +17,6 @@ void main(List<String> args) async {
   exitCode = await runSsgCli(
     manifestPath: manifestPath,
     outputDir: outputDir,
-    adapter: Navigator2Adapter([]),
     islandFactories: {'calculator': IslandType.flutter},
     builders: {
       '/': (path) => homePage(),

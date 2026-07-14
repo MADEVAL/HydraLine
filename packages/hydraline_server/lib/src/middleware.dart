@@ -86,16 +86,21 @@ Middleware hydralineMiddleware(HydralineConfig config) {
       switch (match.mode) {
         case RouteMode.app:
           final response = await inner(request);
-          // App routes default to noindex unless explicitly overridden.
-          return Http.withRobots(response, noindex: match.noindex ?? true);
+          // App routes default to noindex unless explicitly overridden, and
+          // honour nofollow from route metadata.
+          final robots = match.metadata?.robots;
+          return Http.withRobots(
+            response,
+            noindex: match.noindex ?? robots?.noindex ?? true,
+            nofollow: robots?.nofollow ?? false,
+          );
         case RouteMode.document:
         case RouteMode.hybrid:
           final robotsHeaders = _robotsHeaders(match);
           final builder = builders[match.path];
 
           if (cache != null) {
-            final query = request.url.query;
-            final cacheKey = query.isEmpty ? path : '$path?$query';
+            final cacheKey = _cacheKey(path, request);
             final cached = await cache.get(cacheKey);
             String html;
             if (cached != null) {
@@ -110,13 +115,7 @@ Middleware hydralineMiddleware(HydralineConfig config) {
               html = const HtmlSerializer().serialize(root);
               await cache.set(cacheKey, html, ttl: cacheTtl);
             }
-            return _cachedResponse(
-              request,
-              html,
-              cacheTtl,
-              robotsHeaders,
-              delivery,
-            );
+            return _cachedResponse(request, html, cacheTtl, robotsHeaders);
           }
 
           final DocumentNode root;
@@ -168,7 +167,6 @@ Response _cachedResponse(
   String html,
   Duration? cacheTtl,
   Map<String, String> robotsHeaders,
-  ResponseDelivery delivery,
 ) {
   final etag = _etag(html);
   final headers = <String, String>{
@@ -209,13 +207,35 @@ bool _ifNoneMatchContains(String? headerValue, String etag) {
   return false;
 }
 
+/// Builds the cache key: the canonical path plus a canonicalised query string
+/// (keys and values sorted) so that `?a=1&b=2` and `?b=2&a=1` share one entry.
+String _cacheKey(String path, Request request) {
+  final params = request.url.queryParametersAll;
+  if (params.isEmpty) {
+    return path;
+  }
+  final keys = params.keys.toList()..sort();
+  final pairs = <String>[];
+  for (final key in keys) {
+    final values = [...params[key]!]..sort();
+    for (final value in values) {
+      pairs.add(
+        '${Uri.encodeQueryComponent(key)}=${Uri.encodeQueryComponent(value)}',
+      );
+    }
+  }
+  return '$path?${pairs.join('&')}';
+}
+
 /// Deterministic 64-bit FNV-1a hash over the HTML - stable across process
-/// restarts, formatted as 16 lowercase hex digits.
+/// restarts, formatted as 16 lowercase hex digits. The explicit 64-bit mask
+/// keeps the result independent of the platform's int-overflow behaviour.
 String _etag(String html) {
+  const mask = 0xFFFFFFFFFFFFFFFF;
   var hash = 0xcbf29ce484222325;
   for (final unit in html.codeUnits) {
-    hash ^= unit;
-    hash *= 0x100000001b3;
+    hash = (hash ^ unit) & mask;
+    hash = (hash * 0x100000001b3) & mask;
   }
   final high = (hash >>> 32).toRadixString(16).padLeft(8, '0');
   final low = (hash & 0xFFFFFFFF).toRadixString(16).padLeft(8, '0');
@@ -230,14 +250,16 @@ bool _isBotRequest(Request request, Pattern? botUserAgentPattern) {
 }
 
 /// Returns the [RouteEntry] whose path matches [requestPath]. Supports exact
-/// and prefix matching so `/blog/post-1` matches `/blog/:slug`.
+/// and prefix matching so `/blog/post-1` matches `/blog/:slug`. Route patterns
+/// are canonicalised, so a trailing slash in the manifest still matches.
 RouteEntry? _matchRoute(List<RouteEntry> routes, String requestPath) {
   RouteEntry? prefixMatch;
   for (final route in routes) {
-    if (route.path == requestPath) {
+    final routePath = Http.canonicalizePath(route.path);
+    if (routePath == requestPath) {
       return route;
     }
-    if (_isPrefixMatch(route.path, requestPath)) {
+    if (_isPrefixMatch(routePath, requestPath)) {
       prefixMatch ??= route;
     }
   }

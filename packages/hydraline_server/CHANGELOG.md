@@ -1,3 +1,18 @@
+## 0.0.3
+
+- **Fixed:** route patterns with a trailing slash in the manifest (e.g.
+  `/about/`) now match, because route paths are canonicalised during matching.
+- `Http.redirect` preserves an explicit status (301/302/303/307/308) instead
+  of coercing everything non-301 to 302.
+- `app` routes now emit `nofollow` from route metadata (previously only
+  `noindex` was honoured on app routes).
+- The cache key canonicalises query-parameter order, so `?a=1&b=2` and
+  `?b=2&a=1` share one cache entry.
+- The ETag hash applies an explicit 64-bit mask, making it independent of the
+  platform's int-overflow behaviour.
+- Removed a dead `delivery` parameter from the cached-response path.
+- Added `issue_tracker` to the package metadata.
+
 ## 0.0.2
 
 - **Fixed:** builders registered under dynamic route patterns

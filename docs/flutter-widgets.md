@@ -56,8 +56,10 @@ Seo.image(
 
 Registers an `ImageNode` (with `SafeUrl` validation). At runtime, renders an
 `Image.network` with `alt` as the semantic label; when the image cannot load
-it degrades to a `SizedBox` with the given dimensions. If `src` is not a
-valid URL, registration is silently skipped.
+it degrades to a `SizedBox` with the given dimensions. During SSG extraction
+only the registration happens and a plain `SizedBox` placeholder is rendered
+(no network fetch). If `src` is not a valid URL, registration is silently
+skipped.
 
 ### Seo.link
 
@@ -393,9 +395,9 @@ The `SsgRunner` generates static HTML from a route manifest.
 
 ```dart
 SsgRunner({
-  required Object routeManifest,        // RouteManifest
-  required RouteAdapter routeAdapter,
+  required RouteManifest routeManifest,
   required Map<String, Object?> islandFactories,
+  RouteAdapter? routeAdapter,           // optional; manifest drives iteration
   Map<String, SsgPageBuilder> builders = const {},
 })
 
@@ -410,15 +412,14 @@ The runner:
    generated from the manifest
 4. Serializes HTML files into the output directory
 5. Generates `sitemap.xml` (with auto-split at 50,000 URLs) and `robots.txt`
-6. Copies the island runtime assets (custom element, dispatcher, service
-   worker) into the output - only when Flutter islands exist
+6. Writes the island runtime JS (custom element, dispatcher, service
+   worker) into the output - only when a `IslandType.flutter` factory exists
 
 ```dart
 typedef SsgPageBuilder = DocumentNode Function(String path);
 
 final runner = SsgRunner(
   routeManifest: manifest,
-  routeAdapter: Navigator2Adapter([]),
   islandFactories: {},
   builders: {
     '/blog/:slug': (path) => DocumentRootNode(

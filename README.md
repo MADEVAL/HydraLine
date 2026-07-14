@@ -58,9 +58,9 @@ top.** No new framework. No rewrite. One route at a time.
 ```yaml
 # pubspec.yaml
 dependencies:
-  hydraline: ^0.0.2           # core - pure Dart
-  hydraline_server: ^0.0.2    # SSR - pure Dart (shelf / Dart Frog)
-  hydraline_flutter: ^0.0.2   # widgets + SSG + web runtime
+  hydraline: ^0.0.3           # core - pure Dart
+  hydraline_server: ^0.0.3    # SSR - pure Dart (shelf / Dart Frog)
+  hydraline_flutter: ^0.0.3   # widgets + SSG + web runtime
 ```
 
 Build a page in pure Dart:
@@ -113,7 +113,6 @@ void main(List<String> args) async {
   await runSsgCli(
     manifestPath: 'hydraline.routes.yaml',
     outputDir: 'dist',
-    adapter: Navigator2Adapter([]),
     islandFactories: {'calculator': IslandType.flutter},
     builders: {'/': (path) => page},
   );

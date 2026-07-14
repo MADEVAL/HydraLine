@@ -22,11 +22,15 @@ class RedirectException implements Exception {
 
 /// HTTP / status helper.
 abstract final class Http {
-  /// 301/302 redirect.
+  /// Redirect with the given status (301/302/303/307/308). The caller's
+  /// status is preserved; unknown statuses fall back to a `Location` header.
   static Response redirect(String location, {int status = 301}) {
-    return status == 301
-        ? Response.movedPermanently(location)
-        : Response.found(location);
+    return switch (status) {
+      301 => Response.movedPermanently(location),
+      302 => Response.found(location),
+      303 => Response.seeOther(location),
+      _ => Response(status, headers: {'location': location}),
+    };
   }
 
   /// 404.

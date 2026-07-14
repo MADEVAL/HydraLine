@@ -127,14 +127,18 @@ class _SeoImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scope = HydraScope.of(context);
     final url = SafeUrl.tryParse(src);
     if (url != null) {
-      HydraScope.of(
-        context,
-      ).collector?.addImage(url, alt, width: width, height: height);
+      scope.collector?.addImage(url, alt, width: width, height: height);
     }
     final w = width?.toDouble();
     final h = height?.toDouble();
+    // During SSG extraction only the registration above matters; skip the
+    // network fetch and render a sized placeholder instead.
+    if (scope.isSsgMode) {
+      return SizedBox(width: w, height: h);
+    }
     return Image.network(
       src,
       width: w,

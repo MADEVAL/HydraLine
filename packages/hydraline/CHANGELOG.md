@@ -1,3 +1,16 @@
+## 0.0.3
+
+- `RouteManifestBuilder` gained `version()` and `baseUrl()` setters, so
+  programmatically built manifests can carry a `base_url`.
+- The serializer now routes flutter-island `data-state` through
+  `IslandStateCodec.encode`, so non-JSON-safe props raise a clear
+  `ArgumentError` at serialization time.
+- `VanillaIslandNode.config` is serialized as a `data-config` JSON attribute
+  when non-empty (previously the field was silently dropped).
+- Sitemap single-quote escaping switched from `&apos;` to `&#39;` to match
+  `escapeHtmlAttribute`.
+- Added `issue_tracker` to the package metadata.
+
 ## 0.0.2
 
 - **Breaking:** `HtmlSerializer()` no longer takes `SerializerOptions`; the

@@ -165,11 +165,12 @@ abstract final class Sitemap {
   }
 
   /// Escapes text and attribute values for XML output. `"` and `'` are
-  /// included so the same escaper is safe inside quoted attributes.
+  /// included so the same escaper is safe inside quoted attributes. `'` uses
+  /// the numeric `&#39;` (HTML4-compatible), matching the attribute escaper.
   static String _escape(String s) => s
       .replaceAll('&', '&amp;')
       .replaceAll('<', '&lt;')
       .replaceAll('>', '&gt;')
       .replaceAll('"', '&quot;')
-      .replaceAll("'", '&apos;');
+      .replaceAll("'", '&#39;');
 }

@@ -271,14 +271,10 @@
     var viewId = islandViews[id];
     if (viewId !== undefined && enginePromise) {
       delete islandViews[id];
+      /* removeView targets the captured (old) view id; a later hydrate()
+       * gets a fresh id via addView(), so a live view is never torn down. */
       enginePromise.then(function (app) {
-        /* Skip removal if the island re-hydrated onto this view id in the
-         * meantime - never tear down a freshly mounted view. */
-        if (
-          app &&
-          typeof app.removeView === 'function' &&
-          islandViews[id] !== viewId
-        ) {
+        if (app && typeof app.removeView === 'function') {
           app.removeView(viewId);
         }
       });
@@ -402,7 +398,7 @@
   /* -- public API ---------------------------------------------------------------- */
 
   win.hydraline = {
-    version: '0.0.2',
+    version: '0.0.3',
     config: config,
     views: islandViews,
     hydrate: hydrate,

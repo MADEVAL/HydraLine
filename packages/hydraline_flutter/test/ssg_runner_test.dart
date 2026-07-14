@@ -204,6 +204,93 @@ routes:
     });
   });
 
+  group('SsgRunner construction', () {
+    late Directory tmpDir;
+
+    setUp(() {
+      tmpDir = Directory.systemTemp.createTempSync('hydraline_ssg_');
+    });
+
+    tearDown(() {
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    test('runs without an explicit route adapter', () async {
+      const manifestYaml = 'routes:\n  - path: /\n    mode: document\n';
+      final runner = SsgRunner(
+        routeManifest: RouteManifest.parseYaml(manifestYaml),
+        islandFactories: {},
+      );
+      final result = await runner.run(outputDir: tmpDir.path);
+      expect(result.pagesWritten, 1);
+    });
+  });
+
+  group('SSG runner asset copying by island type', () {
+    late Directory tmpDir;
+
+    setUp(() {
+      tmpDir = Directory.systemTemp.createTempSync('hydraline_ssg_');
+    });
+
+    tearDown(() {
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    test(
+      'does not copy Flutter runtime for a vanilla-only factory map',
+      () async {
+        final manifest = RouteManifest.builder()
+            .route(
+              const RouteEntry(
+                path: '/',
+                mode: RouteMode.hybrid,
+                contentSource: WidgetContent(),
+              ),
+            )
+            .build();
+        final runner = SsgRunner(
+          routeManifest: manifest,
+          islandFactories: {'faq': IslandType.vanilla},
+        );
+        final result = await runner.run(outputDir: tmpDir.path);
+        expect(result.assetsCopied, isFalse);
+        expect(
+          await File('${tmpDir.path}/hydraline-island.js').exists(),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'copies Flutter runtime when a flutter island type is present',
+      () async {
+        final manifest = RouteManifest.builder()
+            .route(
+              const RouteEntry(
+                path: '/',
+                mode: RouteMode.hybrid,
+                contentSource: WidgetContent(),
+              ),
+            )
+            .build();
+        final runner = SsgRunner(
+          routeManifest: manifest,
+          islandFactories: {
+            'faq': IslandType.vanilla,
+            'calc': IslandType.flutter,
+          },
+        );
+        final result = await runner.run(outputDir: tmpDir.path);
+        expect(result.assetsCopied, isTrue);
+        expect(
+          await File('${tmpDir.path}/hydraline-island.js').exists(),
+          isTrue,
+        );
+      },
+    );
+  });
+
   group('SSG runner asset copying', () {
     late Directory tmpDir;
 

@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import 'document_node.dart';
 import 'escaping.dart';
+import 'island_manifest.dart' show IslandStateCodec;
 
 /// Serializes a [DocumentNode] tree to HTML.
 abstract interface class HtmlSerializer {
@@ -333,7 +334,7 @@ class _HtmlSerializer implements HtmlSerializer {
     }
     out
       ..write(' data-state="')
-      ..write(escapeHtmlAttribute(jsonEncode(n.state)))
+      ..write(IslandStateCodec.encode(n.state))
       ..write('" role="region" aria-busy="true">')
       ..write('<template shadowrootmode="open"><style>')
       ..write(':host{display:block;contain:layout style paint}');
@@ -377,7 +378,14 @@ class _HtmlSerializer implements HtmlSerializer {
     out
       ..write('<div class="hydraline-island" data-island="')
       ..write(escapeHtmlAttribute(n.kind))
-      ..write('" data-island-level="vanilla">');
+      ..write('" data-island-level="vanilla"');
+    if (n.config.isNotEmpty) {
+      out
+        ..write(' data-config="')
+        ..write(escapeHtmlAttribute(jsonEncode(n.config)))
+        ..write('"');
+    }
+    out.write('>');
     _writeAll(n.children, out);
     out.write('</div>');
   }

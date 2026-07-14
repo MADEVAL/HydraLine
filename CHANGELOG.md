@@ -6,10 +6,23 @@ each package's own changelog:
 [hydraline_server](packages/hydraline_server/CHANGELOG.md) ·
 [hydraline_flutter](packages/hydraline_flutter/CHANGELOG.md).
 
-## 0.0.2
+## 0.0.3
 
-Pre-production hardening: every finding from the full repository review fixed
-and covered by regression tests.
+Second-pass review polish - every remaining finding from the follow-up review
+fixed and regression-tested.
+
+- `hydraline` - `RouteManifestBuilder.version/baseUrl` setters; island
+  `data-state` validated via `IslandStateCodec`; `VanillaIslandNode.config`
+  serialized as `data-config`; sitemap `'` escaped as `&#39;`; `issue_tracker`
+  metadata.
+- `hydraline_server` - trailing-slash route patterns match; `Http.redirect`
+  preserves 303/307/308; app routes emit `nofollow`; cache key normalises
+  query order; explicit 64-bit ETag mask; dead `delivery` parameter removed.
+- `hydraline_flutter` - `Seo.image` skips the network fetch during SSG
+  extraction; `SsgRunner`/`runSsgCli` adapter is optional; island runtime JS
+  written only for actual flutter islands; `dehydrate` simplified.
+
+## 0.0.2
 
 - `hydraline_server` - dynamic-route builders are now invoked (pattern-keyed
   lookup), cache keys include the query string, request paths are

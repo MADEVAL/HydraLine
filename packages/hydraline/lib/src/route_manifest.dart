@@ -73,12 +73,32 @@ abstract interface class RouteManifest {
 
 /// Builder for a [RouteManifest].
 abstract interface class RouteManifestBuilder {
+  /// Sets the `version` field emitted by [RouteManifest.toYaml].
+  RouteManifestBuilder version(String version);
+
+  /// Sets the `base_url` exposed as [RouteManifest.baseUrl].
+  RouteManifestBuilder baseUrl(String baseUrl);
+
   RouteManifestBuilder route(RouteEntry entry);
   RouteManifest build();
 }
 
 class _RouteManifestBuilder implements RouteManifestBuilder {
   final List<RouteEntry> _routes = [];
+  String? _version;
+  String? _baseUrl;
+
+  @override
+  RouteManifestBuilder version(String version) {
+    _version = version;
+    return this;
+  }
+
+  @override
+  RouteManifestBuilder baseUrl(String baseUrl) {
+    _baseUrl = baseUrl;
+    return this;
+  }
 
   @override
   RouteManifestBuilder route(RouteEntry entry) {
@@ -87,7 +107,11 @@ class _RouteManifestBuilder implements RouteManifestBuilder {
   }
 
   @override
-  RouteManifest build() => _RouteManifest(List.unmodifiable(_routes));
+  RouteManifest build() => _RouteManifest(
+    List.unmodifiable(_routes),
+    version: _version,
+    baseUrl: _baseUrl,
+  );
 }
 
 class _RouteManifest implements RouteManifest {

@@ -115,6 +115,35 @@ routes:
       expect(await bodyOf(second), contains('q=beta'));
     });
 
+    test('same query params in different order hit one cache entry', () async {
+      const manifestYaml = '''
+routes:
+  - path: /search
+    mode: document
+''';
+      var builds = 0;
+      final handler = hydralineMiddleware(
+        HydralineConfig(
+          manifest: RouteManifest.parseYaml(manifestYaml),
+          builders: {
+            '/search': (_, _) {
+              builds++;
+              return const DocumentRootNode(
+                body: [
+                  ParagraphNode(children: [TextNode('results')]),
+                ],
+              );
+            },
+          },
+          cache: HydralineCache.inMemory(),
+        ),
+      )((_) async => Response.notFound(''));
+
+      await httpGet(handler, '/search?a=1&b=2');
+      await httpGet(handler, '/search?b=2&a=1');
+      expect(builds, 1);
+    });
+
     test('cacheable responses carry a Vary header', () async {
       final handler = hydralineMiddleware(
         HydralineConfig(

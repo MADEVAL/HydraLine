@@ -16,8 +16,8 @@ import 'ssg_runner.dart' show SsgPageBuilder, SsgRunner;
 Future<int> runSsgCli({
   required String manifestPath,
   required String outputDir,
-  required RouteAdapter adapter,
   required Map<String, Object?> islandFactories,
+  RouteAdapter? adapter,
   Map<String, SsgPageBuilder> builders = const {},
 }) async {
   try {

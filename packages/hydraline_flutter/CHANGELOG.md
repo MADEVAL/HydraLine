@@ -1,3 +1,19 @@
+## 0.0.3
+
+- `Seo.image` renders a lightweight `SizedBox` placeholder during SSG
+  extraction (SSG mode) and the real `Image.network` only at runtime, avoiding
+  needless network image resolution while extracting.
+- `SsgRunner` and `runSsgCli` no longer require a `RouteAdapter`; it is now an
+  optional parameter (build-time iteration is manifest-driven).
+- `_hasFlutterIslands` is type-aware: the island runtime JS is written only
+  when a `IslandType.flutter` factory is present, not for vanilla/htmx-only
+  factory maps.
+- Simplified the dispatcher `dehydrate` path: it always removes the captured
+  (old) view id; the always-true guard and its misleading comment are gone.
+  `web/` and the inline Dart constants stay byte-identical.
+- `SsgDevTools` no longer has an unreachable island-type branch.
+- Added `issue_tracker` to the package metadata.
+
 ## 0.0.2
 
 - **Breaking:** `Island` gained `kind` (vanilla) and `endpoint` (htmx)

@@ -48,13 +48,13 @@ typedef SsgPageBuilder = DocumentNode Function(String path);
 abstract interface class SsgRunner {
   factory SsgRunner({
     required RouteManifest routeManifest,
-    required RouteAdapter routeAdapter,
     required Map<String, Object?> islandFactories,
+    RouteAdapter? routeAdapter,
     Map<String, SsgPageBuilder> builders,
   }) = _SsgRunner.create;
 
-  /// The ONLY responsible for copying the island bundle + web/ assets
-  /// into the output dir (only when islands of type flutter are present).
+  /// The ONLY responsible for writing the island runtime JS into the output
+  /// dir (only when islands of type flutter are present).
   /// Deterministic output (stable paths, stable order).
   Future<SsgResult> run({required String outputDir});
 }
@@ -62,8 +62,8 @@ abstract interface class SsgRunner {
 class _SsgRunner implements SsgRunner {
   _SsgRunner({
     required RouteManifest manifest,
-    required RouteAdapter adapter,
     required Map<String, Object?> islandFactories,
+    RouteAdapter? adapter,
     Map<String, SsgPageBuilder> builders = const {},
   }) : _manifest = manifest,
        _adapter = adapter,
@@ -72,8 +72,8 @@ class _SsgRunner implements SsgRunner {
 
   factory _SsgRunner.create({
     required RouteManifest routeManifest,
-    required RouteAdapter routeAdapter,
     required Map<String, Object?> islandFactories,
+    RouteAdapter? routeAdapter,
     Map<String, SsgPageBuilder> builders = const {},
   }) => _SsgRunner(
     manifest: routeManifest,
@@ -83,12 +83,13 @@ class _SsgRunner implements SsgRunner {
   );
 
   final RouteManifest _manifest;
-  final RouteAdapter _adapter;
+  final RouteAdapter? _adapter;
   final Map<String, Object?> _islandFactories;
   final Map<String, SsgPageBuilder> _builders;
   final HtmlSerializer _serializer = const HtmlSerializer();
 
-  bool _hasFlutterIslands() => _islandFactories.isNotEmpty;
+  bool _hasFlutterIslands() =>
+      _islandFactories.values.contains(IslandType.flutter);
 
   @override
   Future<SsgResult> run({required String outputDir}) async {

@@ -48,9 +48,24 @@ void main() {
       expect(node.height, 480);
     });
 
-    testWidgets('renders an Image widget at runtime', (tester) async {
+    testWidgets('renders a lightweight placeholder during SSG extraction', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         sandbox(Seo.image('/img/a.png', alt: 'A', width: 64, height: 48)),
+      );
+      await tester.pump();
+      expect(find.byType(Image), findsNothing);
+      expect(find.byType(SizedBox), findsWidgets);
+    });
+
+    testWidgets('renders an Image widget at runtime', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: HydraApp(
+            child: Seo.image('/img/a.png', alt: 'A', width: 64, height: 48),
+          ),
+        ),
       );
       await tester.pump();
       expect(find.byType(Image), findsOneWidget);

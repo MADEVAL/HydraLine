@@ -28,6 +28,17 @@ routes:
       final response = await httpGet(handler, '/blog/2026/post');
       expect(response.statusCode, 200);
     });
+
+    test('route pattern with a trailing slash still matches', () async {
+      const manifestYaml = '''
+routes:
+  - path: /about/
+    mode: document
+''';
+      final handler = createTestHandler(RouteManifest.parseYaml(manifestYaml));
+      final response = await httpGet(handler, '/about');
+      expect(response.statusCode, 200);
+    });
   });
 
   group('Http edge cases', () {
@@ -49,6 +60,12 @@ routes:
     test('redirect with 302 status', () {
       final response = Http.redirect('/target', status: 302);
       expect(response.statusCode, 302);
+    });
+
+    test('redirect preserves an explicit 308 status', () {
+      final response = Http.redirect('/target', status: 308);
+      expect(response.statusCode, 308);
+      expect(response.headers['location'], '/target');
     });
   });
 

@@ -109,8 +109,9 @@ void main() {
       expect(jsDispatcher, contains('if (window.hydraline)'));
     });
 
-    test('dehydrate guards against removing a re-hydrated view', () {
-      expect(jsDispatcher, contains('islandViews[id] !== viewId'));
+    test('dehydrate removes the captured view id', () {
+      expect(jsDispatcher, contains('app.removeView(viewId)'));
+      expect(jsDispatcher, isNot(contains('islandViews[id] !== viewId')));
     });
   });
 

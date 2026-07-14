@@ -30,9 +30,7 @@ class SsgDevTools {
         out.add(
           SsgIslandInfo(
             id: node.id,
-            type: node.runtimeType == IslandPlaceholderNode
-                ? 'flutter'
-                : 'unknown',
+            type: 'flutter',
             hydration: node.directive.name,
             widthPx: node.size?.width,
             heightPx: node.size?.height,
