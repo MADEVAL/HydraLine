@@ -1,0 +1,35 @@
+# Shared strict analysis for all Hydraline packages.
+#
+# Each package includes this file via `include: ../../analysis_options.yaml`.
+# Enforced by `melos run analyze` (`dart analyze --fatal-infos --fatal-warnings`).
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    todo: ignore
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+linter:
+  rules:
+    - avoid_dynamic_calls
+    - avoid_print
+    - cascade_invocations
+    - comment_references
+    - directives_ordering
+    - prefer_final_in_for_each
+    - prefer_final_locals
+    - prefer_single_quotes
+    - require_trailing_commas
+    - sort_pub_dependencies
+    - test_types_in_equals
+    - throw_in_finally
+    - unawaited_futures
+    - unnecessary_await_in_return
+    - unnecessary_lambdas
+    - use_super_parameters

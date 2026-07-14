@@ -1,0 +1,22 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+doc/api/
+
+# Pub workspace lockfiles (libraries do not commit lockfiles).
+pubspec.lock
+
+# Coverage
+coverage/
+*.lcov
+
+# Hydraline scratch space (AGENTS.md).
+TEMP/
+
+# IDE
+.idea/
+.vscode/
+*.iml

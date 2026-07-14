@@ -1,0 +1,27 @@
+name: hydraline_flutter
+description: >-
+  Hydraline Flutter package: Seo.* widgets, Island, HydraApp, IslandHost,
+  SSG runner and the level-2 web runtime assets for Flutter Web hydration.
+version: 0.0.1
+repository: https://github.com/hydraline/hydraline
+topics:
+  - seo
+  - flutter-web
+  - hydration
+  - islands
+  - ssg
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=3.22.0"
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter

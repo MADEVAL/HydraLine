@@ -1,0 +1,87 @@
+name: hydraline_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+workspace:
+  - packages/hydraline
+  - packages/hydraline_server
+  - packages/hydraline_flutter
+
+dev_dependencies:
+  melos: ^8.0.0
+  test: ^1.25.0
+
+melos:
+  scripts:
+    analyze:
+      description: Run `dart analyze` (strict) in every package.
+      run: melos exec --dir-exists=lib -- dart analyze --fatal-infos --fatal-warnings .
+
+    format:
+      description: Format all Dart code in place (specs/ contracts excluded).
+      run: dart format packages tool test
+
+    format:check:
+      description: Verify formatting; non-zero exit if changes needed (CI gate).
+      run: dart format --output=none --set-exit-if-changed packages tool test
+
+    test:dart:
+      description: Run pure-Dart tests (core/server).
+      run: melos exec --no-flutter --dir-exists=test -- dart test
+
+    test:flutter:
+      description: Run Flutter widget tests.
+      run: melos exec --flutter --dir-exists=test -- flutter test
+
+    test:tool:
+      description: Run workspace tooling tests (boundary checker).
+      run: dart test test
+
+    test:
+      description: Run all unit/widget tests.
+      steps:
+        - test:dart
+        - test:flutter
+        - test:tool
+
+    test:coverage:
+      description: Run tests with coverage and enforce per-package thresholds (I9).
+      steps:
+        - coverage:dart
+        - coverage:dart:lcov
+        - coverage:flutter
+        - coverage:gate
+
+    coverage:dart:
+      description: Collect coverage for pure-Dart packages.
+      run: melos exec --no-flutter --dir-exists=test -- dart test --coverage=coverage
+
+    coverage:dart:lcov:
+      description: Convert pure-Dart coverage to LCOV.
+      run: melos exec --no-flutter --dir-exists=test -- dart run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
+
+    coverage:flutter:
+      description: Collect Flutter coverage (LCOV).
+      run: melos exec --flutter --dir-exists=test -- flutter test --coverage
+
+    coverage:gate:
+      description: Enforce per-package coverage thresholds (I9).
+      run: dart run tool/check_coverage.dart
+
+    test:golden:
+      description: Run only golden-tagged tests (line endings normalized to \n).
+      run: melos exec --no-flutter --dir-exists=test -- dart test --tags golden
+
+    boundaries:
+      description: Scan for forbidden imports (invariant I1).
+      run: dart run tool/check_boundaries.dart
+
+    precommit:
+      description: Local superset of blocking CI gates (SC1).
+      steps:
+        - analyze
+        - format:check
+        - test
+        - boundaries

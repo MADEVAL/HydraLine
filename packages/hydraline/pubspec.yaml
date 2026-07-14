@@ -1,0 +1,22 @@
+name: hydraline
+description: >-
+  Hydraline pure-Dart core: DocumentNode model, single-pass HTML serializer,
+  contextual escaping, SEO metadata, JSON-LD, sitemap/robots and manifests.
+version: 0.0.1
+repository: https://github.com/hydraline/hydraline
+topics:
+  - seo
+  - ssr
+  - flutter-web
+  - html
+  - prerender
+
+environment:
+  sdk: ^3.6.0
+
+resolution: workspace
+
+dev_dependencies:
+  coverage: ^1.11.0
+  lints: ^5.0.0
+  test: ^1.25.0

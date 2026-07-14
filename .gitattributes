@@ -1,36 +1,22 @@
+# Hydraline — line-ending and binary policy (DEVELOPMENT.md §8; XP1/XP4, R8).
+
+# Normalize all text files to LF in the repository and on checkout.
 * text=auto eol=lf
 
-*.php text eol=lf
-*.js text eol=lf
-*.css text eol=lf
-*.json text eol=lf
-*.md text eol=lf
-*.txt text eol=lf
-*.xml text eol=lf
-*.yml text eol=lf
-*.neon text eol=lf
-*.po text eol=lf
-*.pot text eol=lf
-*.ps1 text eol=lf
-*.svg text eol=lf
-.gitattributes text eol=lf
-.gitignore text eol=lf
+# Golden artefacts are byte-exact fixtures — git must never rewrite them (XP4).
+**/goldens/** binary
+**/test/**/goldens/** binary
 
+# Binary assets.
+*.png binary
 *.jpg binary
 *.jpeg binary
-*.png binary
-*.webp binary
 *.gif binary
+*.webp binary
 *.ico binary
 *.ttf binary
-*.woff2 binary
+*.otf binary
 *.woff binary
-*.eot binary
-*.mp4 binary
-*.mkv binary
-*.avi binary
+*.woff2 binary
+*.wasm binary
 *.pdf binary
-*.mo binary
-*.dat binary
-*.dist binary
-*.lock binary
