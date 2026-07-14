@@ -1,46 +1,155 @@
-/// SEO / safety validators over a [DocumentNode] tree (ARCHITECTURE.md §7, C-10).
-///
-/// Phase 1 seeds the unsafe-HTML warning (S3); SEO checks (title/description
-/// lengths, alt, canonical duplicates, hreflang) are added in P1-18.
+/// SEO / safety validators over [SeoMeta] and [DocumentNode] trees
+/// (ARCHITECTURE.md §7; C-10, SEO-11, S3).
 library;
 
 import 'document_node.dart';
+import 'metadata.dart';
 
 /// Severity of a validation issue.
-enum IssueSeverity { warning, error }
+enum ValidationSeverity { info, warning, error }
 
 /// A single validation finding.
-class SeoIssue {
-  const SeoIssue({
+class ValidationIssue {
+  const ValidationIssue({
     required this.severity,
     required this.code,
     required this.message,
+    this.location,
   });
 
-  final IssueSeverity severity;
+  final ValidationSeverity severity;
   final String code;
   final String message;
 
+  /// Route or node the issue relates to.
+  final String? location;
+
   @override
-  String toString() => '[${severity.name}] $code: $message';
+  String toString() =>
+      '[${severity.name}] $code: $message${location == null ? '' : ' ($location)'}';
 }
 
-/// Validates a [DocumentNode] tree and returns the issues found.
-class SeoValidator {
-  const SeoValidator();
+/// Validates SEO/safety rules: title/description lengths, required alt text,
+/// duplicate canonical links, malformed hreflang, unsafe HTML (C-10).
+abstract interface class SeoValidator {
+  const factory SeoValidator() = _SeoValidator;
 
-  List<SeoIssue> validate(DocumentNode root) {
-    final issues = <SeoIssue>[];
-    for (final node in _walk(root)) {
-      if (node is UnsafeHtmlNode && node.sanitizer == null) {
+  /// Validates a [SeoMeta] or a [DocumentNode] tree.
+  List<ValidationIssue> validate(Object target);
+}
+
+class _SeoValidator implements SeoValidator {
+  const _SeoValidator();
+
+  static const int _titleMaxLength = 70;
+  static const int _descriptionMaxLength = 160;
+
+  @override
+  List<ValidationIssue> validate(Object target) => switch (target) {
+    final SeoMeta meta => _validateMeta(meta),
+    final DocumentNode node => _validateNode(node),
+    _ => throw ArgumentError.value(
+      target,
+      'target',
+      'expected SeoMeta or DocumentNode',
+    ),
+  };
+
+  List<ValidationIssue> _validateMeta(SeoMeta meta) {
+    final issues = <ValidationIssue>[];
+
+    if (meta.title.trim().isEmpty) {
+      issues.add(
+        const ValidationIssue(
+          severity: ValidationSeverity.error,
+          code: 'title_empty',
+          message: 'title must not be empty (SEO-1).',
+        ),
+      );
+    } else if (meta.title.length > _titleMaxLength) {
+      issues.add(
+        ValidationIssue(
+          severity: ValidationSeverity.warning,
+          code: 'title_too_long',
+          message:
+              'title is ${meta.title.length} chars; keep it under '
+              '$_titleMaxLength.',
+        ),
+      );
+    }
+
+    final description = meta.description;
+    if (description == null || description.trim().isEmpty) {
+      issues.add(
+        const ValidationIssue(
+          severity: ValidationSeverity.warning,
+          code: 'description_missing',
+          message: 'a meta description improves search snippets (SEO-1).',
+        ),
+      );
+    } else if (description.length > _descriptionMaxLength) {
+      issues.add(
+        ValidationIssue(
+          severity: ValidationSeverity.warning,
+          code: 'description_too_long',
+          message:
+              'description is ${description.length} chars; keep it under '
+              '$_descriptionMaxLength.',
+        ),
+      );
+    }
+
+    final seenHreflang = <String>{};
+    for (final alternate in meta.hreflang) {
+      if (!seenHreflang.add(alternate.hreflang)) {
         issues.add(
-          const SeoIssue(
-            severity: IssueSeverity.warning,
-            code: 'unsafe_html_without_sanitizer',
-            message: 'UnsafeHtmlNode used without a sanitizer (S3).',
+          ValidationIssue(
+            severity: ValidationSeverity.warning,
+            code: 'duplicate_hreflang',
+            message: 'duplicate hreflang "${alternate.hreflang}" (SEO-8).',
           ),
         );
       }
+    }
+
+    return issues;
+  }
+
+  List<ValidationIssue> _validateNode(DocumentNode root) {
+    final issues = <ValidationIssue>[];
+    var canonicalCount = 0;
+    for (final node in _walk(root)) {
+      switch (node) {
+        case ImageNode(:final alt) when alt.trim().isEmpty:
+          issues.add(
+            const ValidationIssue(
+              severity: ValidationSeverity.error,
+              code: 'image_missing_alt',
+              message: 'images require non-empty alt text (SEO-11).',
+            ),
+          );
+        case LinkNode(:final rel) when rel == 'canonical':
+          canonicalCount++;
+        case UnsafeHtmlNode(:final sanitizer) when sanitizer == null:
+          issues.add(
+            const ValidationIssue(
+              severity: ValidationSeverity.warning,
+              code: 'unsafe_html_without_sanitizer',
+              message: 'UnsafeHtmlNode used without a sanitizer (S3).',
+            ),
+          );
+        default:
+          break;
+      }
+    }
+    if (canonicalCount > 1) {
+      issues.add(
+        ValidationIssue(
+          severity: ValidationSeverity.error,
+          code: 'duplicate_canonical',
+          message: 'found $canonicalCount canonical links; expected at most 1.',
+        ),
+      );
     }
     return issues;
   }

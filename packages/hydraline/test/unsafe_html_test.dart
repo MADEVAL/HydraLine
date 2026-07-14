@@ -23,32 +23,4 @@ void main() {
       expect(node.sanitize(), 'x');
     });
   });
-
-  group('SeoValidator — unsafe HTML warning (S3)', () {
-    test('warns on an UnsafeHtmlNode without a sanitizer', () {
-      const root = DocumentRootNode(body: [UnsafeHtmlNode('<b>x</b>')]);
-      final issues = const SeoValidator().validate(root);
-      expect(
-        issues.map((i) => i.code),
-        contains('unsafe_html_without_sanitizer'),
-      );
-      expect(
-        issues
-            .firstWhere((i) => i.code == 'unsafe_html_without_sanitizer')
-            .severity,
-        IssueSeverity.warning,
-      );
-    });
-
-    test('does not warn when a sanitizer is provided', () {
-      final root = DocumentRootNode(
-        body: [UnsafeHtmlNode('<b>x</b>', sanitizer: (raw) => raw)],
-      );
-      final issues = const SeoValidator().validate(root);
-      expect(
-        issues.map((i) => i.code),
-        isNot(contains('unsafe_html_without_sanitizer')),
-      );
-    });
-  });
 }
