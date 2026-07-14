@@ -9,23 +9,21 @@ void main() {
   group('SsgDevTools', () {
     test('empty collector -> zero islands', () {
       final c = SsgCollector('/');
-      final tools = SsgDevTools.fromCollector(c);
-      final report = tools.analyze();
+      final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 0);
       expect(report.totalPropsBytes, 0);
       expect(report.islands, isEmpty);
     });
 
     test('single island with normal props', () {
-      final c = SsgCollector('/');
-      c.addIsland(const IslandSpec(
-        id: 'hero',
-        type: IslandType.flutter,
-        size: IslandSize(width: 400, height: 300),
-        state: {'title': 'Hello'},
-      ));
-      final tools = SsgDevTools.fromCollector(c);
-      final report = tools.analyze();
+      final c = SsgCollector('/')
+        ..addIsland(const IslandSpec(
+          id: 'hero',
+          type: IslandType.flutter,
+          size: IslandSize(width: 400, height: 300),
+          state: {'title': 'Hello'},
+        ));
+      final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 1);
       final island = report.islands.single;
       expect(island.id, 'hero');
@@ -39,37 +37,34 @@ void main() {
 
     test('island with props > 10KB warns', () {
       final bigStr = 'x' * IslandStateCodec.maxBytes;
-      final c = SsgCollector('/');
-      c.addIsland(IslandSpec(
-        id: 'big',
-        type: IslandType.flutter,
-        state: {'data': bigStr},
-      ));
-      final tools = SsgDevTools.fromCollector(c);
-      final report = tools.analyze();
+      final c = SsgCollector('/')
+        ..addIsland(IslandSpec(
+          id: 'big',
+          type: IslandType.flutter,
+          state: {'data': bigStr},
+        ));
+      final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 1);
       expect(report.islands.single.warnings, contains('Props size exceeds 10 KB'));
     });
 
     test('island missing width/height warns about CLS', () {
-      final c = SsgCollector('/');
-      c.addIsland(const IslandSpec(
-        id: 'no-size',
-        type: IslandType.flutter,
-      ));
-      final tools = SsgDevTools.fromCollector(c);
-      final report = tools.analyze();
+      final c = SsgCollector('/')
+        ..addIsland(const IslandSpec(
+          id: 'no-size',
+          type: IslandType.flutter,
+        ));
+      final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 1);
       expect(report.islands.single.warnings, contains('Missing width/height (anti-CLS)'));
     });
 
     test('multiple islands correct totals', () {
-      final c = SsgCollector('/');
-      c.addIsland(const IslandSpec(id: 'a', type: IslandType.flutter, state: {'n': 1}));
-      c.addIsland(const IslandSpec(id: 'b', type: IslandType.flutter, state: {'n': 2}));
-      c.addIsland(const IslandSpec(id: 'c', type: IslandType.flutter, state: {'n': 3}));
-      final tools = SsgDevTools.fromCollector(c);
-      final report = tools.analyze();
+      final c = SsgCollector('/')
+        ..addIsland(const IslandSpec(id: 'a', type: IslandType.flutter, state: {'n': 1}))
+        ..addIsland(const IslandSpec(id: 'b', type: IslandType.flutter, state: {'n': 2}))
+        ..addIsland(const IslandSpec(id: 'c', type: IslandType.flutter, state: {'n': 3}));
+      final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 3);
       expect(report.islands, hasLength(3));
       num sum = 0;
@@ -80,16 +75,15 @@ void main() {
     });
 
     test('fromCollector returns correct report after seal', () {
-      final c = SsgCollector('/about');
-      c.addIsland(const IslandSpec(
-        id: 'sticky-header',
-        type: IslandType.flutter,
-        size: IslandSize(width: 800, height: 64),
-        state: {'sticky': true},
-      ));
-      c.seal(); // explicitly seal before devtools
-      final tools = SsgDevTools.fromCollector(c);
-      final report = tools.analyze();
+      final c = SsgCollector('/about')
+        ..addIsland(const IslandSpec(
+          id: 'sticky-header',
+          type: IslandType.flutter,
+          size: IslandSize(width: 800, height: 64),
+          state: {'sticky': true},
+        ))
+        ..seal();
+      final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 1);
       expect(report.islands.single.id, 'sticky-header');
       expect(report.islands.single.widthPx, 800);
