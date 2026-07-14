@@ -1,8 +1,6 @@
-// Hydraline — API-контракт (L4) · packages/hydraline/api/seo_artifacts.dart
+// Hydraline — API contract (L4) · packages/hydraline/api/seo_artifacts.dart
 //
-// sitemap.xml, robots.txt, SEO-валидаторы, CLI-аудит. Реализация — PHASE_1
-// (P1-13, P1-14, P1-18, P1-19, P1-20). ARCHITECTURE.md §7.3/§2.1.
-// Покрывает SEO-5, SEO-6, C-6, C-10, C-11.
+// sitemap.xml, robots.txt, SEO validators, and CLI audit.
 //
 // ignore_for_file: unused_element
 
@@ -27,20 +25,20 @@ class SitemapEntry {
   final List<({String hreflang, SafeUrl href})> alternates;
 }
 
-/// Источник URL для sitemap: (a) из route-манифеста, (b) async-провайдер (БД).
+/// URL source for sitemap: (a) from route manifest, (b) async provider (DB).
 abstract interface class SitemapSource {
   Stream<SitemapEntry> entries();
 }
 
-/// Результат генерации: один файл ИЛИ индекс + шарды (автосплит SM1).
+/// Generation result: one file OR index + shards (auto-split).
 class SitemapOutput {
   const SitemapOutput({required this.files, required this.isIndex});
-  final Map<String, String> files; // имя → xml-содержимое
-  final bool isIndex; // true при >50k URL или >50MB
+  final Map<String, String> files; // name → xml content
+  final bool isIndex; // true when >50k URLs or >50MB
 }
 
 abstract final class Sitemap {
-  /// SM1: автосплит в sitemap-index при >50 000 URL или >50 MB на файл.
+  /// Auto-splits into sitemap-index at >50 000 URLs or >50 MB per file.
   static Future<SitemapOutput> generate(SitemapSource source, {required SafeUrl baseUrl}) =>
       throw UnimplementedError();
 }
@@ -59,7 +57,7 @@ abstract final class Robots {
       throw UnimplementedError();
 }
 
-// ── SEO-валидаторы (C-10) ──────────────────────────────────────────────────────
+// ── SEO validators ─────────────────────────────────────────────────────────────
 
 enum ValidationSeverity { info, warning, error }
 
@@ -68,27 +66,27 @@ class ValidationIssue {
   final ValidationSeverity severity;
   final String code;
   final String message;
-  final String? location; // маршрут/узел
+  final String? location; // route/node
 }
 
 abstract interface class SeoValidator {
-  /// Длины title/description, обязательность alt, дубли canonical, битые hreflang.
+  /// Validates title/description lengths, alt required, duplicate canonical, broken hreflang.
   List<ValidationIssue> validate(Object target);
 }
 
-// ── CLI-аудит (C-11) ────────────────────────────────────────────────────────────
+// ── CLI audit ──────────────────────────────────────────────────────────────────
 
 class AuditReport {
   const AuditReport({required this.issues, required this.exitCode});
   final List<ValidationIssue> issues;
-  final int exitCode; // 0 = ок; ≠0 = проблемы (для CI)
+  final int exitCode; // 0 = ok; non-zero = problems (for CI)
 }
 
 abstract final class Audit {
-  /// C-11(a) standalone: view-source, метаданные/OG/JSON-LD, валидаторы. (A1/A2)
+  /// Standalone audit: view-source, metadata/OG/JSON-LD, validators.
   static Future<AuditReport> standalone(String url) => throw UnimplementedError();
 
-  /// C-11(b) server-integration: инвариант A8 —
-  /// `bytes(buffered для UA=Googlebot) == bytes(concat(chunks для обычного UA))`.
+  /// Server-integration audit: verifies that
+  /// `bytes(buffered for UA=Googlebot) == bytes(concat(chunks for normal UA))`.
   static Future<AuditReport> serverIntegration(String url) => throw UnimplementedError();
 }

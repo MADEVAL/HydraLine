@@ -1,13 +1,12 @@
-// Hydraline — API-контракт (L4) · packages/hydraline/api/metadata.dart
+// Hydraline — API contract (L4) · packages/hydraline/api/metadata.dart
 //
-// Метаданные, Open Graph, Twitter Card, JSON-LD. Реализация — PHASE_1
-// (P1-11, P1-12). ARCHITECTURE.md §7.1–§7.2. Покрывает SEO-1..SEO-4, SEO-8.
+// Metadata, Open Graph, Twitter Card, and JSON-LD structured data.
 //
 // ignore_for_file: unused_element
 
 import 'escaping.dart' show SafeUrl;
 
-/// Директивы robots для конкретного маршрута.
+/// Robots directives for a specific route.
 class RobotsDirectives {
   const RobotsDirectives({this.noindex = false, this.nofollow = false});
   final bool noindex;
@@ -62,11 +61,11 @@ class TwitterCard {
 
 class HreflangAlternate {
   const HreflangAlternate({required this.hreflang, required this.href});
-  final String hreflang; // напр. en, ru, x-default
+  final String hreflang; // e.g. en, ru, x-default
   final SafeUrl href;
 }
 
-/// Полная модель метаданных маршрута.
+/// Complete per-route metadata model.
 class SeoMeta {
   const SeoMeta({
     required this.title,
@@ -82,9 +81,9 @@ class SeoMeta {
     this.extraMeta = const [],
     this.extraLinks = const [],
   });
-  final String title; // валидатор: длина (C-10)
+  final String title; // validator: length
   final String? description;
-  final SafeUrl? canonical; // SEO-7: абсолютный
+  final SafeUrl? canonical; // absolute URL
   final RobotsDirectives robots;
   final OpenGraph? openGraph;
   final TwitterCard? twitter;
@@ -96,15 +95,15 @@ class SeoMeta {
   final List<({String rel, SafeUrl href})> extraLinks;
 }
 
-// ── JSON-LD (SEO-4) ────────────────────────────────────────────────────────────
+// ── JSON-LD ────────────────────────────────────────────────────────────────────
 
-/// Базовый контракт схемы structured data → `<script type="application/ld+json">`.
+/// Base contract for structured data schema → `<script type="application/ld+json">`.
 abstract interface class JsonLdSchema {
-  /// Плоское JSON-safe представление (DS2-совместимо).
+  /// A flat JSON-safe representation.
   Map<String, Object?> toJson();
 }
 
-/// Типобезопасные билдеры (сигнатуры сокращены до ключевых полей).
+/// Type-safe builders (signatures shortened to key fields).
 abstract final class JsonLd {
   static JsonLdSchema article({required String headline, required String author, DateTime? datePublished, SafeUrl? image}) => throw UnimplementedError();
   static JsonLdSchema product({required String name, String? description, num? price, String? currency, SafeUrl? image, String? sku}) => throw UnimplementedError();
@@ -116,6 +115,6 @@ abstract final class JsonLd {
   static JsonLdSchema recipe({required String name, List<String> ingredients, List<String> steps}) => throw UnimplementedError();
   static JsonLdSchema review({required String itemName, required num rating, num? bestRating, String? author}) => throw UnimplementedError();
 
-  /// Произвольная схема (осознанный обход типобезопасности).
+  /// Arbitrary schema (intentional escape hatch from type safety).
   static JsonLdSchema raw(Map<String, Object?> json) => throw UnimplementedError();
 }

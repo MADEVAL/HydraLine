@@ -1,7 +1,6 @@
-// Hydraline — API-контракт (L4) · packages/hydraline_flutter/api/widgets.dart
+// Hydraline — API contract (L4) · packages/hydraline_flutter/api/widgets.dart
 //
-// Flutter-виджеты (поверхность A) + Island. Реализация — PHASE_3 (P3-01…P3-04).
-// ARCHITECTURE.md §11.1. Соответствие W-1…W-4.
+// Flutter widgets (surface A) + Island.
 //
 // ignore_for_file: unused_element, undefined_class, uri_does_not_exist
 
@@ -9,18 +8,18 @@ import 'package:flutter/widgets.dart';
 import 'package:hydraline/hydraline.dart'
     show SsgCollector, SectionRole, IslandType, HydrationDirective, IslandRenderMode, IslandStyleMode, SeoMeta;
 
-// ── Интеграция (W-3, W-4) ─────────────────────────────────────────────────────
+// ── Integration ────────────────────────────────────────────────────────────────
 
-/// Интеграционная обёртка. Предоставляет [HydraScope]. НЕ заменяет MaterialApp.
+/// Integration wrapper. Provides [HydraScope]. Does NOT replace MaterialApp.
 class HydraApp extends StatelessWidget {
   const HydraApp({required this.child, this.collector, super.key});
   final Widget child;
-  final SsgCollector? collector; // null в runtime-режиме
+  final SsgCollector? collector; // null in runtime mode
   @override
   Widget build(BuildContext context) => throw UnimplementedError();
 }
 
-/// InheritedWidget с коллектором (CO2: единственная точка доступа из виджетов).
+/// InheritedWidget holding the collector (single access point from widgets).
 class HydraScope extends InheritedWidget {
   const HydraScope({required this.collector, required this.isSsgMode, required super.child, super.key});
   final SsgCollector? collector;
@@ -30,7 +29,7 @@ class HydraScope extends InheritedWidget {
   bool updateShouldNotify(covariant HydraScope oldWidget) => throw UnimplementedError();
 }
 
-/// Обёртка build-time извлечения: заглушки MediaQuery/Navigator/Directionality (R2).
+/// Build-time extraction wrapper: stubs MediaQuery/Navigator/Directionality.
 class SsgSandbox extends StatelessWidget {
   const SsgSandbox({required this.collector, required this.child, super.key});
   final SsgCollector collector;
@@ -39,9 +38,9 @@ class SsgSandbox extends StatelessWidget {
   Widget build(BuildContext context) => throw UnimplementedError();
 }
 
-// ── Seo.* виджеты (W-1, двойная природа) ──────────────────────────────────────
+// ── Seo.* widgets (dual nature) ────────────────────────────────────────────────
 
-/// Namespace-фабрики. Каждый: (1) визуальный виджет, (2) self-registering в build().
+/// Namespace factories. Each: (1) visual widget, (2) self-registering in build().
 abstract final class Seo {
   static Widget text(String text, {int? headingLevel, Key? key}) => throw UnimplementedError();
   static Widget heading(String text, {required int level, Key? key}) => throw UnimplementedError();
@@ -52,27 +51,27 @@ abstract final class Seo {
   static Widget head(SeoMeta meta) => throw UnimplementedError();
 }
 
-// ── Island (W-2) ─────────────────────────────────────────────────────────────
+// ── Island ─────────────────────────────────────────────────────────────────────
 
-/// Две ортогональные оси: directive (когда гидрировать) ⟂ renderMode (что в HTML).
+/// Two orthogonal axes: directive (when to hydrate) ⟂ renderMode (what goes in HTML).
 class Island extends StatelessWidget {
   const Island({
     required this.id,
     required this.type,
     this.props = const {},
-    this.directive = HydrationDirective.onIdle, // дефолт (§7.2)
+    this.directive = HydrationDirective.onIdle, // default
     this.renderMode = IslandRenderMode.ssr,
     this.styleMode = IslandStyleMode.shadow,
     this.width,
-    this.height, // anti-CLS (I8)
+    this.height, // anti-CLS
     this.placeholder,
-    this.errorFallback, // показывается при data-hydration="failed" (§7.9)
-    this.mediaQuery, // для HydrationDirective.onMedia
+    this.errorFallback, // shown when data-hydration="failed"
+    this.mediaQuery, // for HydrationDirective.onMedia
     super.key,
   });
   final String id;
   final IslandType type;
-  final Map<String, Object?> props; // JSON-safe (DS2)
+  final Map<String, Object?> props; // JSON-safe
   final HydrationDirective directive;
   final IslandRenderMode renderMode;
   final IslandStyleMode styleMode;

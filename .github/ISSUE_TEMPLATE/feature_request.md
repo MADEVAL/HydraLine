@@ -1,26 +1,25 @@
 ---
 name: Feature request
-about: Предложить улучшение Hydraline
+about: Suggest an improvement to Hydraline
 title: "[feat] "
 labels: enhancement
 ---
 
-## Проблема / потребность
-<!-- Какую задачу это решает? Кому и зачем. -->
+## Problem / need
+<!-- What problem does this solve? For whom and why. -->
 
-## Предлагаемое решение
+## Proposed solution
 
-## Соответствие спеке
-- [ ] Не нарушает не-цели (`HYDRALINE_SPEC_V3.md §2.2`: не фреймворк, не автоконвертация
-      виджетов, не cloaking, без C/C++/FFI)
-- [ ] Проверено по `REQUIREMENTS_TRACEABILITY.md` (нет дубля/конфликта)
-- [ ] Не в списке осознанно отклонённых идей (`§16.2`) — либо есть новое обоснование
+## Spec alignment
+- [ ] Does not violate non-goals (project spec: not a framework, no auto-conversion
+      of widgets, no cloaking, no C/C++/FFI)
+- [ ] Not in the list of consciously rejected ideas — or there is a new rationale
 
-## Пакет / фаза
-- Пакет: core / server / flutter
-- Ожидаемая фаза: MVP (0–4) / post-MVP (§16.1)
+## Package / phase
+- Package: core / server / flutter
+- Expected phase: MVP (0–4) / post-MVP
 
-## Как проверить (приёмка)
-<!-- Какой тест/инвариант/приёмочный сценарий подтвердит фичу -->
+## Acceptance criteria
+<!-- Which test/invariant/acceptance scenario confirms the feature -->
 
-## Альтернативы
+## Alternatives

@@ -20,7 +20,7 @@ melos:
       run: dart run melos:melos exec --dir-exists=lib -- dart analyze --fatal-infos --fatal-warnings .
 
     format:
-      description: Format all Dart code in place (specs/ contracts excluded).
+      description: Format all Dart code in place.
       run: dart format packages
 
     format:check:

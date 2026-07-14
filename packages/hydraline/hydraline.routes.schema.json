@@ -2,18 +2,18 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://hydraline.dev/schemas/hydraline.routes.schema.json",
   "title": "Hydraline Route Manifest",
-  "description": "Схема канонического route-манифеста hydraline.routes.yaml (C-8, RM1). Валидируется в CI. Соответствует ARCHITECTURE.md §8.1 и packages/hydraline/api/manifests.dart.",
+  "description": "Schema for the canonical route manifest hydraline.routes.yaml. Validated in CI.",
   "type": "object",
   "required": ["routes"],
   "additionalProperties": false,
   "properties": {
     "version": {
-      "description": "Версия схемы манифеста (SemVer). Опционально.",
+      "description": "Schema version (SemVer). Optional.",
       "type": "string",
       "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
     },
     "base_url": {
-      "description": "Абсолютный базовый URL сайта для canonical/sitemap (SEO-7).",
+      "description": "Absolute base URL of the site for canonical/sitemap.",
       "type": "string",
       "format": "uri"
     },
@@ -30,23 +30,23 @@
       "additionalProperties": false,
       "properties": {
         "path": {
-          "description": "Путь маршрута (path-routing, без hash). Сегменты :name — динамические.",
+          "description": "Route path (path-routing, no hash). Dynamic segments use :name.",
           "type": "string",
           "pattern": "^/[^#]*$"
         },
         "mode": {
-          "description": "Режим рендера маршрута (WebRouteRenderMode).",
+          "description": "Render mode for the route.",
           "type": "string",
           "enum": ["app", "document", "hybrid"]
         },
         "metadata": { "$ref": "#/$defs/metadata" },
         "content_source": {
-          "description": "Источник контента: 'widget' или 'widget:<Id>' (поверхность A, извлечение из Flutter-виджетов в build-time; :<Id> — опциональный page-builder) или 'dart_builder:<Id>' (поверхность B, pure-Dart билдер). Для mode=app не требуется.",
+          "description": "Content source: 'widget' or 'widget:<Id>' (surface A, build-time extraction from Flutter widgets; :<Id> — optional page-builder) or 'dart_builder:<Id>' (surface B, pure-Dart builder). Not required for mode=app.",
           "type": "string",
           "pattern": "^(widget(:[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*)?|dart_builder:[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*)$"
         },
         "dynamic_segments": {
-          "description": "Значения динамических сегментов для SSG (W-15). Ключ = имя сегмента без ':'.",
+          "description": "Values of dynamic segments for SSG. Key = segment name without ':'.",
           "type": "object",
           "additionalProperties": {
             "type": "array",
@@ -55,17 +55,17 @@
           }
         },
         "noindex": {
-          "description": "Явный noindex (meta + X-Robots-Tag). Для mode=app по умолчанию true (§4.1).",
+          "description": "Explicit noindex (meta + X-Robots-Tag). Defaults to true for mode=app.",
           "type": "boolean"
         },
         "sitemap": {
-          "description": "Включать ли маршрут в sitemap. Для mode=app по умолчанию false (§4.1).",
+          "description": "Whether to include the route in the sitemap. Defaults to false for mode=app.",
           "type": "boolean"
         }
       },
       "allOf": [
         {
-          "description": "document/hybrid требуют content_source.",
+          "description": "document/hybrid require content_source.",
           "if": { "properties": { "mode": { "enum": ["document", "hybrid"] } } },
           "then": { "required": ["content_source"] }
         }

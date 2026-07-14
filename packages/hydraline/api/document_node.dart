@@ -1,25 +1,21 @@
-// Hydraline — API-контракт (L4) · packages/hydraline/api/document_node.dart
+// Hydraline — API contract (L4) · packages/hydraline/api/document_node.dart
 //
-// Замороженная форма публичного API модели документа. Тела опущены/заглушены;
-// реализация — по PHASE_1_PLAN (P1-01…P1-07). Соответствует ARCHITECTURE.md §4.
-//
-// Инварианты: N1 (иммутабельность), N3 (только SafeUrl в url-полях),
-// N4 (детерминизм), N5 (дерево без циклов, проверяется в SsgCollector.seal()).
+// Frozen public API of the document model. Bodies omitted/stubbed.
 //
 // ignore_for_file: unused_element
 
 import 'escaping.dart' show SafeUrl;
 
-/// Корень иерархии узлов. `sealed` → сериализатор использует исчерпывающий
-/// `switch` (Dart 3) без внешнего visitor'а.
+/// Root of the node hierarchy. `sealed` → the serializer uses an exhaustive
+/// `switch` (Dart 3) without an external visitor.
 sealed class DocumentNode {
   const DocumentNode();
 
-  /// Дочерние узлы (пустой список для листьев). N5: без циклов.
+  /// Child nodes (empty list for leaves). Must be acyclic.
   List<DocumentNode> get children;
 }
 
-// ── Корень и метаданные ──────────────────────────────────────────────────────
+// ── Root and metadata ────────────────────────────────────────────────────────
 
 final class DocumentRootNode extends DocumentNode {
   const DocumentRootNode({this.head, required this.body});
@@ -37,7 +33,7 @@ final class HeadNode extends DocumentNode {
 
 final class TitleNode extends DocumentNode {
   const TitleNode(this.text);
-  final String text; // экранируется на сериализации (N2/S2)
+  final String text; // escaped during serialization
   @override
   List<DocumentNode> get children => const [];
 }
@@ -45,7 +41,7 @@ final class TitleNode extends DocumentNode {
 final class MetaNode extends DocumentNode {
   const MetaNode({this.name, this.property, this.content, this.charset});
   final String? name;
-  final String? property; // напр. og:title
+  final String? property; // e.g. og:title
   final String? content;
   final String? charset;
   @override
@@ -55,13 +51,13 @@ final class MetaNode extends DocumentNode {
 final class LinkNode extends DocumentNode {
   const LinkNode({required this.rel, required this.href, this.hreflang});
   final String rel;
-  final SafeUrl href; // N3
+  final SafeUrl href;
   final String? hreflang;
   @override
   List<DocumentNode> get children => const [];
 }
 
-// ── Блочные ──────────────────────────────────────────────────────────────────
+// ── Block ────────────────────────────────────────────────────────────────────
 
 final class HeadingNode extends DocumentNode {
   const HeadingNode({required this.level, required this.children})
@@ -77,7 +73,7 @@ final class ParagraphNode extends DocumentNode {
   final List<DocumentNode> children;
 }
 
-/// Секционные обёртки: section/article/nav/header/footer/main.
+/// Section wrappers: section/article/nav/header/footer/main.
 enum SectionRole { section, article, nav, header, footer, main }
 
 final class SectionNode extends DocumentNode {
@@ -103,7 +99,7 @@ final class ListItemNode extends DocumentNode {
 
 final class BlockquoteNode extends DocumentNode {
   const BlockquoteNode({required this.children, this.cite});
-  final SafeUrl? cite; // N3
+  final SafeUrl? cite;
   @override
   final List<DocumentNode> children;
 }
@@ -124,12 +120,12 @@ final class CodeNode extends DocumentNode {
 
 final class TimeNode extends DocumentNode {
   const TimeNode({required this.dateTime, required this.children});
-  final String dateTime; // ISO-8601 (детерминизм, DS3)
+  final String dateTime; // ISO-8601
   @override
   final List<DocumentNode> children;
 }
 
-// ── Таблицы (MVP: текст в ячейках) ─────────────────────────────────────────────
+// ── Tables (MVP: text in cells) ───────────────────────────────────────────────
 
 final class TableNode extends DocumentNode {
   const TableNode({required this.rows});
@@ -152,7 +148,7 @@ final class TableCellNode extends DocumentNode {
   final List<DocumentNode> children;
 }
 
-// ── details/summary (no-JS аккордеон уровня 0) ─────────────────────────────────
+// ── details/summary (no-JS accordion, level 0) ─────────────────────────────────
 
 final class DetailsNode extends DocumentNode {
   const DetailsNode({required this.summary, required this.children, this.open = false});
@@ -168,9 +164,9 @@ final class SummaryNode extends DocumentNode {
   final List<DocumentNode> children;
 }
 
-// ── Инлайн ─────────────────────────────────────────────────────────────────────
+// ── Inline ─────────────────────────────────────────────────────────────────────
 
-/// Всегда экранируется на сериализации (S2). Сырой текст хранится как есть (N2).
+/// Always escaped during serialization. Raw text is stored as-is.
 final class TextNode extends DocumentNode {
   const TextNode(this.text);
   final String text;
@@ -189,14 +185,14 @@ final class AnchorNode extends DocumentNode {
 final class ImageNode extends DocumentNode {
   const ImageNode({required this.src, required this.alt, this.width, this.height});
   final SafeUrl src; // N3
-  final String alt; // валидатор требует непустой (SEO-11)
+  final String alt; // validator requires non-empty
   final int? width;
   final int? height;
   @override
   List<DocumentNode> get children => const [];
 }
 
-// ── Острова ──────────────────────────────────────────────────────────────────
+// ── Islands ───────────────────────────────────────────────────────────────────
 
 enum IslandType { flutter, vanilla, htmx }
 
@@ -206,23 +202,23 @@ enum IslandRenderMode { ssr, skeletonOnly }
 
 enum IslandStyleMode { shadow, scoped }
 
-/// Размеры-заглушки (px) для anti-CLS (I8).
+/// Placeholder dimensions (px) for anti-CLS.
 final class IslandSize {
   const IslandSize({required this.width, required this.height});
   final int width;
   final int height;
 }
 
-/// Flutter-остров (уровень 2).
+/// Flutter island (level 2).
 final class IslandPlaceholderNode extends DocumentNode {
   const IslandPlaceholderNode({
     required this.id,
-    this.directive = HydrationDirective.onIdle, // дефолт
+    this.directive = HydrationDirective.onIdle, // default
     this.renderMode = IslandRenderMode.ssr,
     this.styleMode = IslandStyleMode.shadow,
     this.size,
-    this.state = const {}, // JSON-safe (DS2)
-    this.mediaQuery, // для onMedia
+    this.state = const {}, // JSON-safe
+    this.mediaQuery, // for onMedia
     this.fallback = const [],
   });
   final String id;
@@ -232,12 +228,12 @@ final class IslandPlaceholderNode extends DocumentNode {
   final IslandSize? size;
   final Map<String, Object?> state;
   final String? mediaQuery;
-  final List<DocumentNode> fallback; // SSR-контент/скелетон
+  final List<DocumentNode> fallback; // SSR content / skeleton
   @override
   List<DocumentNode> get children => fallback;
 }
 
-/// HTMX-остров (уровень 1).
+/// HTMX island (level 1).
 final class HtmxIslandNode extends DocumentNode {
   const HtmxIslandNode({
     required this.id,
@@ -257,7 +253,7 @@ final class HtmxIslandNode extends DocumentNode {
   List<DocumentNode> get children => fallback;
 }
 
-/// Vanilla-остров (уровень 1): accordion|tabs|carousel|theme|copy-button|lazy-image.
+/// Vanilla island (level 1): accordion|tabs|carousel|theme|copy-button|lazy-image.
 final class VanillaIslandNode extends DocumentNode {
   const VanillaIslandNode({
     required this.id,
@@ -272,9 +268,9 @@ final class VanillaIslandNode extends DocumentNode {
   final List<DocumentNode> children;
 }
 
-// ── Небезопасный HTML (opt-in, единственный обход) ─────────────────────────────
+// ── Unsafe HTML (opt-in, only escape hatch) ───────────────────────────────
 
-/// S3: имя содержит «Unsafe». Валидатор предупреждает при `sanitizer == null`.
+/// The name contains «Unsafe». Validator warns when `sanitizer == null`.
 final class UnsafeHtmlNode extends DocumentNode {
   const UnsafeHtmlNode(this.rawHtml, {this.sanitizer});
   final String rawHtml;

@@ -1,37 +1,37 @@
 ---
 name: Bug report
-about: Сообщить о некорректном поведении Hydraline
+about: Report incorrect behavior in Hydraline
 title: "[bug] "
 labels: bug
 ---
 
-<!-- ВНИМАНИЕ: уязвимости безопасности НЕ сюда — см. SECURITY.md (приватный advisory). -->
+<!-- IMPORTANT: do NOT report security vulnerabilities here — see SECURITY.md (private advisory). -->
 
-## Пакет
+## Package
 - [ ] hydraline (core)
 - [ ] hydraline_server
 - [ ] hydraline_flutter
 
-## Версии
+## Versions
 - Hydraline: 
 - Dart: 
-- Flutter (если применимо): 
-- ОС: Windows / WSL / Linux / macOS
-- Браузер (если гидрация/E2E): 
+- Flutter (if applicable): 
+- OS: Windows / WSL / Linux / macOS
+- Browser (if hydration/E2E): 
 
-## Режим / уровень
-- Режим маршрута: app / document / hybrid
-- Уровень острова: 0 (HTML) / 1 (vanilla|htmx) / 2 (flutter)
+## Mode / level
+- Route mode: app / document / hybrid
+- Island level: 0 (HTML) / 1 (vanilla|htmx) / 2 (flutter)
 
-## Ожидаемое поведение
+## Expected behavior
 
-## Фактическое поведение
+## Actual behavior
 
-## Минимальное воспроизведение
-<!-- Код/репо/шаги. Для SSR — детерминированный вход (без DateTime.now/random). -->
+## Minimal reproduction
+<!-- Code/repo/steps. For SSR — deterministic input (no DateTime.now/random). -->
 
-## Затронутый инвариант (если известно)
-<!-- напр. I3 идентичность тела, I6 zero-overhead, I7 sizing — см. ARCHITECTURE.md §15 -->
+## Affected invariant (if known)
+<!-- e.g. body identity, zero-overhead, sizing — see project invariants -->
 
-## Логи / вывод аудита
-<!-- `dart run hydraline:audit ...`, вывод CI, скриншоты -->
+## Logs / audit output
+<!-- `dart run hydraline:audit ...`, CI output, screenshots -->
