@@ -97,9 +97,9 @@ This invariant is verified in CI.
 ```yaml
 # pubspec.yaml
 dependencies:
-  hydraline: ^1.0.0
-  hydraline_server: ^1.0.0    # for SSR
-  hydraline_flutter: ^1.0.0   # for widgets / SSG
+  hydraline: ^0.0.1
+  hydraline_server: ^0.0.1    # for SSR
+  hydraline_flutter: ^0.0.1   # for widgets / SSG
 ```
 
 ```dart

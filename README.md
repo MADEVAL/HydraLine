@@ -42,6 +42,12 @@ melos run test
 
 Full docs at [`docs/`](docs/).
 
+## Community
+
+- [Contributing](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+
 ## License
 
 MIT — [Yevhen Leonidov](https://leonidov.dev) / [Globus Studio](https://globus.studio)
