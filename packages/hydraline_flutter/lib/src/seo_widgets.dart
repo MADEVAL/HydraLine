@@ -1,0 +1,182 @@
+/// `Seo.*` widgets (surface A): self-registering Flutter widgets with dual
+/// nature — they render a visual and register semantic info into the nearest
+/// [SsgCollector] via [HydraScope] (ARCHITECTURE.md §11.1; W-1).
+///
+/// Registration happens unconditionally on each build; the collector handles
+/// deduplication by key (CO2).
+library;
+
+import 'package:flutter/widgets.dart';
+import 'package:hydraline/hydraline.dart'
+    show SafeUrl, SectionRole, SeoMeta, SsgCollector, TextNode;
+
+import 'hydra_app.dart' show HydraScope;
+
+/// Self-registering SEO widgets.
+abstract final class Seo {
+  static Widget text(String text, {int? headingLevel, Key? key}) => _SeoText(
+    text: text,
+    headingLevel: headingLevel,
+    key: key ?? ValueKey('seo-text-$text'),
+  );
+
+  static Widget heading(String text, {required int level, Key? key}) =>
+      _SeoHeading(
+        text: text,
+        level: level,
+        key: key ?? ValueKey('seo-h$level-$text'),
+      );
+
+  static Widget image(
+    String src, {
+    required String alt,
+    int? width,
+    int? height,
+    Key? key,
+  }) => _SeoImage(
+    src: src,
+    alt: alt,
+    width: width,
+    height: height,
+    key: key ?? ValueKey('seo-img-$src'),
+  );
+
+  static Widget link({required String href, required Widget child, Key? key}) =>
+      _SeoLink(
+        href: href,
+        child: child,
+        key: key ?? ValueKey('seo-link-$href'),
+      );
+
+  static Widget section({
+    required SectionRole role,
+    required List<Widget> children,
+    Key? key,
+  }) => _SeoSection(
+    role: role,
+    children: children,
+    key: key ?? ValueKey('seo-section-${role.name}'),
+  );
+
+  static Widget list({
+    required bool ordered,
+    required List<Widget> items,
+    Key? key,
+  }) => _SeoList(
+    ordered: ordered,
+    items: items,
+    key: key ?? ValueKey('seo-list-${ordered ? "ol" : "ul"}'),
+  );
+
+  static Widget head(SeoMeta meta) =>
+      _SeoHead(meta: meta, key: const ValueKey('seo-head'));
+}
+
+class _SeoText extends StatelessWidget {
+  const _SeoText({required this.text, this.headingLevel, super.key});
+
+  final String text;
+  final int? headingLevel;
+
+  @override
+  Widget build(BuildContext context) {
+    HydraScope.of(context).collector?.addText(
+      text,
+      headingLevel: headingLevel,
+      key: key?.toString() ?? '',
+    );
+    return Text(text);
+  }
+}
+
+class _SeoHeading extends StatelessWidget {
+  const _SeoHeading({required this.text, required this.level, super.key});
+
+  final String text;
+  final int level;
+
+  @override
+  Widget build(BuildContext context) {
+    HydraScope.of(context).collector?.addText(text, headingLevel: level);
+    return Text(text);
+  }
+}
+
+class _SeoImage extends StatelessWidget {
+  const _SeoImage({
+    required this.src,
+    required this.alt,
+    this.width,
+    this.height,
+    super.key,
+  });
+
+  final String src;
+  final String alt;
+  final int? width;
+  final int? height;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = SafeUrl.tryParse(src);
+    if (url != null) {
+      HydraScope.of(
+        context,
+      ).collector?.addImage(url, alt, width: width, height: height);
+    }
+    return SizedBox(width: width?.toDouble(), height: height?.toDouble());
+  }
+}
+
+class _SeoLink extends StatelessWidget {
+  const _SeoLink({required this.href, required this.child, super.key});
+
+  final String href;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = SafeUrl.tryParse(href);
+    if (url != null) {
+      HydraScope.of(context).collector?.addLink(url, '');
+    }
+    return GestureDetector(child: child);
+  }
+}
+
+class _SeoSection extends StatelessWidget {
+  const _SeoSection({required this.role, required this.children, super.key});
+
+  final SectionRole role;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    HydraScope.of(context).collector?.addNode(const TextNode(''));
+    return Column(children: children);
+  }
+}
+
+class _SeoList extends StatelessWidget {
+  const _SeoList({required this.ordered, required this.items, super.key});
+
+  final bool ordered;
+  final List<Widget> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: items);
+  }
+}
+
+class _SeoHead extends StatelessWidget {
+  const _SeoHead({required this.meta, super.key});
+
+  final SeoMeta meta;
+
+  @override
+  Widget build(BuildContext context) {
+    HydraScope.of(context).collector?.addMeta(meta);
+    return const SizedBox.shrink();
+  }
+}
