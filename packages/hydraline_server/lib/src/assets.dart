@@ -62,7 +62,7 @@ abstract final class Assets {
 }
 
 /// Generates the default [SeoMeta] for a route when no explicit metadata
-/// is configured in the manifest (P2-11).
+/// is configured in the manifest.
 ///
 /// - `app` routes default to `noindex` and are excluded from sitemap (§4.1).
 /// - `document`/`hybrid` routes have no robots restrictions by default.

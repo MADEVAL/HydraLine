@@ -120,7 +120,7 @@ abstract final class Audit {
 
   /// C-11(b) server-integration comparator (A8/I3): the document body served
   /// buffered (to bots) must be byte-identical to the concatenation of the
-  /// streamed chunks (to users). The full live audit lands in Phase 2.
+  /// streamed chunks (to users).
   static AuditReport compareBodies(String buffered, List<String> chunks) {
     final concatenated = chunks.join();
     if (buffered == concatenated) {

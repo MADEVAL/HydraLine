@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 import '../tool/test_utils.dart';
 
 void main() {
-  group('InMemoryCache (P2-06/S-8)', () {
+  group('InMemoryCache', () {
     test('stores and retrieves an entry', () async {
       final cache = InMemoryCache();
       await cache.set('k', 'v');
@@ -19,7 +19,7 @@ void main() {
     });
   });
 
-  group('Assets (P2-08/S-9)', () {
+  group('Assets', () {
     test('robots.txt endpoint returns 200', () async {
       final handler = Assets.serveCoreAssets();
       final response = await handler(
@@ -42,7 +42,7 @@ void main() {
     );
   });
 
-  group('injectFlutterAssets (P2-09/S-10)', () {
+  group('injectFlutterAssets', () {
     test('injects flutter bundle scripts after </body>', () {
       var root = DocumentRootNode(
         body: [
@@ -68,7 +68,7 @@ void main() {
     });
   });
 
-  group('Dart Frog adapter (P2-10)', () {
+  group('Dart Frog adapter', () {
     test('middleware produces a valid shelf handler', () {
       const manifestYaml = 'routes:\n  - path: /\n    mode: document\n';
       final handler = DartFrogAdapter.middleware(
@@ -78,7 +78,7 @@ void main() {
     });
   });
 
-  group('app route defaults (P2-11)', () {
+  group('app route defaults', () {
     test('app route auto-noindex', () {
       final meta = defaultMetadataForRoute(
         const RouteEntry(path: '/app', mode: RouteMode.app),

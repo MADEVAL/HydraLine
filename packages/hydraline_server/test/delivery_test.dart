@@ -12,7 +12,7 @@ void main() {
     ],
   );
 
-  group('ResponseDelivery (P2-03/P2-04)', () {
+  group('ResponseDelivery', () {
     final delivery = const ResponseDelivery();
 
     test('buffered returns a single complete HTML response', () async {
@@ -45,7 +45,7 @@ void main() {
     });
   });
 
-  group('HTMX helpers (P2-07)', () {
+  group('HTMX helpers', () {
     test('renderFragment returns HTML fragment without doctype', () async {
       const node = ParagraphNode(children: [TextNode('x')]);
       final response = Htmx.renderFragment(node);

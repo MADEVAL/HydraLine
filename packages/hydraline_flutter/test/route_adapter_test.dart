@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
 void main() {
-  group('RouteAdapter (P3-07, W-5)', () {
+  group('RouteAdapter', () {
     test('RouteInfo stores path and optional name', () {
       const info = RouteInfo(path: '/blog/', name: 'blog');
       expect(info.path, '/blog/');

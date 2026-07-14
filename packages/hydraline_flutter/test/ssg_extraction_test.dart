@@ -7,7 +7,7 @@ import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
 void main() {
-  group('SSG extraction (P3-10)', () {
+  group('SSG extraction', () {
     testWidgets('extracts heading and paragraph nodes', (tester) async {
       final collector = SsgCollector('/test');
       await tester.pumpWidget(
@@ -66,7 +66,7 @@ void main() {
     });
   });
 
-  group('Golden A<->B equivalence (P3-09/I5)', () {
+  group('Golden A<->B equivalence', () {
     testWidgets(
       'Seo widgets produce the same DocumentNode as a pure-Dart builder',
       (tester) async {

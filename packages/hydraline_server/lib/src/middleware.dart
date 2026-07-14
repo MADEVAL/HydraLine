@@ -30,7 +30,7 @@ class HydralineConfig {
   /// Per-path pure-Dart [DocumentNode] builders (surface B).
   final Map<String, DocumentBuilder> builders;
 
-  final Object? cache; // HydralineCache — wired in P2-06
+  final Object? cache;
 
   /// Pattern matching bot user agents. Read only by the transport layer, never
   /// by the builder (SRV1). When null, chunked delivery is always used.

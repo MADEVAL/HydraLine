@@ -3,14 +3,14 @@ import 'package:hydraline_flutter/hydraline_flutter.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('P4-03: scoped style mode', () {
+  group('scoped style mode', () {
     test('declarative shadow DOM includes style handling', () {
       expect(jsCustomElement, contains('shadow'));
       expect(jsCustomElement, contains('style'));
     });
   });
 
-  group('P4-11/12: DevTools', () {
+  group('DevTools', () {
     test('SsgResult carries pagesWritten and assetsCopied', () {
       const result = SsgResult(pagesWritten: 5, assetsCopied: true);
       expect(result.pagesWritten, 5);
@@ -18,7 +18,7 @@ void main() {
     });
   });
 
-  group('P4-13: virtual views JS', () {
+  group('virtual views JS', () {
     test('virtual views module references hydraline-island-segment', () {
       expect(jsVirtualViews, contains('hydraline-island-segment'));
     });
@@ -28,7 +28,7 @@ void main() {
     });
   });
 
-  group('P4-14: zero-overhead (I6/AS1)', () {
+  group('zero-overhead (I6/AS1)', () {
     test('document without flutter islands omits flutter_bootstrap.js', () {
       final root = DocumentRootNode(
         head: const HeadNode(children: [TitleNode('T')]),
@@ -55,7 +55,7 @@ void main() {
     });
   });
 
-  group('P4-10: hosting recipes', () {
+  group('hosting recipes', () {
     test('hosting docs exist and are non-empty', () {
       expect(hostingFirebase, isNotEmpty);
       expect(hostingNetlify, isNotEmpty);

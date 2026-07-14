@@ -22,7 +22,7 @@ routes:
     handler = createTestHandler(manifest);
   });
 
-  group('Route matching (P2-01)', () {
+  group('Route matching', () {
     test('document route returns 200 with HTML', () async {
       final response = await httpGet(handler, '/');
       expect(response.statusCode, 200);
@@ -49,7 +49,7 @@ routes:
     });
   });
 
-  group('HTTP semantics (P2-05 / SEO-9)', () {
+  group('HTTP semantics', () {
     test('redirect', () async {
       // Unit-tested via shelf's Response.movedPermanently
       final response = Response.movedPermanently('/target');

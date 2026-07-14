@@ -1,4 +1,4 @@
-/// Hosting recipe strings (P4-10/W-17).
+/// Hosting recipe strings.
 library;
 
 const hostingFirebase = r'''

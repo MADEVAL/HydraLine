@@ -2,7 +2,7 @@
 ///
 /// Global `window.hydraline` API, all hydration directives
 /// (onLoad/onIdle/onVisible/onInteraction/onMedia/manual), `data-hydration`
-/// lifecycle, timeout/retry (DP1-DP6).
+/// lifecycle, timeout and retry.
 library;
 
 const jsDispatcher = r'''

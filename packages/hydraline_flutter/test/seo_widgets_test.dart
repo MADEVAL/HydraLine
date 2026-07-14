@@ -94,7 +94,7 @@ void main() {
     });
   });
 
-  group('Island widget (P3-04)', () {
+  group('Island widget', () {
     testWidgets('registers IslandPlaceholderNode with id and props', (
       tester,
     ) async {

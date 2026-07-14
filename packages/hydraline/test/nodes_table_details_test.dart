@@ -2,7 +2,7 @@ import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Table nodes (P1-04)', () {
+  group('Table nodes', () {
     test('TableNode rows are its children', () {
       const rows = [
         TableRowNode(
@@ -33,7 +33,7 @@ void main() {
     });
   });
 
-  group('Details/Summary nodes (P1-05)', () {
+  group('Details/Summary nodes', () {
     test('DetailsNode carries summary, children and open flag', () {
       const details = DetailsNode(
         summary: SummaryNode(children: [TextNode('More')]),

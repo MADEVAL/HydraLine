@@ -2,7 +2,7 @@ import 'package:hydraline_flutter/hydraline_flutter.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Custom Element JS (P4-01/W-8)', () {
+  group('Custom Element JS', () {
     test('is a non-empty string', () {
       expect(jsCustomElement, isNotEmpty);
     });
@@ -22,7 +22,7 @@ void main() {
     });
   });
 
-  group('Dispatcher JS (P4-04/W-9)', () {
+  group('Dispatcher JS', () {
     test('exposes hydraline API', () {
       expect(jsDispatcher, contains('hydraline'));
       expect(jsDispatcher, contains('hydrate'));
@@ -43,7 +43,7 @@ void main() {
     });
   });
 
-  group('Service Worker JS (P4-06/W-11)', () {
+  group('Service Worker JS', () {
     test('handles fetch and caches WASM assets', () {
       expect(jsServiceWorker, contains("addEventListener('fetch'"));
       expect(jsServiceWorker, contains('canvaskit'));

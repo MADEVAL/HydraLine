@@ -4,7 +4,7 @@ import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
 void main() {
-  group('HydraApp + HydraScope (P3-01)', () {
+  group('HydraApp + HydraScope', () {
     testWidgets('HydraScope exposes the collector via InheritedWidget', (
       tester,
     ) async {
@@ -62,7 +62,7 @@ void main() {
     });
   });
 
-  group('SsgSandbox (P3-02)', () {
+  group('SsgSandbox', () {
     testWidgets('provides MediaQuery and Directionality stubs', (tester) async {
       final collector = SsgCollector('/test');
       await tester.pumpWidget(

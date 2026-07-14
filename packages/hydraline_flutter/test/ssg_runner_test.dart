@@ -14,7 +14,7 @@ class _TestAdapter implements RouteAdapter {
 }
 
 void main() {
-  group('SSG runner (P4-07/SSG1-SSG3)', () {
+  group('SSG runner', () {
     late Directory tmpDir;
 
     setUp(() {
@@ -56,7 +56,7 @@ void main() {
     });
   });
 
-  group('Dynamic segments (P4-09/W-15)', () {
+  group('Dynamic segments', () {
     test('expands a pattern into concrete paths', () {
       const segments = {
         'slug': ['post-1', 'post-2'],
