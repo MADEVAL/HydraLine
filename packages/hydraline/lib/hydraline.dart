@@ -5,6 +5,8 @@
 /// (invariant I1); enforced by `melos run boundaries`.
 library;
 
+export 'src/assets/htmx_glue.dart' show htmxGlueJs;
+export 'src/assets/vanilla_islands.dart' show vanillaIslandsJs;
 export 'src/audit.dart';
 export 'src/collector.dart';
 export 'src/document_node.dart';
