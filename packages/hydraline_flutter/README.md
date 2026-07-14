@@ -6,8 +6,8 @@ Flutter package for [Hydraline](../../README.md): `Seo.*` widgets, `Island`,
 
 ## Flutter version policy (NF-5, Q7)
 
-- **Minimum supported: Flutter 3.32.0** (`environment.flutter: ">=3.32.0"`),
-  the first SDK bundling Dart 3.8 — required by pub workspaces (see
+- **Minimum supported: Flutter 3.35.0** (`environment.flutter: ">=3.35.0"`),
+  the first SDK bundling Dart 3.9 — required by pub workspaces (see
   `docs/adr/0002-pub-workspaces-min-sdk.md`). This supersedes the original
   3.22 target from the spec.
 - CI runs the minimum and the latest stable SDK as blocking jobs.
