@@ -17,6 +17,10 @@ environment:
 
 resolution: workspace
 
+dependencies:
+  hydraline: any
+  shelf: ^1.4.1
+
 dev_dependencies:
   coverage: ^1.11.0
   lints: ^5.0.0
