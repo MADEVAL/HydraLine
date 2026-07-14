@@ -1,6 +1,6 @@
 ---
+name: systematic-debugging
 description: "Systematic debugging agent for finding root causes before attempting fixes. Use for test failures, bugs, unexpected behavior, performance problems, or build failures."
-mode: subagent
 ---
 # Systematic Debugging
 

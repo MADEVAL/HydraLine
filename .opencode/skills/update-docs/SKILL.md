@@ -1,6 +1,6 @@
 ---
+name: update-docs
 description: "Documentation update agent. Use after code changes — new API surface, new DocumentNode, serializer/escaping changes, server/route behavior, new melos scripts, or invariant changes. Keeps specs/ and package docs consistent with code."
-mode: subagent
 ---
 # Update Docs After Code Changes
 

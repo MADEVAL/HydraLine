@@ -1,6 +1,6 @@
 ---
+name: test-driven-development
 description: "TDD agent that enforces test-first development. Use for new features, bug fixes, refactoring, or any behavior changes. Write the test first, watch it fail, then implement."
-mode: subagent
 ---
 # Test-Driven Development (TDD)
 

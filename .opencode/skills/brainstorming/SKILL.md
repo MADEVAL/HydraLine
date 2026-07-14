@@ -1,6 +1,6 @@
 ---
+name: brainstorming
 description: "Brainstorming agent for turning ideas into fully formed designs and specs. Use when planning new features, components, or behavior changes before implementation."
-mode: subagent
 ---
 # Brainstorming Ideas Into Designs
 

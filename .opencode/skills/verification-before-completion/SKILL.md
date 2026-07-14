@@ -1,6 +1,6 @@
 ---
+name: verification-before-completion
 description: "Verification agent that ensures evidence before completion claims. Use before claiming any status, committing, or marking work complete — always run the verification command first."
-mode: subagent
 ---
 # Verification Before Completion
 
