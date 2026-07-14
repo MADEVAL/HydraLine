@@ -6,7 +6,7 @@ Thanks for your interest in contributing!
 
 ```bash
 dart pub global activate melos
-git clone https://github.com/leonidov-dev/hydraline.git
+git clone https://github.com/MADEVAL/HydraLine.git
 cd hydraline
 melos bootstrap
 ```

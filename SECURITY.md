@@ -3,7 +3,7 @@
 ## Reporting a Vulnerability
 
 **Do not open a public issue.** Send details privately via
-[GitHub Security Advisories](https://github.com/leonidov-dev/hydraline/security/advisories/new)
+[GitHub Security Advisories](https://github.com/MADEVAL/HydraLine/security/advisories/new)
 or email.
 
 We aim to acknowledge reports within 48 hours and provide a fix within 7 days.
