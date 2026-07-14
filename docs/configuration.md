@@ -115,9 +115,11 @@ print(manifest.toYaml());
 
 ## Island Manifest
 
-The island manifest describes every island on a page. It is generated
-automatically by the serializer and embedded in the HTML. The client-side
-dispatcher reads it to know what to hydrate and when.
+The island manifest describes every island on a page. The serializer emits
+each island's descriptor as attributes on its element (`data-directive`,
+`data-state`, `data-media`, ...), which the client-side dispatcher reads to
+know what to hydrate and when. The same descriptor is available
+programmatically as `IslandSpec` / `IslandManifest` for tooling.
 
 ### Fields (per island)
 

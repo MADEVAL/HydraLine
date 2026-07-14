@@ -307,9 +307,9 @@ matching island widget - one engine instance, N views (see
 
 ### Service Worker
 
-Caches the engine binary and WASM module. On warm visits, TTI drops to ~1 second
-by serving cached assets and pre-warming the WASM module via streaming
-instantiation.
+Caches the engine binary and WASM module with a cache-first strategy. On warm
+visits, TTI drops to ~1 second because the heavy engine assets are served
+from the local cache instead of the network.
 
 ## Zero Overhead Guarantee
 

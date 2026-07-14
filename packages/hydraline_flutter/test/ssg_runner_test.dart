@@ -125,6 +125,14 @@ void main() {
     });
   });
 
+  group('SsgResult', () {
+    test('carries pagesWritten and assetsCopied', () {
+      const result = SsgResult(pagesWritten: 5, assetsCopied: true);
+      expect(result.pagesWritten, 5);
+      expect(result.assetsCopied, isTrue);
+    });
+  });
+
   group('SSG runner asset copying', () {
     late Directory tmpDir;
 

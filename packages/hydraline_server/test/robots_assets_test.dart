@@ -110,5 +110,44 @@ routes:
       final response = await httpGet(handler, '/robots.txt');
       expect(await bodyOf(response), contains('Disallow: /private'));
     });
+
+    test('serves a default robots.txt when no override is given', () async {
+      final handler = Assets.serveCoreAssets();
+      final response = await httpGet(handler, '/robots.txt');
+      expect(response.statusCode, 200);
+      expect(await bodyOf(response), contains('User-agent'));
+    });
+
+    test('sitemap.xml responds 404 when not configured', () async {
+      final handler = Assets.serveCoreAssets();
+      final response = await httpGet(handler, '/sitemap.xml');
+      expect(response.statusCode, 404);
+    });
+  });
+
+  group('Assets.injectFlutterAssets', () {
+    test('appends the engine scripts before </body>', () {
+      var root = DocumentRootNode(
+        body: [
+          ParagraphNode(children: [TextNode('x')]),
+        ],
+      );
+      root = Assets.injectFlutterAssets(root) as DocumentRootNode;
+      final html = const HtmlSerializer().serialize(root);
+      expect(html, contains('/main.dart.js'));
+      expect(html, contains('/flutter_bootstrap.js'));
+      expect(html, contains('<p>x</p>'));
+    });
+
+    test('uses the provided baseHref for absolute paths', () {
+      final root =
+          Assets.injectFlutterAssets(
+                const DocumentRootNode(body: []),
+                baseHref: '/app/',
+              )
+              as DocumentRootNode;
+      final html = const HtmlSerializer().serialize(root);
+      expect(html, contains('/app/main.dart.js'));
+    });
   });
 }

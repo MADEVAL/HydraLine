@@ -178,7 +178,7 @@ Island({
 | `styleMode` | `shadow` (isolated Shadow DOM) or `scoped` (CSS `@scope`, best for many identical islands) |
 | `width` / `height` | Reserved space in px — prevents Cumulative Layout Shift |
 | `placeholder` | Widget shown before hydration (default: sized `SizedBox`) |
-| `errorFallback` | Shown when hydration fails |
+| `errorFallback` | Reserved for a future release; on failure the SSR fallback stays visible |
 | `mediaQuery` | CSS media query for `hydrateOnMedia` — serialized as `data-media` |
 
 ### Island Types

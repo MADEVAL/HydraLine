@@ -92,7 +92,7 @@ routes:
     });
   });
 
-  group('Bot-aware delivery (P2-04)', () {
+  group('Bot-aware delivery', () {
     const manifestYaml = '''
 routes:
   - path: /
@@ -155,7 +155,7 @@ routes:
     });
   });
 
-  group('DocumentBuilder UA-blind contract (P2-02)', () {
+  group('DocumentBuilder UA-blind contract', () {
     test('typedef excludes User-Agent as a direct parameter', () {
       // The DocumentBuilder type is (Request request, Object? data) — no
       // User-Agent or UA-specific parameter.

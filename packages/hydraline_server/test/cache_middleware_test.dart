@@ -111,5 +111,23 @@ void main() {
       expect(await cache.get('b'), '2');
       expect(await cache.get('c'), '3');
     });
+
+    test('entry with an expired TTL is evicted on read', () async {
+      final cache = HydralineCache.inMemory();
+      await cache.set('k', 'v', ttl: const Duration(milliseconds: 1));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(await cache.get('k'), isNull);
+    });
+
+    test('entry with a live TTL is served', () async {
+      final cache = HydralineCache.inMemory();
+      await cache.set('k', 'v', ttl: const Duration(hours: 1));
+      expect(await cache.get('k'), 'v');
+    });
+
+    test('returns null on a miss', () async {
+      final cache = HydralineCache.inMemory();
+      expect(await cache.get('nonexistent'), isNull);
+    });
   });
 }

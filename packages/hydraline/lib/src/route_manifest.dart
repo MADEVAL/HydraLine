@@ -47,10 +47,10 @@ class RouteEntry {
   final ContentSource? contentSource;
   final Map<String, List<String>> dynamicSegments;
 
-  /// Explicit `noindex` override; when null, `mode == app` implies noindex (§4.1).
+  /// Explicit `noindex` override; when null, `mode == app` implies noindex.
   final bool? noindex;
 
-  /// Explicit sitemap inclusion; when null, `mode != app` is included (§4.1).
+  /// Explicit sitemap inclusion; when null, `mode != app` is included.
   final bool? includeInSitemap;
 }
 

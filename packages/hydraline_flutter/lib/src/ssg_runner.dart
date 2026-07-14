@@ -13,7 +13,7 @@ import 'route_adapter.dart' show RouteAdapter;
 /// Generates the default [SeoMeta] for a route when no explicit metadata is
 /// configured in the manifest.
 ///
-/// `app` routes default to `noindex` (§4.1).
+/// `app` routes default to `noindex`.
 SeoMeta defaultSeoMeta(RouteEntry route) {
   final noindex = route.mode == RouteMode.app;
   return SeoMeta(

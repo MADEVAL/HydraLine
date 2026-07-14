@@ -27,6 +27,26 @@ void main() {
     test('carries the Hydraline banner', () {
       expect(jsCustomElement, contains('HYDRALINE'));
     });
+
+    test('supports the scoped/shadow style handling', () {
+      expect(jsCustomElement, contains('shadow'));
+      expect(jsCustomElement, contains('style'));
+    });
+  });
+
+  group('Virtual Views JS', () {
+    test('references hydraline-island-segment', () {
+      expect(jsVirtualViews, contains('hydraline-island-segment'));
+    });
+
+    test('dispatches segment enter/leave events', () {
+      expect(jsVirtualViews, contains('hydraline:segment-enter'));
+      expect(jsVirtualViews, contains('hydraline:segment-leave'));
+    });
+
+    test('carries the Hydraline banner', () {
+      expect(jsVirtualViews, contains('HYDRALINE'));
+    });
   });
 
   group('Dispatcher JS', () {
@@ -102,6 +122,10 @@ void main() {
 
     test('service worker JS stays under 4 KB', () {
       expect(jsServiceWorker.codeUnits.length, lessThan(4096));
+    });
+
+    test('virtual views JS stays under 4 KB', () {
+      expect(jsVirtualViews.codeUnits.length, lessThan(4096));
     });
   });
 

@@ -81,7 +81,7 @@ Middleware hydralineMiddleware(HydralineConfig config) {
       switch (match.mode) {
         case RouteMode.app:
           final response = await inner(request);
-          // App routes default to noindex unless explicitly overridden (§4.1).
+          // App routes default to noindex unless explicitly overridden.
           return Http.withRobots(response, noindex: match.noindex ?? true);
         case RouteMode.document:
         case RouteMode.hybrid:
