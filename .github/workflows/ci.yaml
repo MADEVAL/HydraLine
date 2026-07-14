@@ -27,6 +27,8 @@ jobs:
         run: dart run melos:melos run format:check
       - name: analyze
         run: dart run melos:melos run analyze
+      - name: boundaries
+        run: dart run melos:melos run boundaries
       - name: test (dart)
         run: dart run melos:melos run test:dart
       - name: golden

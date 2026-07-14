@@ -17,16 +17,26 @@ dev_dependencies:
 melos:
   scripts:
     analyze:
-      description: Run `dart analyze` (strict) in every package.
+      description: Run `dart analyze` (strict) in every package and the repo tooling.
+      steps:
+        - analyze:packages
+        - analyze:tool
+
+    analyze:packages:
+      description: Run `dart analyze` (strict) in every workspace package.
       run: dart run melos:melos exec --dir-exists=lib -- dart analyze --fatal-infos --fatal-warnings .
+
+    analyze:tool:
+      description: Run `dart analyze` (strict) on the root tool/ and test/ dirs.
+      run: dart analyze --fatal-infos --fatal-warnings tool test
 
     format:
       description: Format all Dart code in place.
-      run: dart format packages example
+      run: dart format packages example tool test
 
     format:check:
       description: Verify formatting; non-zero exit if changes needed (CI gate).
-      run: dart format --output=none --set-exit-if-changed packages example
+      run: dart format --output=none --set-exit-if-changed packages example tool test
 
     test:dart:
       description: Run pure-Dart tests (core/server).
@@ -35,6 +45,10 @@ melos:
     test:flutter:
       description: Run Flutter widget tests.
       run: dart run melos:melos exec --flutter --dir-exists=test -- flutter test
+
+    test:server:
+      description: Run only the hydraline_server suite (SSR/delivery invariants).
+      run: dart run melos:melos exec --scope=hydraline_server -- dart test
 
     test:
       description: Run all unit/widget tests.
@@ -69,9 +83,38 @@ melos:
       description: Property/fuzz XSS suite.
       run: dart run melos:melos exec --dir-exists=test/security -- dart test --tags security
 
+    boundaries:
+      description: Scan for forbidden imports across package boundaries (I1).
+      steps:
+        - boundaries:unit
+        - boundaries:scan
+
+    boundaries:unit:
+      description: Unit-test the boundary scanner itself.
+      run: dart test test/check_boundaries_test.dart
+
+    boundaries:scan:
+      description: Fail on forbidden imports in core/server lib/ (I1).
+      run: dart tool/check_boundaries.dart
+
+    audit:
+      description: Build the example SSG output and audit what a crawler sees.
+      steps:
+        - audit:build
+        - audit:check
+
+    audit:build:
+      description: Generate the example static site into example/TEMP/audit-dist.
+      run: dart run melos:melos exec --scope=hydraline_example -- dart run hydraline_flutter:build hydraline.routes.yaml TEMP/audit-dist
+
+    audit:check:
+      description: Run the SEO audit CLI against the generated home page.
+      run: dart run melos:melos exec --scope=hydraline_example -- dart run hydraline:audit TEMP/audit-dist/index.html
+
     precommit:
-      description: Local superset of blocking CI gates (SC1).
+      description: Local superset of blocking CI gates.
       steps:
         - analyze
         - format:check
         - test
+        - boundaries
