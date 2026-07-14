@@ -1,5 +1,4 @@
-/// Route metadata: Open Graph, Twitter Card, hreflang and `<head>` rendering
-/// (ARCHITECTURE.md §7.1; SEO-1/2/3/8).
+/// Route metadata: Open Graph, Twitter Card, hreflang and `<head>` rendering.
 library;
 
 import 'document_node.dart';
@@ -121,7 +120,7 @@ class SeoMeta {
   final List<({String rel, SafeUrl href})> extraLinks;
 }
 
-/// Builds a deterministic `<head>` from [meta] (SER2).
+/// Builds a deterministic `<head>` from [meta].
 ///
 /// Order: charset, title, viewport, description, robots, canonical, Open Graph,
 /// Twitter Card, hreflang alternates, extra `<meta>`, extra `<link>`,

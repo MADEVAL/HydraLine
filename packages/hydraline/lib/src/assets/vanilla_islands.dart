@@ -1,5 +1,4 @@
-/// Standalone vanilla-islands JavaScript bundle for level-1 interactivity
-/// (ARCHITECTURE.md §13; C-12).
+/// Standalone vanilla-islands JavaScript bundle for level-1 interactivity.
 ///
 /// Enhances static HTML elements tagged with `data-island` attributes. Runs on
 /// `DOMContentLoaded` and does not depend on Flutter or any other runtime.

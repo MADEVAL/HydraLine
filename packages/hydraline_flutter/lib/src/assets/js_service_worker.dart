@@ -1,7 +1,7 @@
-/// Service Worker JS (W-11, ≤2 KB).
+/// Service Worker JS (≤2 KB).
 ///
-/// Caches `main.dart.js` and `canvaskit.*` assets (SW1).
-/// WASM streaming + `<link rel="preload">` for warm visits (SW2).
+/// Caches `main.dart.js` and `canvaskit.*` assets.
+/// WASM streaming + `<link rel="preload">` for warm visits.
 library;
 
 const jsServiceWorker = r'''

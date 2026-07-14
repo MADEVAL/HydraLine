@@ -34,7 +34,7 @@ void main() {
     });
   });
 
-  test('IslandSize carries px width/height (anti-CLS, I8)', () {
+  test('IslandSize carries px width/height (anti-CLS)', () {
     const size = IslandSize(width: 640, height: 480);
     expect(size.width, 640);
     expect(size.height, 480);

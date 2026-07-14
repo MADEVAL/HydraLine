@@ -1,6 +1,5 @@
 /// Response delivery: buffered (bot, Content-Length) and chunked streaming
 /// (user, Transfer-Encoding) from a pure-Dart [DocumentNode] tree.
-/// (ARCHITECTURE.md §10; S-4, S-5, SRV2/SRV3, I3).
 library;
 
 import 'dart:convert';
@@ -9,7 +8,7 @@ import 'package:hydraline/hydraline.dart' show DocumentNode, HtmlSerializer;
 import 'package:shelf/shelf.dart';
 
 /// Two-layer transport: content (UA-blind, always identical) vs transport
-/// (may check UA; I3 demands byte-identical output either way).
+/// (may check UA; byte-identical output either way).
 abstract interface class ResponseDelivery {
   const factory ResponseDelivery() = _ResponseDelivery;
 
@@ -21,7 +20,7 @@ abstract interface class ResponseDelivery {
   });
 
   /// Chunked: progressive in-order streaming (Transfer-Encoding: chunked).
-  /// I3: `bytes(buffered(root)) == bytes(concat(stream chunks))`.
+  /// `bytes(buffered(root)) == bytes(concat(stream chunks))`.
   Response chunked(
     DocumentNode root, {
     int status = 200,

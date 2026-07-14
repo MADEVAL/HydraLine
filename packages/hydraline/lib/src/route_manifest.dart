@@ -1,5 +1,5 @@
 /// Route manifest: parses/emits the canonical `hydraline.routes.yaml` and
-/// provides a Dart builder for the same model (ARCHITECTURE.md §8.1; C-8, RM1).
+/// provides a Dart builder for the same model.
 library;
 
 import 'package:yaml/yaml.dart';
@@ -54,7 +54,7 @@ class RouteEntry {
   final bool? includeInSitemap;
 }
 
-/// The route manifest. YAML is primary; the Dart builder emits the same YAML (RM1).
+/// The route manifest. YAML is primary; the Dart builder emits the same YAML.
 abstract interface class RouteManifest {
   List<RouteEntry> get routes;
 

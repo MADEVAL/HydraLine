@@ -14,7 +14,7 @@ const _goodHtml = '''
 ''';
 
 void main() {
-  group('Audit.auditHtml (C-11a / A1,A2)', () {
+  group('Audit.auditHtml', () {
     test('a well-formed page reports no errors and exit code 0', () {
       final report = Audit.auditHtml(_goodHtml);
       expect(
@@ -30,7 +30,7 @@ void main() {
       expect(report.exitCode, isNonZero);
     });
 
-    test('image without alt is an error (SEO-11)', () {
+    test('image without alt is an error', () {
       final report = Audit.auditHtml(
         '<html><head><title>T</title></head><body>'
         '<h1>H</h1><img src="/a.png"></body></html>',
@@ -39,7 +39,7 @@ void main() {
       expect(report.exitCode, isNonZero);
     });
 
-    test('missing Open Graph tags warn (A2)', () {
+    test('missing Open Graph tags warn', () {
       final report = Audit.auditHtml(
         '<html><head><title>T</title>'
         '<meta name="description" content="d"></head>'
@@ -66,7 +66,7 @@ void main() {
     });
   });
 
-  group('Audit.compareBodies (C-11b / A8 scaffold)', () {
+  group('Audit.compareBodies', () {
     test('identical buffered and concatenated chunks pass', () {
       final report = Audit.compareBodies('<html>x</html>', [
         '<html>',
@@ -76,7 +76,7 @@ void main() {
       expect(report.issues, isEmpty);
     });
 
-    test('a body mismatch is a cloaking error (I3)', () {
+    test('a body mismatch is a cloaking error', () {
       final report = Audit.compareBodies('<html>a</html>', ['<html>b</html>']);
       expect(report.issues.map((i) => i.code), contains('body_mismatch'));
       expect(report.exitCode, isNonZero);

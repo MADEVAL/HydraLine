@@ -1,7 +1,7 @@
-/// Virtual views JS (W-13, ≤2 KB).
+/// Virtual views JS (≤2 KB).
 ///
 /// Manages `hydraline-island-segment` elements for tall islands that exceed
-/// the canvas size limit (R10). Uses a shared `IntersectionObserver` to
+/// the canvas size limit. Uses a shared `IntersectionObserver` to
 /// mount/unmount segments as they enter/leave the viewport.
 library;
 

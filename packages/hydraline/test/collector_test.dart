@@ -8,7 +8,7 @@ DocumentRootNode sealed(void Function(SsgCollector) build) {
 }
 
 void main() {
-  group('SsgCollector content (CO)', () {
+  group('SsgCollector content', () {
     test('addText emits heading or paragraph', () {
       final root = sealed((c) {
         c
@@ -62,7 +62,7 @@ void main() {
   });
 
   group('SsgCollector invariants', () {
-    test('CO: dedup by key keeps the first occurrence', () {
+    test('dedup by key keeps the first occurrence', () {
       final root = sealed((c) {
         c
           ..addText('first', key: 'k')
@@ -72,7 +72,7 @@ void main() {
       expect(root.body, hasLength(2));
     });
 
-    test('CO4: add* is ignored after seal()', () {
+    test('add* is ignored after seal()', () {
       final collector = SsgCollector('/r')..addText('one');
       final first = collector.seal() as DocumentRootNode;
       collector.addText('two');
@@ -81,7 +81,7 @@ void main() {
       expect(second.body, hasLength(1));
     });
 
-    test('CO1: separate instances are isolated', () {
+    test('separate instances are isolated', () {
       final a = SsgCollector('/a')..addText('a');
       final b = SsgCollector('/b')
         ..addText('b1')

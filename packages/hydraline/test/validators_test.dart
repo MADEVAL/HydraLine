@@ -7,7 +7,7 @@ void main() {
   List<String> codes(Object target) =>
       validator.validate(target).map((i) => i.code).toList();
 
-  group('SeoMeta validation (C-10)', () {
+  group('SeoMeta validation', () {
     test('empty title is an error', () {
       final issues = validator.validate(const SeoMeta(title: ''));
       final title = issues.firstWhere((i) => i.code == 'title_empty');
@@ -55,7 +55,7 @@ void main() {
     });
   });
 
-  group('DocumentNode validation (SEO-11/S3)', () {
+  group('DocumentNode validation', () {
     test('image without alt is an error', () {
       final root = DocumentRootNode(
         body: [ImageNode(src: SafeUrl.parse('/i.png'), alt: '')],
@@ -79,7 +79,7 @@ void main() {
       expect(codes(root), contains('duplicate_canonical'));
     });
 
-    test('unsafe html without sanitizer warns (S3)', () {
+    test('unsafe html without sanitizer warns', () {
       const root = DocumentRootNode(body: [UnsafeHtmlNode('<b>x</b>')]);
       final issue = validator
           .validate(root)

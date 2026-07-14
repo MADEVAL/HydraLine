@@ -1,7 +1,7 @@
-/// Custom Element `<hydraline-island>` (W-8/CE1-CE5).
+/// Custom Element `<hydraline-island>`.
 ///
 /// Uses Declarative Shadow DOM — the existing Shadow Root from server-rendered
-/// `<template shadowrootmode="open">` is reused, so there is no FOUC (CE1).
+/// `<template shadowrootmode="open">` is reused, so there is no FOUC.
 /// Budget: ≤ 2 KB.
 library;
 

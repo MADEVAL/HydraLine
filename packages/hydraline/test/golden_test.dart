@@ -7,12 +7,12 @@ import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('product card (hybrid) golden — deterministic HTML (I4/SER2)', () {
+  test('product card (hybrid) golden — deterministic HTML', () {
     final html = const HtmlSerializer().serialize(_productCard());
     _expectGolden('product_card.html', html);
   });
 
-  test('HTMX fragment golden — no document shell (C-4)', () {
+  test('HTMX fragment golden — no document shell', () {
     final fragment = const HtmlSerializer().serializeFragment(
       _reviewsFragment(),
     );
@@ -38,7 +38,7 @@ SectionNode _reviewsFragment() => const SectionNode(
 );
 
 /// Compares [actual] against `test/goldens/[name]`, normalising line endings to
-/// `\n` (SER5, R8). Regenerate with `UPDATE_GOLDENS=1` in the environment.
+/// `\n`. Regenerate with `UPDATE_GOLDENS=1` in the environment.
 void _expectGolden(String name, String actual) {
   final file = File('test/goldens/$name');
   final normalized = actual.replaceAll('\r\n', '\n');

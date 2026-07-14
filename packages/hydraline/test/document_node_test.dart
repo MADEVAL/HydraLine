@@ -2,7 +2,7 @@ import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('DocumentNode contract (N1/N5)', () {
+  group('DocumentNode contract', () {
     test('leaf nodes expose an empty, const children list', () {
       expect(const TitleNode('T').children, isEmpty);
       expect(const MetaNode(name: 'x', content: 'y').children, isEmpty);
@@ -13,7 +13,7 @@ void main() {
     });
 
     test(
-      'TitleNode keeps its raw text (escaped only on serialization, N2)',
+      'TitleNode keeps its raw text (escaped only on serialization)',
       () {
         expect(const TitleNode('A & B').text, 'A & B');
       },
@@ -26,7 +26,7 @@ void main() {
       expect(meta.name, isNull);
     });
 
-    test('LinkNode only accepts a SafeUrl href (N3)', () {
+    test('LinkNode only accepts a SafeUrl href', () {
       final link = LinkNode(
         rel: 'alternate',
         href: SafeUrl.parse('https://example.com/en'),
@@ -41,7 +41,7 @@ void main() {
       expect(head.children, hasLength(1));
     });
 
-    test('DocumentRootNode children are head followed by body (order, N4)', () {
+    test('DocumentRootNode children are head followed by body (order)', () {
       const head = HeadNode(children: [TitleNode('T')]);
       const body = [MetaNode(name: 'x')];
       const root = DocumentRootNode(head: head, body: body);

@@ -1,7 +1,7 @@
-/// Type-safe JSON-LD builders (ARCHITECTURE.md §7.2; SEO-4).
+/// Type-safe JSON-LD builders.
 ///
 /// Each builder returns a [JsonLdSchema] whose [JsonLdSchema.toJson] is a
-/// JSON-safe map (DS2) with `@context`/`@type`, ready for a `JsonLdNode`.
+/// JSON-safe map with `@context`/`@type`, ready for a `JsonLdNode`.
 library;
 
 import 'escaping.dart' show SafeUrl;
@@ -10,7 +10,7 @@ const String _context = 'https://schema.org';
 
 /// A structured-data schema serialised into `<script type="application/ld+json">`.
 abstract interface class JsonLdSchema {
-  /// Flat JSON-safe representation (DS2-compatible).
+  /// Flat JSON-safe representation.
   Map<String, Object?> toJson();
 }
 

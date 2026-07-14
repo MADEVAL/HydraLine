@@ -2,32 +2,32 @@ import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('IslandStateCodec (DS1-DS4)', () {
+  group('IslandStateCodec', () {
     test('encode/decode round-trip', () {
       const state = {'price': 100, 'currency': 'RUB', 'inStock': true};
       final encoded = IslandStateCodec.encode(state);
       expect(IslandStateCodec.decode(encoded), state);
     });
 
-    test('encode HTML-escapes the attribute value (DS1)', () {
+    test('encode HTML-escapes the attribute value', () {
       final encoded = IslandStateCodec.encode({'q': '"a"<b>&c'});
       expect(encoded, contains('&quot;'));
       expect(encoded, isNot(contains('"a"')));
     });
 
-    test('rejects non-JSON-safe values like DateTime (DS3)', () {
+    test('rejects non-JSON-safe values like DateTime', () {
       expect(
         () => IslandStateCodec.encode({'when': DateTime.utc(2026)}),
         throwsA(isA<ArgumentError>()),
       );
     });
 
-    test('byteSize reports the JSON payload size (DS4)', () {
+    test('byteSize reports the JSON payload size', () {
       expect(IslandStateCodec.byteSize({'a': 1}), '{"a":1}'.length);
     });
   });
 
-  group('IslandManifest (C-7)', () {
+  group('IslandManifest', () {
     test('serialize/deserialize round-trip', () {
       final manifest = IslandManifest([
         const IslandSpec(

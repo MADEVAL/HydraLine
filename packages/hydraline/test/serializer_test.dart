@@ -7,7 +7,7 @@ void main() {
   String frag(DocumentNode node) => s.serializeFragment(node);
 
   group('inline nodes', () {
-    test('TextNode is escaped (S2/I4)', () {
+    test('TextNode is escaped', () {
       expect(frag(const TextNode('A & <B>')), 'A &amp; &lt;B&gt;');
     });
 

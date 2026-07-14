@@ -4,7 +4,7 @@ import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('JsonLd builders (SEO-4)', () {
+  group('JsonLd builders', () {
     test('article', () {
       final json = JsonLd.article(
         headline: 'Hello',
@@ -75,7 +75,7 @@ void main() {
     });
   });
 
-  group('JsonLdNode serialization (SEO-4, XSS-safe)', () {
+  group('JsonLdNode serialization (XSS-safe)', () {
     test('emits an ld+json script', () {
       final node = JsonLdNode(JsonLd.webPage(name: 'Home').toJson());
       final html = const HtmlSerializer().serializeFragment(node);

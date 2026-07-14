@@ -1,10 +1,10 @@
-/// Contextual HTML escaping and URL sanitisation (ARCHITECTURE.md §5).
+/// Contextual HTML escaping and URL sanitisation.
 ///
-/// Invariants: S1 (scheme allowlist), S2 (mandatory escaping),
-/// S4 (0 XSS on fuzzing), S5 (CSP helper).
+/// Invariants: scheme allowlist, mandatory escaping,
+/// zero XSS on fuzzing, CSP helper.
 library;
 
-/// Escapes text content: `&`, `<`, `>` become entities (S2).
+/// Escapes text content: `&`, `<`, `>` become entities.
 ///
 /// Quotes are intentionally left untouched — text and attribute contexts use
 /// different escapers so they can never be confused (see [escapeHtmlAttribute]).
@@ -28,7 +28,7 @@ String escapeHtmlText(String input) {
   return buffer.toString();
 }
 
-/// Escapes an attribute value: `&`, `<`, `>`, `"`, `'` become entities (S2).
+/// Escapes an attribute value: `&`, `<`, `>`, `"`, `'` become entities.
 String escapeHtmlAttribute(String input) {
   if (!input.contains(RegExp('[&<>"\']'))) {
     return input;
@@ -55,7 +55,7 @@ String escapeHtmlAttribute(String input) {
 
 /// A URL that has passed scheme sanitisation. There is **no** public
 /// constructor: instances come only from [SafeUrl.parse]/[SafeUrl.tryParse],
-/// so a node can never be built with an unchecked URL (N3/S1).
+/// so a node can never be built with an unchecked URL.
 abstract interface class SafeUrl {
   /// The sanitised string value.
   String get value;
@@ -64,7 +64,7 @@ abstract interface class SafeUrl {
   ///
   /// Allowlist: `http`, `https`, `mailto`, `tel` and relative URLs
   /// (`/`, `./`, `#`, `?`, bare paths). Blocked: everything else, including
-  /// `javascript:`, `data:`, `vbscript:` (S1).
+  /// `javascript:`, `data:`, `vbscript:`.
   static SafeUrl? tryParse(String raw) {
     final cleaned = raw.replaceAll(RegExp('[\u0000-\u001F\u007F]'), '').trim();
     final scheme = RegExp(r'^([a-zA-Z][a-zA-Z0-9+.\-]*):').firstMatch(cleaned);
@@ -103,7 +103,7 @@ final class _SafeUrl implements SafeUrl {
   String toString() => 'SafeUrl($value)';
 }
 
-/// Thrown by [SafeUrl.parse] when a URL's scheme is not allowed (S1).
+/// Thrown by [SafeUrl.parse] when a URL's scheme is not allowed.
 class UnsafeUrlException implements Exception {
   const UnsafeUrlException(this.raw, this.reason);
 
@@ -114,7 +114,7 @@ class UnsafeUrlException implements Exception {
   String toString() => 'UnsafeUrlException: $reason ($raw)';
 }
 
-/// Helper for the recommended Content-Security-Policy (S5):
+/// Helper for the recommended Content-Security-Policy:
 /// `script-src 'self' 'wasm-unsafe-eval'` (no `unsafe-inline`; CanvasKit needs
 /// `wasm-unsafe-eval`).
 abstract final class Csp {

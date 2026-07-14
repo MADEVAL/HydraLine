@@ -1,4 +1,4 @@
-/// `robots.txt` generation (ARCHITECTURE.md §7.3; SEO-6, C-6).
+/// `robots.txt` generation.
 library;
 
 import 'escaping.dart' show SafeUrl;

@@ -1,4 +1,4 @@
-/// Dispatcher JS (W-9, Qwikloader-style, ≤2 KB).
+/// Dispatcher JS (≤2 KB).
 ///
 /// Global `window.hydraline` API, all hydration directives
 /// (onLoad/onIdle/onVisible/onInteraction/onMedia/manual), `data-hydration`

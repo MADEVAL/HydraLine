@@ -1,5 +1,5 @@
 /// `SsgCollector`: pure-Dart collector for self-registering widgets (surface A)
-/// that seals into a [DocumentNode] tree (ARCHITECTURE.md §9; C-9, CO1-CO4).
+/// that seals into a [DocumentNode] tree.
 library;
 
 import 'document_node.dart';
@@ -7,7 +7,7 @@ import 'escaping.dart' show SafeUrl;
 import 'island_manifest.dart' show IslandSpec;
 import 'metadata.dart';
 
-/// Instance-scoped collector (CO1). Immutable after [seal] (CO4).
+/// Instance-scoped collector. Immutable after [seal].
 abstract interface class SsgCollector {
   factory SsgCollector(String route) = _SsgCollector;
 
@@ -24,7 +24,7 @@ abstract interface class SsgCollector {
   void addNode(DocumentNode node, {String? key});
   void addMeta(SeoMeta meta);
 
-  /// Finalises: dedup by key, N5 (no cycles), immutable result.
+  /// Finalises: dedup by key, no cycles, immutable result.
   DocumentNode seal();
 }
 
@@ -39,7 +39,7 @@ class _SsgCollector implements SsgCollector {
 
   void _add(DocumentNode node, String? key) {
     if (_sealed != null) {
-      return; // CO4
+      return;
     }
     if (key != null) {
       if (_keys.contains(key)) {
@@ -81,7 +81,7 @@ class _SsgCollector implements SsgCollector {
   @override
   void addMeta(SeoMeta meta) {
     if (_sealed != null) {
-      return; // CO4
+      return;
     }
     _meta = meta;
   }

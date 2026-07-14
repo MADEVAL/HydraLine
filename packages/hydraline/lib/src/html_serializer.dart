@@ -1,9 +1,9 @@
-/// Single-pass HTML serializer (ARCHITECTURE.md §6).
+/// Single-pass HTML serializer.
 ///
-/// Invariants: SER1 (single pass into a [StringSink], no intermediate tree),
-/// SER2 (deterministic, stable attribute order), SER3 (O(nodes + text), no
-/// quadratic concatenation), SER4 (`serialize == concat(serializeToStream)`),
-/// SER5 (line endings are always `\n`).
+/// Invariants: single pass into a [StringSink] with no intermediate tree,
+/// deterministic with stable attribute order, O(nodes + text) with no quadratic
+/// concatenation, `serialize == concat(serializeToStream)`, line endings are
+/// always `\n`.
 library;
 
 import 'dart:convert';
@@ -24,10 +24,10 @@ abstract interface class HtmlSerializer {
   /// Default implementation.
   const factory HtmlSerializer([SerializerOptions options]) = _HtmlSerializer;
 
-  /// Buffered HTML (bots / SSG file). SER1/SER2.
+  /// Buffered HTML (bots / SSG file).
   String serialize(DocumentNode root);
 
-  /// Progressive in-order stream (SSR). SER4: equals [serialize] concatenated.
+  /// Progressive in-order stream (SSR). Equals [serialize] concatenated.
   Stream<String> serializeToStream(DocumentNode root);
 
   /// A fragment without `<html>/<head>` (HTMX responses).
@@ -259,7 +259,7 @@ class _HtmlSerializer implements HtmlSerializer {
   }
 
   /// Encodes JSON-LD, escaping `<`, `>` and `&` as `\uXXXX` so the payload can
-  /// never break out of the surrounding `<script>` element (S2/S4).
+  /// never break out of the surrounding `<script>` element.
   String _encodeJsonLd(Map<String, Object?> json) => jsonEncode(json)
       .replaceAll('<', r'\u003c')
       .replaceAll('>', r'\u003e')

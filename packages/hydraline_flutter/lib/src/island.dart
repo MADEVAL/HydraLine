@@ -1,6 +1,6 @@
 /// Island widget — a Flutter island that registers as an
 /// `IslandPlaceholderNode` during extraction and renders a placeholder UI
-/// at configuration time (ARCHITECTURE.md §11.1; W-2).
+/// at configuration time.
 library;
 
 import 'package:flutter/widgets.dart';

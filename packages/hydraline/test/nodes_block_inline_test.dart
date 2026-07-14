@@ -21,7 +21,7 @@ void main() {
     });
   });
 
-  group('TextNode (N2)', () {
+  group('TextNode', () {
     test('stores raw text and is a leaf', () {
       const t = TextNode('A & <B>');
       expect(t.text, 'A & <B>');
@@ -34,7 +34,7 @@ void main() {
     expect(p.children, hasLength(1));
   });
 
-  group('AnchorNode (N3)', () {
+  group('AnchorNode', () {
     test('accepts a SafeUrl href plus optional rel', () {
       final a = AnchorNode(
         href: SafeUrl.parse('/about'),
@@ -47,7 +47,7 @@ void main() {
     });
   });
 
-  group('ImageNode (N3)', () {
+  group('ImageNode', () {
     test('carries SafeUrl src, alt and optional size; is a leaf', () {
       final img = ImageNode(
         src: SafeUrl.parse('/img/a.png'),

@@ -11,7 +11,7 @@ class _ListSource implements SitemapSource {
 void main() {
   final base = SafeUrl.parse('https://x.example');
 
-  group('Sitemap.generate — single file (SEO-5)', () {
+  group('Sitemap.generate — single file', () {
     test('emits a urlset with loc/lastmod/changefreq/priority', () async {
       final source = _ListSource([
         SitemapEntry(
@@ -64,7 +64,7 @@ void main() {
     });
   });
 
-  group('Sitemap.generate — autosplit (SM1)', () {
+  group('Sitemap.generate — autosplit', () {
     test('produces an index + shards past the per-file URL limit', () async {
       final entries = [
         for (var i = 0; i < 5; i++)
@@ -90,7 +90,7 @@ void main() {
     });
   });
 
-  group('Robots.generate (SEO-6)', () {
+  group('Robots.generate', () {
     test('renders user-agent rules and sitemaps', () {
       final txt = Robots.generate(
         rules: const [

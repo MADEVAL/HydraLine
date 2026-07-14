@@ -1,5 +1,5 @@
 /// HTTP semantics: status codes, redirects, X-Robots-Tag and path
-/// canonicalisation (ARCHITECTURE.md §10; S-7, SEO-9).
+/// canonicalisation.
 library;
 
 import 'dart:convert';
@@ -54,7 +54,7 @@ abstract final class Http {
   }
 
   /// Canonicalises a path: normalises slashes, strips trailing slash, ensures
-  /// leading slash (SEO-7).
+  /// leading slash.
   static String canonicalizePath(String path) {
     var clean = path.replaceAll(RegExp(r'/+'), '/');
     if (clean.length > 1 && clean.endsWith('/')) {

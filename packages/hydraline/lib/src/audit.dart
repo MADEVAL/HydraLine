@@ -1,5 +1,5 @@
 /// CLI audit: "what the crawler sees" (standalone) and the buffered↔chunked
-/// body-identity comparator (server-integration) (ARCHITECTURE.md §7; C-11).
+/// body-identity comparator (server-integration).
 library;
 
 import 'package:html/parser.dart' as html;
@@ -19,8 +19,8 @@ abstract final class Audit {
   static const int _titleMaxLength = 70;
   static const int _descriptionMaxLength = 160;
 
-  /// C-11(a) standalone: audits the raw HTML a crawler would see — title,
-  /// meta description, Open Graph, canonical, headings and image alt (A1/A2).
+/// Standalone: audits the raw HTML a crawler would see — title,
+/// meta description, Open Graph, canonical, headings and image alt.
   static AuditReport auditHtml(String source) {
     final document = html.parse(source);
     final issues = <ValidationIssue>[];
@@ -31,7 +31,7 @@ abstract final class Audit {
         const ValidationIssue(
           severity: ValidationSeverity.error,
           code: 'title_missing',
-          message: '<title> is missing or empty (SEO-1).',
+          message: '<title> is missing or empty.',
         ),
       );
     } else if (title.length > _titleMaxLength) {
@@ -52,7 +52,7 @@ abstract final class Audit {
         const ValidationIssue(
           severity: ValidationSeverity.warning,
           code: 'description_missing',
-          message: 'meta description is missing (SEO-1).',
+          message: 'meta description is missing.',
         ),
       );
     } else if (description.length > _descriptionMaxLength) {
@@ -75,7 +75,7 @@ abstract final class Audit {
         const ValidationIssue(
           severity: ValidationSeverity.warning,
           code: 'og_missing',
-          message: 'Open Graph og:title/og:image are recommended (SEO-2, A2).',
+          message: 'Open Graph og:title/og:image are recommended.',
         ),
       );
     }
@@ -85,7 +85,7 @@ abstract final class Audit {
         const ValidationIssue(
           severity: ValidationSeverity.warning,
           code: 'h1_missing',
-          message: 'no <h1> found (SEO-11).',
+          message: 'no <h1> found.',
         ),
       );
     }
@@ -97,7 +97,7 @@ abstract final class Audit {
           const ValidationIssue(
             severity: ValidationSeverity.error,
             code: 'image_missing_alt',
-            message: 'an <img> is missing alt text (SEO-11).',
+            message: 'an <img> is missing alt text.',
           ),
         );
       }
@@ -118,9 +118,9 @@ abstract final class Audit {
     return AuditReport(issues: issues, exitCode: _exitCode(issues));
   }
 
-  /// C-11(b) server-integration comparator (A8/I3): the document body served
-  /// buffered (to bots) must be byte-identical to the concatenation of the
-  /// streamed chunks (to users).
+/// Server-integration comparator: the document body served buffered (to bots)
+/// must be byte-identical to the concatenation of the streamed chunks (to
+/// users).
   static AuditReport compareBodies(String buffered, List<String> chunks) {
     final concatenated = chunks.join();
     if (buffered == concatenated) {
@@ -131,8 +131,7 @@ abstract final class Audit {
         severity: ValidationSeverity.error,
         code: 'body_mismatch',
         message:
-            'buffered body differs from concatenated chunks — cloaking risk '
-            '(I3/A8).',
+            'buffered body differs from concatenated chunks — cloaking risk.',
       ),
     ];
     return AuditReport(issues: issues, exitCode: _exitCode(issues));

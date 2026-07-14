@@ -1,5 +1,5 @@
 /// Dart Frog adapter — wraps [hydralineMiddleware] so it plugs into a Dart Frog
-/// server with the same configuration (ARCHITECTURE.md §10; S-1).
+/// server with the same configuration.
 library;
 
 import 'package:shelf/shelf.dart';

@@ -1,5 +1,5 @@
 /// Routing adapters connecting go_router / Navigator 2.0 to the route manifest
-/// for build-time traversal (ARCHITECTURE.md §11.3; W-5).
+/// for build-time traversal.
 ///
 // ignore_for_file: avoid_dynamic_calls
 library;

@@ -1,9 +1,8 @@
-/// The `DocumentNode` tree (ARCHITECTURE.md §4).
+/// The `DocumentNode` tree.
 ///
 /// The hierarchy is `sealed`, so the serializer walks it with an exhaustive
-/// `switch` (no external visitor). Invariants: N1 (immutable), N2 (text stored
-/// raw, escaped only on serialization), N3 (URL fields are always [SafeUrl]),
-/// N4 (deterministic), N5 (tree without cycles).
+/// `switch` (no external visitor). Invariants: immutable, text stored raw (escaped only on serialization),
+/// URL fields are always [SafeUrl], deterministic, tree without cycles.
 library;
 
 import 'escaping.dart' show SafeUrl;
@@ -12,7 +11,7 @@ import 'escaping.dart' show SafeUrl;
 sealed class DocumentNode {
   const DocumentNode();
 
-  /// Child nodes (empty for leaves). N5: no cycles.
+  /// Child nodes (empty for leaves). No cycles.
   List<DocumentNode> get children;
 }
 
@@ -25,7 +24,7 @@ final class DocumentRootNode extends DocumentNode {
   final HeadNode? head;
   final List<DocumentNode> body;
 
-  /// Optional `lang` for the `<html>` element (SEO-8).
+  /// Optional `lang` for the `<html>` element.
   final String? lang;
 
   @override
@@ -44,7 +43,7 @@ final class HeadNode extends DocumentNode {
 final class TitleNode extends DocumentNode {
   const TitleNode(this.text);
 
-  /// Raw title text; escaped only on serialization (N2/S2).
+  /// Raw title text; escaped only on serialization.
   final String text;
 
   @override
@@ -158,7 +157,7 @@ final class CodeNode extends DocumentNode {
   List<DocumentNode> get children => const [];
 }
 
-/// A `<time>` element carrying an ISO-8601 `dateTime` (determinism, DS3).
+/// A `<time>` element carrying an ISO-8601 `dateTime`.
 final class TimeNode extends DocumentNode {
   const TimeNode({required this.dateTime, required this.children});
 
@@ -246,7 +245,7 @@ enum IslandRenderMode { ssr, skeletonOnly }
 /// How island styles are scoped.
 enum IslandStyleMode { shadow, scoped }
 
-/// Reserved placeholder size in px (anti-CLS, I8).
+/// Reserved placeholder size in px to prevent layout shift.
 final class IslandSize {
   const IslandSize({required this.width, required this.height});
 
@@ -321,7 +320,7 @@ final class VanillaIslandNode extends DocumentNode {
 
 // ── Unsafe HTML (opt-in, the only raw-HTML escape hatch) ─────────────────────
 
-/// The only path for raw HTML (S3). The name intentionally contains "Unsafe".
+/// The only path for raw HTML. The name intentionally contains "Unsafe".
 /// Without a [sanitizer] the `SeoValidator` emits a warning.
 final class UnsafeHtmlNode extends DocumentNode {
   const UnsafeHtmlNode(this.rawHtml, {this.sanitizer});
@@ -337,7 +336,7 @@ final class UnsafeHtmlNode extends DocumentNode {
   List<DocumentNode> get children => const [];
 }
 
-/// A `<script type="application/ld+json">` structured-data block (SEO-4).
+/// A `<script type="application/ld+json">` structured-data block.
 ///
 /// This is the only `<script>` the serializer emits; its content is JSON data
 /// (not executable code) and is escaped to prevent `</script>` breakout.
@@ -352,7 +351,7 @@ final class JsonLdNode extends DocumentNode {
 
 // ── Inline ───────────────────────────────────────────────────────────────────
 
-/// Text content. Stored raw (N2); always escaped on serialization (S2).
+/// Text content. Stored raw; always escaped on serialization.
 final class TextNode extends DocumentNode {
   const TextNode(this.text);
 
@@ -362,7 +361,7 @@ final class TextNode extends DocumentNode {
   List<DocumentNode> get children => const [];
 }
 
-/// An anchor `<a href>`; `href` is always a [SafeUrl] (N3).
+/// An anchor `<a href>`; `href` is always a [SafeUrl].
 final class AnchorNode extends DocumentNode {
   const AnchorNode({required this.href, required this.children, this.rel});
 
@@ -373,7 +372,7 @@ final class AnchorNode extends DocumentNode {
   final List<DocumentNode> children;
 }
 
-/// An image `<img src alt>`; `src` is always a [SafeUrl] (N3).
+/// An image `<img src alt>`; `src` is always a [SafeUrl].
 final class ImageNode extends DocumentNode {
   const ImageNode({
     required this.src,

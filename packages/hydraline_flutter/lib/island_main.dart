@@ -2,7 +2,7 @@
 ///
 /// This file owns only the island runtime: [IslandHost] + per-island factories.
 /// It does NOT include MaterialApp, the main app router, or business logic,
-/// keeping the island bundle small (~450 KB gzip, W-7).
+/// keeping the island bundle small (~450 KB gzip).
 library;
 
 import 'package:flutter/material.dart';

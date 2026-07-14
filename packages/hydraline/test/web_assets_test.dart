@@ -2,7 +2,7 @@ import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('vanilla islands bundle (C-12, <=8 KB)', () {
+  group('vanilla islands bundle (<=8 KB)', () {
     test('is a non-empty string', () {
       expect(vanillaIslandsJs, isNotEmpty);
     });
@@ -17,7 +17,7 @@ void main() {
     });
   });
 
-  group('HTMX glue (C-12, <=14 KB)', () {
+  group('HTMX glue (<=14 KB)', () {
     test('is a non-empty string', () {
       expect(htmxGlueJs, isNotEmpty);
     });

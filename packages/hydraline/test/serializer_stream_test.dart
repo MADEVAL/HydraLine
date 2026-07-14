@@ -13,7 +13,7 @@ void main() {
     ],
   );
 
-  test('SER4: concat(serializeToStream) == serialize', () async {
+  test('concat(serializeToStream) == serialize', () async {
     final chunks = await s.serializeToStream(root).toList();
     expect(chunks.join(), s.serialize(root));
   });
@@ -30,7 +30,7 @@ void main() {
     expect(headingIndex, lessThan(paragraphIndex));
   });
 
-  test('SER4 holds for a non-root fragment node', () async {
+  test('holds for a non-root fragment node', () async {
     const node = ParagraphNode(children: [TextNode('x & y')]);
     final chunks = await s.serializeToStream(node).toList();
     expect(chunks.join(), s.serializeFragment(node));

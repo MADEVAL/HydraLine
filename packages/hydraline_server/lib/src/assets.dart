@@ -1,5 +1,4 @@
-/// Static asset handlers and Flutter-asset injection
-/// (ARCHITECTURE.md §10; S-9, S-10).
+/// Static asset handlers and Flutter-asset injection.
 library;
 
 import 'package:hydraline/hydraline.dart'
@@ -18,7 +17,7 @@ import 'package:shelf/shelf.dart';
 /// Asset endpoints and Flutter-asset inlining.
 abstract final class Assets {
   /// Serves `robots.txt` and `sitemap.xml` + L0-L1 core assets
-  /// (vanilla JS, self-hosted HTMX) (S-9).
+  /// (vanilla JS, self-hosted HTMX).
   static Handler serveCoreAssets() => (Request request) {
     final path = request.url.path;
     if (path == 'robots.txt') {
@@ -35,7 +34,7 @@ abstract final class Assets {
 
   /// Injects Flutter-asset `<script>` tags (pointing at the Flutter Web SDK
   /// entry-points) into [root] before `</body>`. Uses [baseHref] so paths
-  /// are always absolute regardless of the current route (S-10).
+  /// are always absolute regardless of the current route.
   /// Only for routes that have `IslandType.flutter` islands.
   static DocumentNode injectFlutterAssets(
     DocumentNode root, {

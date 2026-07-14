@@ -51,7 +51,7 @@ String _randomString(Random rng) {
 void main() {
   const serializer = HtmlSerializer();
 
-  group('escapeHtmlText (S2/S4/I2)', () {
+  group('escapeHtmlText', () {
     test('OWASP vectors leave no tag delimiters and round-trip', () {
       for (final vector in _owaspVectors) {
         final escaped = escapeHtmlText(vector);
@@ -76,7 +76,7 @@ void main() {
     });
   });
 
-  group('escapeHtmlAttribute (S2/S4/I2)', () {
+  group('escapeHtmlAttribute', () {
     test('1e6 generated inputs cannot break out of a quoted attribute', () {
       final rng = Random(0xC0FFEE);
       for (var i = 0; i < 1000000; i++) {
@@ -95,7 +95,7 @@ void main() {
     });
   });
 
-  group('SafeUrl allowlist (S1/S4)', () {
+  group('SafeUrl allowlist', () {
     test('rejects every dangerous URL vector', () {
       for (final url in _dangerousUrls) {
         expect(SafeUrl.tryParse(url), isNull, reason: url);
@@ -103,7 +103,7 @@ void main() {
     });
   });
 
-  group('serializer (I2)', () {
+  group('serializer', () {
     test('attacker-controlled text/alt never inject markup', () {
       final rng = Random(0xBADF00D);
       for (var i = 0; i < 100000; i++) {

@@ -1,5 +1,4 @@
-/// `sitemap.xml` generation with hreflang alternates and index auto-split
-/// (ARCHITECTURE.md §7.3; SEO-5, C-6, SM1).
+/// `sitemap.xml` generation with hreflang alternates and index auto-split.
 library;
 
 import 'escaping.dart' show SafeUrl;
@@ -29,7 +28,7 @@ abstract interface class SitemapSource {
   Stream<SitemapEntry> entries();
 }
 
-/// The generation result: one file, or an index plus shards (SM1).
+/// The generation result: one file, or an index plus shards.
 class SitemapOutput {
   const SitemapOutput({required this.files, required this.isIndex});
 
@@ -51,7 +50,7 @@ abstract final class Sitemap {
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
       'xmlns:xhtml="http://www.w3.org/1999/xhtml">';
 
-  /// SM1: auto-splits into a `sitemap-index` when a shard would exceed
+  /// Auto-splits into a `sitemap-index` when a shard would exceed
   /// [maxUrlsPerFile] URLs or [maxBytesPerFile] bytes.
   static Future<SitemapOutput> generate(
     SitemapSource source, {

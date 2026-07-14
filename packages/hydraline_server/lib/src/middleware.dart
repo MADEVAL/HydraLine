@@ -1,5 +1,5 @@
 /// shelf middleware: route matching and server-rendered HTML delivery from a
-/// pure-Dart [DocumentNode] tree (ARCHITECTURE.md §10; S-1, S-2).
+/// pure-Dart [DocumentNode] tree.
 library;
 
 import 'dart:async';
@@ -33,14 +33,13 @@ class HydralineConfig {
   final Object? cache;
 
   /// Pattern matching bot user agents. Read only by the transport layer, never
-  /// by the builder (SRV1). When null, chunked delivery is always used.
+  /// by the builder. When null, chunked delivery is always used.
   final Pattern? botUserAgentPattern;
 }
 
 /// A pure-Dart function that builds a [DocumentNode] for a given request and
 /// optional application data. The signature deliberately does **not** include
-/// `User-Agent` — the builder is architecturally prevented from cloaking
-/// (SRV1, R7).
+  /// `User-Agent` — the builder is architecturally prevented from cloaking.
 typedef DocumentBuilder =
     FutureOr<DocumentNode> Function(Request request, Object? data);
 

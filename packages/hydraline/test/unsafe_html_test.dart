@@ -2,7 +2,7 @@ import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('UnsafeHtmlNode (S3)', () {
+  group('UnsafeHtmlNode', () {
     test('stores raw HTML, is a leaf, sanitizer null by default', () {
       const node = UnsafeHtmlNode('<b>x</b>');
       expect(node.rawHtml, '<b>x</b>');

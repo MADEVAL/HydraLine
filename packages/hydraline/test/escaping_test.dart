@@ -29,7 +29,7 @@ void main() {
     });
   });
 
-  group('SafeUrl allowlist (S1/N3)', () {
+  group('SafeUrl allowlist', () {
     test('accepts http/https/mailto/tel', () {
       expect(
         SafeUrl.parse('https://example.com/x').value,
@@ -83,7 +83,7 @@ void main() {
     });
   });
 
-  group('Csp (S5)', () {
+  group('Csp', () {
     test('recommends self + wasm-unsafe-eval and forbids unsafe-inline', () {
       final value = Csp.recommendedHeaderValue();
       expect(value, contains("script-src 'self' 'wasm-unsafe-eval'"));

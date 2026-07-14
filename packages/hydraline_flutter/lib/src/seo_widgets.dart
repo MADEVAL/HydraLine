@@ -1,9 +1,9 @@
 /// `Seo.*` widgets (surface A): self-registering Flutter widgets with dual
 /// nature — they render a visual and register semantic info into the nearest
-/// [SsgCollector] via [HydraScope] (ARCHITECTURE.md §11.1; W-1).
+/// [SsgCollector] via [HydraScope].
 ///
 /// Registration happens unconditionally on each build; the collector handles
-/// deduplication by key (CO2).
+/// deduplication by key.
 library;
 
 import 'package:flutter/widgets.dart';

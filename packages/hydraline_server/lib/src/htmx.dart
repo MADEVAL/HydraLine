@@ -1,5 +1,4 @@
-/// HTMX helpers: fragment rendering and response wrappers
-/// (ARCHITECTURE.md §10.3; S-6, A10 — server side).
+/// HTMX helpers: fragment rendering and response wrappers.
 library;
 
 import 'package:hydraline/hydraline.dart' show DocumentNode, HtmlSerializer;
@@ -50,7 +49,7 @@ class HtmxResponse {
 /// HTMX static helpers.
 abstract final class Htmx {
   /// Renders a fragment without `<html>/<head>`, via
-  /// [HtmlSerializer.serializeFragment] (C-4).
+  /// [HtmlSerializer.serializeFragment].
   static Response renderFragment(DocumentNode fragment, {int status = 200}) {
     final html = const HtmlSerializer().serializeFragment(fragment);
     return Response(

@@ -1,5 +1,4 @@
-/// SEO / safety validators over [SeoMeta] and [DocumentNode] trees
-/// (ARCHITECTURE.md §7; C-10, SEO-11, S3).
+/// SEO / safety validators over [SeoMeta] and [DocumentNode] trees.
 library;
 
 import 'document_node.dart';
@@ -30,7 +29,7 @@ class ValidationIssue {
 }
 
 /// Validates SEO/safety rules: title/description lengths, required alt text,
-/// duplicate canonical links, malformed hreflang, unsafe HTML (C-10).
+/// duplicate canonical links, malformed hreflang, unsafe HTML.
 abstract interface class SeoValidator {
   const factory SeoValidator() = _SeoValidator;
 
@@ -63,7 +62,7 @@ class _SeoValidator implements SeoValidator {
         const ValidationIssue(
           severity: ValidationSeverity.error,
           code: 'title_empty',
-          message: 'title must not be empty (SEO-1).',
+          message: 'title must not be empty.',
         ),
       );
     } else if (meta.title.length > _titleMaxLength) {
@@ -84,7 +83,7 @@ class _SeoValidator implements SeoValidator {
         const ValidationIssue(
           severity: ValidationSeverity.warning,
           code: 'description_missing',
-          message: 'a meta description improves search snippets (SEO-1).',
+          message: 'a meta description improves search snippets.',
         ),
       );
     } else if (description.length > _descriptionMaxLength) {
@@ -106,7 +105,7 @@ class _SeoValidator implements SeoValidator {
           ValidationIssue(
             severity: ValidationSeverity.warning,
             code: 'duplicate_hreflang',
-            message: 'duplicate hreflang "${alternate.hreflang}" (SEO-8).',
+            message: 'duplicate hreflang "${alternate.hreflang}".',
           ),
         );
       }
@@ -125,7 +124,7 @@ class _SeoValidator implements SeoValidator {
             const ValidationIssue(
               severity: ValidationSeverity.error,
               code: 'image_missing_alt',
-              message: 'images require non-empty alt text (SEO-11).',
+              message: 'images require non-empty alt text.',
             ),
           );
         case LinkNode(:final rel) when rel == 'canonical':
@@ -135,7 +134,7 @@ class _SeoValidator implements SeoValidator {
             const ValidationIssue(
               severity: ValidationSeverity.warning,
               code: 'unsafe_html_without_sanitizer',
-              message: 'UnsafeHtmlNode used without a sanitizer (S3).',
+              message: 'UnsafeHtmlNode used without a sanitizer.',
             ),
           );
         default:

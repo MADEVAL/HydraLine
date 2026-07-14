@@ -1,6 +1,5 @@
 /// Build-time extraction sandbox: provides stub ancestors so `Seo.*` widgets
 /// don't fail when `dart:ui`-dependent ancestors are absent.
-/// (ARCHITECTURE.md §9; W-4, R2).
 library;
 
 import 'package:flutter/material.dart';

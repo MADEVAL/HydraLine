@@ -1,7 +1,6 @@
 /// SSG runner: iterates the route manifest, extracts a [DocumentNode] for every
 /// route via SSG extraction (flutter_tester), and writes the serialised HTML
 /// + sitemap + robots + island assets into an output directory.
-/// (ARCHITECTURE.md §11.3; W-14, W-16, SSG1–SSG3).
 library;
 
 import 'dart:io';
@@ -28,11 +27,11 @@ class SsgResult {
 
   final int pagesWritten;
 
-  /// `true` when Flutter islands were present and their bundle was copied (SSG2).
+  /// `true` when Flutter islands were present and their bundle was copied.
   final bool assetsCopied;
 }
 
-/// SSG1: MUST be executed inside a flutter_tester harness
+/// MUST be executed inside a flutter_tester harness
 /// (`flutter test --tags ssg`). Never plain `dart run`.
 abstract interface class SsgRunner {
   factory SsgRunner({
@@ -44,9 +43,9 @@ abstract interface class SsgRunner {
     adapter: routeAdapter,
   );
 
-  /// SSG2: the ONLY responsible for copying the island bundle + web/ assets
+  /// The ONLY responsible for copying the island bundle + web/ assets
   /// into the output dir (only when islands of type flutter are present).
-  /// SSG3: deterministic output (stable paths, stable order).
+  /// Deterministic output (stable paths, stable order).
   Future<SsgResult> run({required String outputDir});
 }
 

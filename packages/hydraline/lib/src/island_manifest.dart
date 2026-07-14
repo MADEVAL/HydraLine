@@ -1,5 +1,4 @@
-/// Island manifest and the `data-state` props contract
-/// (ARCHITECTURE.md §8.2/§8.3; C-7, DS1-DS5).
+/// Island manifest and the `data-state` props contract.
 library;
 
 import 'dart:convert';
@@ -13,16 +12,16 @@ import 'document_node.dart'
         IslandType;
 import 'escaping.dart' show escapeHtmlAttribute;
 
-/// JSON-safe island state: `String|int|double|bool|null|List|Map<String,Object?>` (DS2).
+/// JSON-safe island state: `String|int|double|bool|null|List|Map<String,Object?>`.
 typedef IslandState = Map<String, Object?>;
 
-/// Serialises island props across the server → HTML → client boundary (DS1-DS5).
+/// Serialises island props across the server → HTML → client boundary.
 abstract final class IslandStateCodec {
-  /// DS4: soft budget (~10 KB) per island; devtools warns past this.
+  /// Soft budget (~10 KB) per island; devtools warns past this.
   static const int maxBytes = 10 * 1024;
 
-  /// DS1: `jsonEncode` + HTML-attribute escape. Throws [ArgumentError] on a
-  /// non-JSON-safe value (DS3): `DateTime`, `Uri`, functions, etc.
+/// `jsonEncode` + HTML-attribute escape. Throws [ArgumentError] on a
+/// non-JSON-safe value (e.g. `DateTime`, `Uri`, functions, etc).
   static String encode(IslandState state) {
     _validate(state, 'state');
     return escapeHtmlAttribute(jsonEncode(state));
@@ -37,7 +36,7 @@ abstract final class IslandStateCodec {
     return json.cast<String, Object?>();
   }
 
-  /// DS4: byte size of the JSON payload (before HTML-escaping).
+  /// Byte size of the JSON payload (before HTML-escaping).
   static int byteSize(IslandState state) =>
       utf8.encode(jsonEncode(state)).length;
 
@@ -68,7 +67,7 @@ abstract final class IslandStateCodec {
         throw ArgumentError.value(
           value,
           path,
-          'island state must be JSON-safe (DS2); got ${value.runtimeType}',
+          'island state must be JSON-safe; got ${value.runtimeType}',
         );
     }
   }

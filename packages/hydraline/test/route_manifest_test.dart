@@ -23,7 +23,7 @@ routes:
 ''';
 
 void main() {
-  group('RouteManifest.parseYaml (RM1/C-8)', () {
+  group('RouteManifest.parseYaml', () {
     test('parses routes, modes and content sources', () {
       final manifest = RouteManifest.parseYaml(_yaml);
       expect(manifest.routes, hasLength(3));
@@ -62,7 +62,7 @@ void main() {
     });
   });
 
-  group('RM1 round-trip (YAML <-> model)', () {
+  group('YAML round-trip', () {
     test('toYaml output is stable across a re-parse', () {
       final once = RouteManifest.parseYaml(_yaml).toYaml();
       final twice = RouteManifest.parseYaml(once).toYaml();

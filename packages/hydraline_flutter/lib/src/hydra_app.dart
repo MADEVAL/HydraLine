@@ -1,5 +1,5 @@
 /// Integration widget and scope: provides [SsgCollector] to the widget tree
-/// via [HydraScope] InheritedWidget (W-3, CO2).
+/// via [HydraScope] InheritedWidget.
 library;
 
 import 'package:flutter/widgets.dart';
@@ -25,7 +25,7 @@ class HydraApp extends StatelessWidget {
 }
 
 /// InheritedWidget carrying the current [SsgCollector] (if any) and a flag
-/// indicating whether we are in build-time SSG mode (CO2: the only access
+/// indicating whether we are in build-time SSG mode (the only access
 /// point from widgets).
 class HydraScope extends InheritedWidget {
   const HydraScope({

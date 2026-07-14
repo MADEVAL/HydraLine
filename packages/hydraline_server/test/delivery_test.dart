@@ -33,7 +33,7 @@ void main() {
       expect(chunks.join(), serializer.serialize(root));
     });
 
-    test('SER4/I3: bytes(buffered) == bytes(concat(chunks))', () async {
+    test('bytes(buffered) == bytes(concat(chunks))', () async {
       final bufferedBody = utf8.decode(
         (await delivery.buffered(root).read().expand((c) => c).toList()),
       );
@@ -41,7 +41,7 @@ void main() {
       await for (final chunk in delivery.chunked(root).read()) {
         chunkedBody.addAll(chunk);
       }
-      expect(utf8.decode(chunkedBody), bufferedBody); // I3 proof
+      expect(utf8.decode(chunkedBody), bufferedBody);
     });
   });
 

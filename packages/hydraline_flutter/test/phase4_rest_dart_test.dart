@@ -28,7 +28,7 @@ void main() {
     });
   });
 
-  group('zero-overhead (I6/AS1)', () {
+  group('zero-overhead', () {
     test('document without flutter islands omits flutter_bootstrap.js', () {
       final root = DocumentRootNode(
         head: const HeadNode(children: [TitleNode('T')]),

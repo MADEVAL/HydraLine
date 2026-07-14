@@ -15,7 +15,7 @@ void main() {
     });
   });
 
-  group('buildHead — core meta (SEO-1)', () {
+  group('buildHead — core meta', () {
     test('minimal head: charset, title, viewport', () {
       expect(
         head(const SeoMeta(title: 'Home')),
@@ -47,7 +47,7 @@ void main() {
       );
     });
 
-    test('robots meta only when noindex/nofollow set (SEO-6)', () {
+    test('robots meta only when noindex/nofollow set', () {
       expect(head(const SeoMeta(title: 'T')), isNot(contains('name="robots"')));
       expect(
         head(
@@ -67,7 +67,7 @@ void main() {
     });
   });
 
-  group('buildHead — Open Graph (SEO-2)', () {
+  group('buildHead — Open Graph', () {
     test('emits present og fields in order', () {
       final html = head(
         SeoMeta(
@@ -101,7 +101,7 @@ void main() {
     });
   });
 
-  group('buildHead — Twitter Card (SEO-3)', () {
+  group('buildHead — Twitter Card', () {
     test('summary_large_image with fields', () {
       final html = head(
         SeoMeta(
@@ -123,7 +123,7 @@ void main() {
     });
   });
 
-  group('buildHead — i18n and extras (SEO-8)', () {
+  group('buildHead — i18n and extras', () {
     test('hreflang alternates', () {
       final html = head(
         SeoMeta(
@@ -169,7 +169,7 @@ void main() {
     });
   });
 
-  group('DocumentRootNode lang (SEO-8)', () {
+  group('DocumentRootNode lang', () {
     test('serializes html lang when provided', () {
       const root = DocumentRootNode(lang: 'ru', body: []);
       expect(

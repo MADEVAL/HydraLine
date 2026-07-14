@@ -17,7 +17,7 @@ void main() {
       expect(jsCustomElement, contains('template'));
     });
 
-    test('includes ResizeObserver for view constraints (CE4/CE5)', () {
+    test('includes ResizeObserver for view constraints', () {
       expect(jsCustomElement, contains('ResizeObserver'));
     });
   });

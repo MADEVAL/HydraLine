@@ -1,4 +1,4 @@
-/// Pluggable server-side HTML cache (ARCHITECTURE.md §10; S-8).
+/// Pluggable server-side HTML cache.
 library;
 
 /// Cache interface for server-rendered HTML.
