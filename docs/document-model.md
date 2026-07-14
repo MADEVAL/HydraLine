@@ -488,7 +488,7 @@ The default policy is compatible with CanvasKit (which requires
 
 ## Building the Tree Programmatically
 
-The helper function `Document.of()` provides a concise way to construct trees:
+Compose nodes directly â€” the tree is plain immutable Dart objects:
 
 ```dart
 final doc = DocumentRootNode(
@@ -518,3 +518,11 @@ final doc = DocumentRootNode(
   ],
 );
 ```
+
+## See Also
+
+- [Getting Started](./getting-started.md) — installation and first pages
+- [Server](./server.md) — rendering trees at request time
+- [Flutter Widgets](./flutter-widgets.md) — building trees from widgets
+- [Security](./security.md) — escaping, SafeUrl, UnsafeHtmlNode
+- Runnable example: [packages/hydraline/example/main.dart](../packages/hydraline/example/main.dart)

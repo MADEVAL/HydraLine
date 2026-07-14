@@ -8,17 +8,19 @@ packages build on.
 | Module | Description |
 |---|---|
 | `DocumentNode` | Sealed immutable tree — headings, paragraphs, links, images, tables, islands |
-| `HtmlSerializer` | Single-pass deterministic HTML serializer (buffered + streaming) |
-| `SafeUrl` | Type-safe URL validation against scheme allowlist |
+| `HtmlSerializer` | Single-pass deterministic HTML serializer (buffered + streaming + fragment) |
+| `SafeUrl` | Type-safe URL validation against a scheme allowlist |
 | `SeoMeta` | Open Graph, Twitter Card, hreflang, canonical, meta tags |
-| `JsonLd` | Type-safe JSON-LD builders (Article, Product, FAQ, BreadcrumbList, etc.) |
-| `Sitemap` | sitemap.xml generation with auto-split at 50k URLs |
+| `JsonLd` | Type-safe JSON-LD builders (Article, Product, FAQ, BreadcrumbList, …) |
+| `Sitemap` | sitemap.xml generation with defaults + auto-split at 50k URLs |
 | `Robots` | robots.txt generation |
-| `RouteManifest` | hydraline.routes.yaml parser + Dart builder |
+| `RouteManifest` | `hydraline.routes.yaml` parser + Dart builder |
+| `IslandSpec` / `IslandStateCodec` | `data-state` props contract (JSON-safe, ~10 KB budget) |
 | `SsgCollector` | Widget-to-node registration surface |
-| `Audit` | CLI audit — what crawler sees + body-identity comparator |
-| `vanillaIslandsJs` | Level-1 vanilla islands bundle (<8 KB) |
-| `htmxGlueJs` | HTMX bootstrap glue (<14 KB) |
+| `SeoValidator` / `Audit` | SEO validation + crawler-view audit |
+| `runAuditCli` | `dart run hydraline:audit` — page audit + anti-cloaking check |
+| `vanillaIslandsJs` | Level-1 vanilla islands bundle (≤ 8 KB) |
+| `htmxGlueJs` | HTMX bootstrap glue (< 1 KB) |
 
 ## Rules
 
@@ -46,7 +48,18 @@ final root = DocumentRootNode(
 );
 
 const serializer = HtmlSerializer();
-print(serializer.serialize(root)); // <!DOCTYPE html><html lang="en">...
+print(serializer.serialize(root)); // <!DOCTYPE html><html>...
+```
+
+Runnable example: [`example/main.dart`](example/main.dart) — document
+building, streaming, sitemap, robots and validation in one file.
+
+## Audit CLI
+
+```bash
+dart run hydraline:audit https://example.com            # what a crawler sees
+dart run hydraline:audit dist/index.html                # audit a local file
+dart run hydraline:audit --server-integration <url>     # anti-cloaking check
 ```
 
 ## Documentation

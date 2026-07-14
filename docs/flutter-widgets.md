@@ -4,11 +4,18 @@
 render visually in a running Flutter app *and* self-register their semantic
 content into a `SsgCollector` for build-time SSG extraction.
 
+> `hydraline_flutter` re-exports the whole `hydraline` core, so a single
+> `import 'package:hydraline_flutter/hydraline_flutter.dart';` gives you
+> `SeoMeta`, `SafeUrl`, `IslandType`, node classes, and everything else.
+
 ## Seo.* Widgets
 
 The `Seo` namespace provides static factory methods. Each returns a widget that
 registers semantic information during SSG extraction and renders a lightweight
 visual at runtime.
+
+Registration is **flat**: widgets register into the collector in build order.
+Nested structures (sections, lists) register their children individually.
 
 ### Seo.text
 
@@ -61,9 +68,10 @@ Seo.link({
 })
 ```
 
-Registers an `AnchorNode`. At runtime, renders a `GestureDetector` wrapping
-`child`. The link text is not automatically extracted from the child — use
-`Seo.text` for link labels visible to crawlers.
+Registers an `AnchorNode`. When `child` is a `Text` widget, its string becomes
+the link label visible to crawlers; for other child widgets the label is empty
+— add `Seo.text` nearby for crawler-visible copy. At runtime, renders a
+`GestureDetector` wrapping `child`.
 
 ### Seo.section
 
@@ -75,19 +83,20 @@ Seo.section({
 })
 ```
 
-Registers a `SectionNode`. At runtime, renders a `Column` with the children.
+Renders a `Column` with the children. The children self-register into the
+collector in build order (flat model); the `role` shapes visual grouping.
 
 ### Seo.list
 
 ```dart
 Seo.list({
-  required bool ordered,         // true → <ol>, false → <ul>
+  required bool ordered,         // visual hint only
   required List<Widget> items,
   Key? key,
 })
 ```
 
-At runtime, renders a `Column` with the items.
+Renders a `Column`; the items self-register individually (flat model).
 
 ### Seo.head
 
@@ -170,7 +179,7 @@ Island({
 | `width` / `height` | Reserved space in px — prevents Cumulative Layout Shift |
 | `placeholder` | Widget shown before hydration (default: sized `SizedBox`) |
 | `errorFallback` | Shown when hydration fails |
-| `mediaQuery` | CSS media query for `hydrateOnMedia` directive |
+| `mediaQuery` | CSS media query for `hydrateOnMedia` — serialized as `data-media` |
 
 ### Island Types
 
@@ -246,17 +255,18 @@ calls are silently ignored. Each extraction run gets its own collector instance.
 ## SsgSandbox
 
 During SSG extraction (which runs in `flutter_tester`), widgets may depend on
-ancestors that don't exist in the test environment — `MediaQuery`, `Navigator`,
-`Directionality`. `SsgSandbox` provides stubs for these.
+ancestors that don't exist in the test environment — `MediaQuery`,
+`Directionality`. `SsgSandbox` provides stubs for these *and* wires the
+collector into scope:
 
 ```dart
 SsgSandbox({
+  required SsgCollector collector,
   required Widget child,
 })
 ```
 
-Wrap your page inside `SsgSandbox` during extraction to prevent `NoSuchWidget`
-errors:
+Wrap your page inside `SsgSandbox` during extraction:
 
 ```dart
 void main() {
@@ -264,10 +274,8 @@ void main() {
     final collector = SsgCollector('/blog/post-1');
     await tester.pumpWidget(
       SsgSandbox(
-        child: HydraApp(
-          collector: collector,
-          child: const BlogPage(),
-        ),
+        collector: collector,
+        child: const BlogPage(),
       ),
     );
     final doc = collector.seal();
@@ -276,9 +284,9 @@ void main() {
 }
 ```
 
-## IslandHost
+## IslandHost and IslandViewRegistry
 
-The server-side counterpart of the JavaScript dispatcher. `IslandHost` is the
+The Dart-side counterpart of the JavaScript dispatcher. `IslandHost` is the
 root widget for the island entry-point (`lib/island_main.dart`). One engine
 instance hosts N islands in N views.
 
@@ -289,6 +297,18 @@ IslandHost({
   required Map<String, IslandFactory> factories,
 })
 ```
+
+When the dispatcher hydrates an island it creates a `FlutterView` and registers
+the view → island binding:
+
+```dart
+// Called from the web bootstrap glue when addView() fires:
+IslandViewRegistry.register(viewId, 'calculator', {'price': 89990});
+```
+
+`IslandHost` looks up the binding for the view it is built in and mounts the
+matching factory. Views without a binding render a neutral full-viewport
+container.
 
 Each factory maps an island `id` to a builder function. Heavy islands use
 deferred imports (`deferred as` + `loadLibrary()`):
@@ -316,67 +336,94 @@ void main() {
 ## Route Adapter
 
 Hydraline integrates with Flutter routers through the `RouteAdapter` interface.
-First-class support is provided for `go_router`.
-
-### GoRouterAdapter
-
-```dart
-final adapter = GoRouterAdapter(router: myGoRouter);
-final routes = adapter.extractRoutes();   // List<RouteInfo>
-```
-
-The adapter extracts route paths, names, and parameters for use in the route
-manifest and SSG runner.
-
-### Custom RouteAdapter
-
-Implement `RouteAdapter` for other routers:
+First-class support is provided for `go_router` (without a hard dependency —
+the adapter inspects the router object dynamically).
 
 ```dart
 abstract interface class RouteAdapter {
-  List<RouteInfo> extractRoutes();
-  String? resolvePath(String name, Map<String, String> params);
+  List<RouteInfo> get routes;
+  Future<void> navigateToForExtraction(RouteInfo route);
 }
 
 class RouteInfo {
   final String path;
   final String? name;
-  final List<String> segments;
 }
+```
+
+### GoRouterAdapter
+
+```dart
+final adapter = GoRouterAdapter(myGoRouter);
+final routes = adapter.routes;   // List<RouteInfo> from GoRouter.configuration
+```
+
+### Navigator2Adapter
+
+For bare Navigator 2.0 apps, list the routes explicitly:
+
+```dart
+final adapter = Navigator2Adapter([
+  const RouteInfo(path: '/', name: 'home'),
+  const RouteInfo(path: '/product/:id', name: 'product'),
+]);
 ```
 
 ## SSG Runner
 
-The `SsgRunner` generates static HTML from a route manifest. It must execute
-inside `flutter_tester` (it cannot run as plain `dart`).
+The `SsgRunner` generates static HTML from a route manifest.
 
 ```dart
 SsgRunner({
-  required Object routeManifest,
+  required Object routeManifest,        // RouteManifest
   required RouteAdapter routeAdapter,
   required Map<String, Object?> islandFactories,
+  Map<String, SsgPageBuilder> builders = const {},
 })
 
 Future<SsgResult> run({required String outputDir});
 ```
 
 The runner:
-1. Iterates the route manifest
-2. Builds a `DocumentNode` per route
-3. Serializes HTML to `dist/`
-4. Generates `sitemap.xml` (with auto-split at 50,000 URLs)
-5. Generates `robots.txt`
-6. Copies the island bundle and web assets into `dist/` (only when Flutter
-   islands exist)
+1. Iterates the route manifest (skipping `app` routes)
+2. Expands dynamic segments into concrete paths
+3. Builds a `DocumentNode` per page — a registered pure-Dart
+   `SsgPageBuilder` (surface B) wins; otherwise a metadata-only shell is
+   generated from the manifest
+4. Serializes HTML files into the output directory
+5. Generates `sitemap.xml` (with auto-split at 50,000 URLs) and `robots.txt`
+6. Copies the island runtime assets (custom element, dispatcher, service
+   worker) into the output — only when Flutter islands exist
 
-CLI invocation:
+```dart
+typedef SsgPageBuilder = DocumentNode Function(String path);
 
-```bash
-dart run hydraline_flutter:build
+final runner = SsgRunner(
+  routeManifest: manifest,
+  routeAdapter: Navigator2Adapter([]),
+  islandFactories: {},
+  builders: {
+    '/blog/:slug': (path) => DocumentRootNode(
+      head: buildHead(SeoMeta(title: 'Post $path')),
+      body: [/* ... */],
+    ),
+  },
+);
+final result = await runner.run(outputDir: 'dist');
+// result.pagesWritten, result.assetsCopied
 ```
 
-`SsgResult` reports the number of pages written and whether island assets
-were copied.
+Widget extraction (surface A) runs inside `flutter_tester`: pump pages in a
+`SsgSandbox` from a test tagged `ssg` and serialize `collector.seal()` — see
+[SsgSandbox](#ssgsandbox).
+
+CLI invocation (plain Dart VM, no Flutter engine needed):
+
+```bash
+dart run hydraline_flutter:build hydraline.routes.yaml dist
+# or
+dart run hydraline_flutter:build --config hydraline.routes.yaml --output dist
+```
 
 ## Dynamic Segments
 
@@ -399,9 +446,30 @@ DynamicSegments.expand({
     'slug': ['post-1', 'post-2'],
   },
 })
+// ['/blog/post-1', '/blog/post-2']
+```
+
+## SsgDevTools and SsgDomDiff
+
+Diagnostics for island-heavy pages:
+
+```dart
+// Island report: props sizes (10 KB budget), anti-CLS warnings.
+final report = SsgDevTools.fromCollector(collector).analyze();
+for (final island in report.islands) {
+  print('${island.id}: ${island.propsBytes} B ${island.warnings}');
+}
+
+// Compare SSG output against the hydrated DOM (>5% divergence -> warning).
+final diff = SsgDomDiff.compare(ssgHtml, hydratedDomHtml);
+if (diff.hasWarning) print('${diff.divergencePercent}% text divergence');
 ```
 
 ## Complete Widget Example
+
+A runnable version lives in
+[`packages/hydraline_flutter/example/lib/main.dart`](../packages/hydraline_flutter/example/lib/main.dart)
+and a full-stack demo in [`example/`](../example/README.md).
 
 ```dart
 import 'package:flutter/material.dart';
@@ -412,60 +480,59 @@ class ProductPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HydraApp(
-    child: SsgSandbox(
-      child: Column(children: [
-        // Metadata (invisible at runtime)
-        Seo.head(SeoMeta(
+    child: Column(children: [
+      // Metadata (invisible at runtime)
+      Seo.head(SeoMeta(
+        title: 'iPhone 15',
+        description: 'Apple iPhone 15, 128 GB',
+        canonical: SafeUrl.parse('https://example.com/product/iphone15'),
+        openGraph: OpenGraph(
           title: 'iPhone 15',
-          description: 'Apple iPhone 15, 128 GB',
-          canonical: SafeUrl.parse('https://example.com/product/iphone15'),
-          openGraph: OpenGraph(
-            title: 'iPhone 15',
-            type: 'product',
-            image: SafeUrl.parse('https://example.com/og/iphone15.png'),
-          ),
-          robots: RobotsDirectives(noindex: false),
-        )),
+          type: 'product',
+          image: SafeUrl.parse('https://example.com/og/iphone15.png'),
+        ),
+      )),
 
-        // Semantic content
-        Seo.heading('iPhone 15', level: 1),
-        Seo.text('The latest smartphone from Apple.'),
-        Seo.image('/images/iphone15.png', alt: 'iPhone 15 front view',
-                   width: 800, height: 600),
+      // Semantic content
+      Seo.heading('iPhone 15', level: 1),
+      Seo.text('The latest smartphone from Apple.'),
+      Seo.image('/images/iphone15.png', alt: 'iPhone 15 front view',
+                 width: 800, height: 600),
 
-        // Price table
-        Seo.section(role: SectionRole.section, children: [
-          Seo.heading('Specifications', level: 2),
-          Seo.list(ordered: false, items: [
-            Seo.text('Display: 6.1" Super Retina XDR'),
-            Seo.text('Chip: A16 Bionic'),
-            Seo.text('Storage: 128 GB'),
-          ]),
+      // Specifications
+      Seo.section(role: SectionRole.section, children: [
+        Seo.heading('Specifications', level: 2),
+        Seo.list(ordered: false, items: [
+          Seo.text('Display: 6.1" Super Retina XDR'),
+          Seo.text('Chip: A16 Bionic'),
+          Seo.text('Storage: 128 GB'),
         ]),
-
-        // Flutter island — hydrates when scrolled into view
-        Island(
-          id: 'calculator',
-          type: IslandType.flutter,
-          props: {'price': 89990, 'currency': 'RUB'},
-          directive: HydrationDirective.onVisible,
-          width: 640,
-          height: 480,
-          placeholder: Container(
-            width: 640, height: 480,
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-        ),
-
-        // Vanilla island — lightweight accordion for FAQ
-        Island(
-          id: 'faq',
-          type: IslandType.vanilla,
-          props: {'kind': 'accordion'},
-          directive: HydrationDirective.onIdle,
-        ),
       ]),
-    ),
+
+      // Flutter island — hydrates when scrolled into view
+      const Island(
+        id: 'calculator',
+        type: IslandType.flutter,
+        props: {'price': 89990, 'currency': 'RUB'},
+        directive: HydrationDirective.onVisible,
+        width: 640,
+        height: 480,
+      ),
+
+      // Vanilla island — lightweight accordion for FAQ
+      const Island(
+        id: 'faq',
+        type: IslandType.vanilla,
+        props: {'kind': 'accordion'},
+      ),
+    ]),
   );
 }
 ```
+
+## See Also
+
+- [Getting Started](./getting-started.md) — installation, SSG vs SSR
+- [Architecture](./architecture.md) — islands, SSG pipeline, client runtime
+- [Configuration](./configuration.md) — route manifest, island manifest
+- [`hydraline_flutter` package README](../packages/hydraline_flutter/README.md)

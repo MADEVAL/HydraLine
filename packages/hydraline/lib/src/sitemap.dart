@@ -52,9 +52,14 @@ abstract final class Sitemap {
 
   /// Auto-splits into a `sitemap-index` when a shard would exceed
   /// [maxUrlsPerFile] URLs or [maxBytesPerFile] bytes.
+  ///
+  /// [changefreq] and [defaultPriority] act as fallbacks for entries that do
+  /// not carry their own values.
   static Future<SitemapOutput> generate(
     SitemapSource source, {
     required SafeUrl baseUrl,
+    ChangeFreq? changefreq,
+    double? defaultPriority,
     int maxUrlsPerFile = _defaultMaxUrls,
     int maxBytesPerFile = _defaultMaxBytes,
   }) async {
@@ -77,7 +82,7 @@ abstract final class Sitemap {
 
     openShard();
     await for (final entry in source.entries()) {
-      final url = _url(entry);
+      final url = _url(entry, changefreq, defaultPriority);
       final wouldExceedBytes =
           current.length + url.length + '</urlset>'.length > maxBytesPerFile;
       if (count > 0 && (count >= maxUrlsPerFile || wouldExceedBytes)) {
@@ -113,18 +118,22 @@ abstract final class Sitemap {
     return SitemapOutput(files: files, isIndex: true);
   }
 
-  static String _url(SitemapEntry entry) {
+  static String _url(
+    SitemapEntry entry,
+    ChangeFreq? defaultChangefreq,
+    double? defaultPriority,
+  ) {
     final buffer = StringBuffer('<url>')
       ..write('<loc>${_escape(entry.loc.value)}</loc>');
     final lastmod = entry.lastmod;
     if (lastmod != null) {
       buffer.write('<lastmod>${_date(lastmod)}</lastmod>');
     }
-    final changefreq = entry.changefreq;
+    final changefreq = entry.changefreq ?? defaultChangefreq;
     if (changefreq != null) {
       buffer.write('<changefreq>${changefreq.name}</changefreq>');
     }
-    final priority = entry.priority;
+    final priority = entry.priority ?? defaultPriority;
     if (priority != null) {
       buffer.write('<priority>${_priority(priority)}</priority>');
     }

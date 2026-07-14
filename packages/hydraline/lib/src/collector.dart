@@ -104,6 +104,7 @@ DocumentNode _islandNode(IslandSpec spec) => switch (spec.type) {
     styleMode: spec.styleMode,
     size: spec.size,
     state: spec.state,
+    mediaQuery: spec.mediaQuery,
   ),
   IslandType.htmx => HtmxIslandNode(id: spec.id, endpoint: spec.endpoint ?? ''),
   IslandType.vanilla => VanillaIslandNode(

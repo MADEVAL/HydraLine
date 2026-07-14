@@ -27,31 +27,39 @@ class SsgDevTools {
         if (node.size == null) {
           warnings.add('Missing width/height (anti-CLS)');
         }
-        out.add(SsgIslandInfo(
-          id: node.id,
-          type: node.runtimeType == IslandPlaceholderNode ? 'flutter' : 'unknown',
-          hydration: node.directive.name,
-          widthPx: node.size?.width,
-          heightPx: node.size?.height,
-          propsBytes: propsSize,
-          warnings: List.unmodifiable(warnings),
-        ));
+        out.add(
+          SsgIslandInfo(
+            id: node.id,
+            type: node.runtimeType == IslandPlaceholderNode
+                ? 'flutter'
+                : 'unknown',
+            hydration: node.directive.name,
+            widthPx: node.size?.width,
+            heightPx: node.size?.height,
+            propsBytes: propsSize,
+            warnings: List.unmodifiable(warnings),
+          ),
+        );
       } else if (node is HtmxIslandNode) {
-        out.add(SsgIslandInfo(
-          id: node.id,
-          type: 'htmx',
-          hydration: node.trigger,
-          propsBytes: 0,
-          warnings: const [],
-        ));
+        out.add(
+          SsgIslandInfo(
+            id: node.id,
+            type: 'htmx',
+            hydration: node.trigger,
+            propsBytes: 0,
+            warnings: const [],
+          ),
+        );
       } else if (node is VanillaIslandNode) {
-        out.add(SsgIslandInfo(
-          id: node.id,
-          type: 'vanilla',
-          hydration: node.kind,
-          propsBytes: 0,
-          warnings: const [],
-        ));
+        out.add(
+          SsgIslandInfo(
+            id: node.id,
+            type: 'vanilla',
+            hydration: node.kind,
+            propsBytes: 0,
+            warnings: const [],
+          ),
+        );
       }
       _walk(node.children, out);
     }
@@ -65,7 +73,8 @@ class SsgDevToolsReport {
 
   int get totalCount => islands.length;
 
-  int get totalPropsBytes => islands.fold<int>(0, (sum, i) => sum + i.propsBytes);
+  int get totalPropsBytes =>
+      islands.fold<int>(0, (sum, i) => sum + i.propsBytes);
 }
 
 class SsgIslandInfo {

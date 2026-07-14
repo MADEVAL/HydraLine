@@ -16,11 +16,10 @@ coverage/
 # Hydraline scratch space (TEMP/).
 TEMP/
 
-# Opencode / AGENTS / local reports
+# Opencode / AGENTS 
 AGENTS.md
 .opencode/
 opencode.json
-GAP_REPORT.md
 
 # IDE
 .idea/

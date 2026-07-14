@@ -1,18 +1,24 @@
 /// SSG CLI: programmatic entry point that reads a manifest config and
-/// invokes the SSG runner. Designed to be called from `bin/main.dart` or
+/// invokes the SSG runner. Designed to be called from `bin/build.dart` or
 /// from tests directly.
+///
+/// Deliberately imports only pure-Dart modules so `dart run
+/// hydraline_flutter:build` works on the plain Dart VM.
 library;
 
 import 'dart:io';
 
-import 'package:hydraline/hydraline.dart';
-import 'package:hydraline_flutter/hydraline_flutter.dart';
+import 'package:hydraline/hydraline.dart' show RouteManifest;
+
+import 'route_adapter.dart' show RouteAdapter;
+import 'ssg_runner.dart' show SsgPageBuilder, SsgRunner;
 
 Future<int> runSsgCli({
   required String manifestPath,
   required String outputDir,
   required RouteAdapter adapter,
   required Map<String, Object?> islandFactories,
+  Map<String, SsgPageBuilder> builders = const {},
 }) async {
   try {
     final manifestFile = File(manifestPath);
@@ -28,6 +34,7 @@ Future<int> runSsgCli({
       routeManifest: manifest,
       routeAdapter: adapter,
       islandFactories: islandFactories,
+      builders: builders,
     );
 
     final result = await runner.run(outputDir: outputDir);

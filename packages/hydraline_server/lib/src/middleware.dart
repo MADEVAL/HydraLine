@@ -5,11 +5,18 @@ library;
 import 'dart:async';
 
 import 'package:hydraline/hydraline.dart'
-    show DocumentNode, DocumentRootNode, RouteEntry, RouteManifest, RouteMode;
+    show
+        DocumentNode,
+        DocumentRootNode,
+        HtmlSerializer,
+        RouteEntry,
+        RouteManifest,
+        RouteMode;
 import 'package:shelf/shelf.dart';
 
+import 'cache.dart' show HydralineCache;
 import 'delivery.dart' show ResponseDelivery;
-import 'http_semantics.dart' show RedirectException;
+import 'http_semantics.dart' show Http, RedirectException;
 
 /// The configuration for [hydralineMiddleware].
 class HydralineConfig {
@@ -17,6 +24,7 @@ class HydralineConfig {
     required this.manifest,
     this.builders = const {},
     this.cache,
+    this.cacheTtl,
     this.botUserAgentPattern,
   });
 
@@ -25,7 +33,14 @@ class HydralineConfig {
   /// Per-path pure-Dart [DocumentNode] builders (surface B).
   final Map<String, DocumentBuilder> builders;
 
-  final Object? cache;
+  /// Optional server-side HTML cache. When set, rendered pages are stored
+  /// per path, responses carry an `ETag`, and `If-None-Match` revalidation
+  /// returns `304 Not Modified`.
+  final HydralineCache? cache;
+
+  /// TTL for cached entries; also emitted as
+  /// `Cache-Control: public, max-age=N` on cacheable responses.
+  final Duration? cacheTtl;
 
   /// Pattern matching bot user agents. Read only by the transport layer, never
   /// by the builder. When null, chunked delivery is always used.
@@ -42,12 +57,17 @@ typedef DocumentBuilder =
 /// 1. matches the path against the configured [RouteManifest];
 /// 2. renders `document`/`hybrid` routes via the registered [DocumentBuilder],
 ///    or an empty page;
-/// 3. passes `app` routes through to the inner handler.
+/// 3. passes `app` routes through to the inner handler (adding
+///    `X-Robots-Tag: noindex` unless overridden);
+/// 4. serves from [HydralineConfig.cache] with `ETag`/`304` support when a
+///    cache is configured.
 Middleware hydralineMiddleware(HydralineConfig config) {
   final delivery = const ResponseDelivery();
   final botPattern = config.botUserAgentPattern;
   final routes = config.manifest.routes;
   final builders = config.builders;
+  final cache = config.cache;
+  final cacheTtl = config.cacheTtl;
 
   return (Handler inner) {
     return (Request request) async {
@@ -60,30 +80,113 @@ Middleware hydralineMiddleware(HydralineConfig config) {
 
       switch (match.mode) {
         case RouteMode.app:
-          return inner(request);
+          final response = await inner(request);
+          // App routes default to noindex unless explicitly overridden (§4.1).
+          return Http.withRobots(response, noindex: match.noindex ?? true);
         case RouteMode.document:
         case RouteMode.hybrid:
-          final builder = builders[path];
-          DocumentNode root;
-          if (builder != null) {
-            try {
-              root = await builder(request, null);
-            } on RedirectException catch (e) {
-              return e.status == 301
-                  ? Response.movedPermanently(e.location)
-                  : Response.found(e.location);
+          final robotsHeaders = _robotsHeaders(match);
+
+          if (cache != null) {
+            final cached = await cache.get(path);
+            String html;
+            if (cached != null) {
+              html = cached;
+            } else {
+              final DocumentNode root;
+              try {
+                root = await _buildRoot(builders[path], request);
+              } on RedirectException catch (e) {
+                return _redirectResponse(e);
+              }
+              html = const HtmlSerializer().serialize(root);
+              await cache.set(path, html, ttl: cacheTtl);
             }
-          } else {
-            root = DocumentRootNode(body: []);
+            return _cachedResponse(
+              request,
+              html,
+              cacheTtl,
+              robotsHeaders,
+              delivery,
+            );
+          }
+
+          final DocumentNode root;
+          try {
+            root = await _buildRoot(builders[path], request);
+          } on RedirectException catch (e) {
+            return _redirectResponse(e);
           }
 
           if (_isBotRequest(request, botPattern)) {
-            return delivery.buffered(root);
+            return delivery.buffered(root, headers: robotsHeaders);
           }
-          return delivery.chunked(root);
+          return delivery.chunked(root, headers: robotsHeaders);
       }
     };
   };
+}
+
+Future<DocumentNode> _buildRoot(
+  DocumentBuilder? builder,
+  Request request,
+) async {
+  if (builder == null) {
+    return const DocumentRootNode(body: []);
+  }
+  return builder(request, null);
+}
+
+Response _redirectResponse(RedirectException e) => switch (e.status) {
+  301 => Response.movedPermanently(e.location),
+  302 => Response.found(e.location),
+  410 => Response(410, body: ''),
+  _ => Response(e.status, headers: {'location': e.location}),
+};
+
+Map<String, String> _robotsHeaders(RouteEntry route) {
+  final robots = route.metadata?.robots;
+  final noindex = route.noindex ?? robots?.noindex ?? false;
+  final nofollow = robots?.nofollow ?? false;
+  if (!noindex && !nofollow) {
+    return const {};
+  }
+  final values = [if (noindex) 'noindex', if (nofollow) 'nofollow'].join(', ');
+  return {'X-Robots-Tag': values};
+}
+
+Response _cachedResponse(
+  Request request,
+  String html,
+  Duration? cacheTtl,
+  Map<String, String> robotsHeaders,
+  ResponseDelivery delivery,
+) {
+  final etag = _etag(html);
+  final headers = <String, String>{
+    ...robotsHeaders,
+    'ETag': etag,
+    if (cacheTtl != null)
+      'Cache-Control': 'public, max-age=${cacheTtl.inSeconds}',
+  };
+  if (request.headers['if-none-match'] == etag) {
+    return Response(304, headers: headers);
+  }
+  return Response(
+    200,
+    body: html,
+    headers: {'Content-Type': 'text/html; charset=utf-8', ...headers},
+  );
+}
+
+/// Deterministic FNV-1a hash over the HTML — stable across process restarts.
+String _etag(String html) {
+  var hash = 0x811c9dc5;
+  for (final unit in html.codeUnits) {
+    hash ^= unit;
+    hash = (hash * 0x01000193) & 0xFFFFFFFF;
+  }
+  return '"${hash.toRadixString(16)}"';
 }
 
 bool _isBotRequest(Request request, Pattern? botUserAgentPattern) {
@@ -127,5 +230,3 @@ bool _isPrefixMatch(String pattern, String requestPath) {
   }
   return true;
 }
-
-// Re-export core types for convenience.

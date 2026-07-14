@@ -41,6 +41,32 @@ void main() {
       expect(out.files['sitemap.xml']!, contains('a=1&amp;b=2'));
     });
 
+    test(
+      'applies default changefreq and priority when entry omits them',
+      () async {
+        final source = _ListSource([
+          SitemapEntry(loc: SafeUrl.parse('https://x.example/a')),
+          SitemapEntry(
+            loc: SafeUrl.parse('https://x.example/b'),
+            changefreq: ChangeFreq.daily,
+            priority: 0.9,
+          ),
+        ]);
+        final xml = (await Sitemap.generate(
+          source,
+          baseUrl: base,
+          changefreq: ChangeFreq.weekly,
+          defaultPriority: 0.5,
+        )).files['sitemap.xml']!;
+        // Entry without explicit values falls back to the defaults.
+        expect(xml, contains('<changefreq>weekly</changefreq>'));
+        expect(xml, contains('<priority>0.5</priority>'));
+        // Explicit per-entry values win over the defaults.
+        expect(xml, contains('<changefreq>daily</changefreq>'));
+        expect(xml, contains('<priority>0.9</priority>'));
+      },
+    );
+
     test('renders hreflang alternates as xhtml:link', () async {
       final source = _ListSource([
         SitemapEntry(

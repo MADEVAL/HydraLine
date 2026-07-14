@@ -30,4 +30,5 @@ Hydraline is an HTML generation and delivery library. Its security properties:
 - **Self-hosted JS** — all JavaScript assets are first-party and
   CSP-compatible (`script-src 'self'`)
 
-See [docs/security.md](docs/security.md) for full details.
+See [docs/security.md](docs/security.md) for full details, including the
+threat model, the `data-state` contract and secure deployment guidance.

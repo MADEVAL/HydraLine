@@ -90,6 +90,7 @@ class IslandSpec {
     this.styleMode = IslandStyleMode.shadow,
     this.size,
     this.state = const {},
+    this.mediaQuery,
     this.mountSelector,
     this.endpoint,
     this.kind,
@@ -102,6 +103,9 @@ class IslandSpec {
   final IslandStyleMode styleMode;
   final IslandSize? size;
   final IslandState state;
+
+  /// CSS media query for [HydrationDirective.onMedia].
+  final String? mediaQuery;
   final String? mountSelector;
   final String? endpoint;
   final String? kind;
@@ -114,6 +118,7 @@ class IslandSpec {
     'styleMode': styleMode.name,
     if (size != null) 'size': {'width': size!.width, 'height': size!.height},
     if (state.isNotEmpty) 'state': state,
+    if (mediaQuery != null) 'mediaQuery': mediaQuery,
     if (mountSelector != null) 'mountSelector': mountSelector,
     if (endpoint != null) 'endpoint': endpoint,
     if (kind != null) 'kind': kind,
@@ -134,6 +139,7 @@ class IslandSpec {
             )
           : null,
       state: (json['state'] as Map?)?.cast<String, Object?>() ?? const {},
+      mediaQuery: json['mediaQuery'] as String?,
       mountSelector: json['mountSelector'] as String?,
       endpoint: json['endpoint'] as String?,
       kind: json['kind'] as String?,

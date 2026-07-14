@@ -94,11 +94,12 @@ typedef DocumentBuilder = FutureOr<DocumentNode> Function(
 
 The transport layer inspects `User-Agent` only to decide between buffered and
 chunked delivery. The body bytes are **byte-identical** in both cases. This
-invariant is verified by the CI audit tool:
+invariant is verified by the audit CLI:
 
 ```bash
-hydraline audit --server-integration https://example.com
-# Verifies: bytes(buffered) == bytes(concat(chunks))
+dart run hydraline:audit --server-integration https://example.com
+# Fetches the page as a bot and as a browser and verifies:
+# bytes(bot body) == bytes(user body)
 ```
 
 ## CSP (Content-Security-Policy)
@@ -168,8 +169,10 @@ Advisory (repository â†’ Security â†’ Report a vulnerability). Include:
 - Attack vector
 - Expected vs. actual behaviour
 
-Security patches follow a 48-hour SLA from confirmation and are released as
-patch versions with an advisory and a regression test for the specific vector.
+Security patches follow the timelines in the
+[Security Policy](../SECURITY.md): reports are acknowledged within 48 hours
+and a fix targeted within 7 days, released as a patch version with an
+advisory and a regression test for the specific vector.
 
 ## Deploying Securely
 
@@ -180,8 +183,14 @@ patch versions with an advisory and a regression test for the specific vector.
 3. **Pass a sanitizer to `UnsafeHtmlNode`** whenever you use it
 4. **Run the audit CLI** in CI:
    ```bash
-   dart run hydraline:audit --standalone <url>
+   dart run hydraline:audit https://example.com
    ```
 5. **Enable HTTPS** â€” `SafeUrl` allowlists `http` for development, but
    production should use HTTPS throughout
 6. **Review `canonical` URLs** â€” they should be absolute and consistent
+
+## See Also
+
+- [Security Policy](../SECURITY.md) — reporting and response timelines
+- [Document Model](./document-model.md) — escaping and SafeUrl reference
+- [Server](./server.md) — bot-aware delivery in practice

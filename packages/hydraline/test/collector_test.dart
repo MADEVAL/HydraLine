@@ -47,6 +47,23 @@ void main() {
       expect(root.body[2], isA<VanillaIslandNode>());
     });
 
+    test('addIsland carries mediaQuery through to the serialized HTML', () {
+      final root = sealed((c) {
+        c.addIsland(
+          const IslandSpec(
+            id: 'm',
+            type: IslandType.flutter,
+            directive: HydrationDirective.onMedia,
+            mediaQuery: '(min-width: 800px)',
+          ),
+        );
+      });
+      final island = root.body[0] as IslandPlaceholderNode;
+      expect(island.mediaQuery, '(min-width: 800px)');
+      final html = const HtmlSerializer().serializeFragment(island);
+      expect(html, contains('data-media="(min-width: 800px)"'));
+    });
+
     test('addMeta populates the head', () {
       final root = sealed((c) {
         c

@@ -5,7 +5,10 @@ title: "[bug] "
 labels: bug
 ---
 
-<!-- IMPORTANT: do NOT report security vulnerabilities here — use private advisory. -->
+<!-- IMPORTANT: do NOT report security vulnerabilities here — follow the
+     Security Policy (../../SECURITY.md) and use a private advisory. -->
+<!-- Docs: https://github.com/MADEVAL/HydraLine/tree/main/docs -->
+<!-- Contributing guide: ../../CONTRIBUTING.md -->
 
 ## Package
 - [ ] hydraline (core)

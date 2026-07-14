@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
 void main() {

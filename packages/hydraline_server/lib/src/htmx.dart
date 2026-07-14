@@ -1,6 +1,8 @@
 /// HTMX helpers: fragment rendering and response wrappers.
 library;
 
+import 'dart:convert';
+
 import 'package:hydraline/hydraline.dart' show DocumentNode, HtmlSerializer;
 import 'package:shelf/shelf.dart';
 
@@ -58,4 +60,33 @@ abstract final class Htmx {
       headers: {'Content-Type': 'text/html; charset=utf-8'},
     );
   }
+
+  /// Returns [html] as a `text/html` response, optionally announcing
+  /// [triggers] to the client through the `HX-Trigger` header
+  /// (`{event: detail}` JSON).
+  static Response response(
+    String html, {
+    int status = 200,
+    Map<String, String> triggers = const {},
+  }) {
+    return Response(
+      status,
+      body: html,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        if (triggers.isNotEmpty) 'HX-Trigger': jsonEncode(triggers),
+      },
+    );
+  }
+
+  /// Creates an [HtmxTrigger]: a bare event name, or `{event: detail}` JSON
+  /// when [detail] is provided.
+  static HtmxTrigger trigger(String event, [String? detail]) => detail == null
+      ? HtmxTrigger(event)
+      : HtmxTrigger(jsonEncode({event: detail}));
+
+  /// Returns a response instructing HTMX to perform a client-side redirect
+  /// via the `HX-Redirect` header.
+  static Response redirect(String url) =>
+      Response.ok('', headers: {'HX-Redirect': url});
 }

@@ -8,6 +8,7 @@ workspace:
   - packages/hydraline
   - packages/hydraline_server
   - packages/hydraline_flutter
+  - example
 
 dev_dependencies:
   melos: ^8.0.0
@@ -21,11 +22,11 @@ melos:
 
     format:
       description: Format all Dart code in place.
-      run: dart format packages
+      run: dart format packages example
 
     format:check:
       description: Verify formatting; non-zero exit if changes needed (CI gate).
-      run: dart format --output=none --set-exit-if-changed packages
+      run: dart format --output=none --set-exit-if-changed packages example
 
     test:dart:
       description: Run pure-Dart tests (core/server).

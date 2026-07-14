@@ -3,20 +3,23 @@
 Flutter package for [Hydraline](../../README.md) — Seo.* widgets,
 Island, HydraApp, IslandHost, SSG runner, and web runtime assets.
 
+Re-exports the whole `hydraline` core: one import gives you the full API.
+
 ## What's inside
 
 | Module | Description |
 |---|---|
 | `Seo.*` widgets | Self-registering widgets — build UI and register semantic info simultaneously |
-| `Island` | Flutter island with configurable hydration, render mode, and size |
+| `Island` | Island zones with hydration directives, render/style modes, anti-CLS sizing |
 | `HydraApp` / `HydraScope` | Integration wrapper + InheritedWidget for SsgCollector access |
-| `IslandHost` | Root multi-view widget — one Flutter engine hosts N islands |
-| `SsgRunner` | Build-time SSG — traverse routes, extract DocumentNode, write HTML to dist |
+| `IslandHost` / `IslandViewRegistry` | Multi-view runtime — one engine, view → island bindings |
+| `SsgRunner` | Build-time SSG — routes → HTML + sitemap + robots into `dist/` |
+| `dart run hydraline_flutter:build` | SSG CLI (plain Dart VM) |
 | `RouteAdapter` | go_router / Navigator 2.0 adapters for build-time route traversal |
-| `SsgSandbox` | Build-time stub ancestors (MediaQuery, Navigator) for extraction |
+| `SsgSandbox` | Build-time stub ancestors (MediaQuery, Directionality) for extraction |
 | `SsgDevTools` | Island diagnostics — props size warnings, anti-CLS checks |
 | `SsgDomDiff` | SSG-HTML vs hydrated DOM text-node divergence comparator |
-| Web runtime | Custom Element, dispatcher, Service Worker, virtual views |
+| Web runtime | `<hydraline-island>` Custom Element, dispatcher, Service Worker, virtual views |
 
 ## Flutter version policy
 
@@ -36,14 +39,16 @@ import 'package:flutter/material.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
 class ProductPage extends StatelessWidget {
+  const ProductPage({super.key});
+
   @override
   Widget build(BuildContext context) => HydraApp(
     child: Column(children: [
-      Seo.head(SeoMeta(title: 'Product', description: 'A great product')),
+      Seo.head(const SeoMeta(title: 'Product', description: 'A great product')),
       Seo.heading('iPhone 15', level: 1),
       Seo.text('The latest iPhone with A17 Pro chip.'),
       Seo.image('/img/phone.png', alt: 'iPhone 15 in titanium'),
-      Island(
+      const Island(
         id: 'calculator',
         type: IslandType.flutter,
         props: {'price': 89990},
@@ -55,9 +60,12 @@ class ProductPage extends StatelessWidget {
 ```
 
 ```bash
-# Run SSG to generate static HTML
-dart run hydraline_flutter:ssg --config hydraline.routes.yaml --output dist/
+# Generate static HTML from the route manifest
+dart run hydraline_flutter:build hydraline.routes.yaml dist
 ```
+
+Runnable example: [`example/lib/main.dart`](example/lib/main.dart) — a product
+page with metadata, semantic content, islands and an `IslandHost` entry-point.
 
 ## Documentation
 

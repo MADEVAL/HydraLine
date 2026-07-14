@@ -5,7 +5,7 @@ const hostingFirebase = r'''
 # Firebase Hosting — hydraline SSG deploy
 
 ## 1. Build
-flutter pub run hydraline_flutter:build
+dart run hydraline_flutter:build hydraline.routes.yaml dist
 
 ## 2. firebase.json
 {
@@ -27,7 +27,7 @@ const hostingNetlify = r'''
 # Netlify — hydraline SSG deploy
 
 ## 1. Build
-flutter pub run hydraline_flutter:build
+dart run hydraline_flutter:build hydraline.routes.yaml dist
 
 ## 2. netlify.toml
 [build]
@@ -43,7 +43,7 @@ const hostingCloudflare = r'''
 # Cloudflare Pages — hydraline SSG deploy
 
 ## 1. Build command
-flutter pub run hydraline_flutter:build
+dart run hydraline_flutter:build hydraline.routes.yaml dist
 
 ## 2. Output directory: dist
 
@@ -55,7 +55,7 @@ const hostingGitHubPages = r'''
 # GitHub Pages — hydraline SSG deploy
 
 ## 1. Build
-flutter pub run hydraline_flutter:build
+dart run hydraline_flutter:build hydraline.routes.yaml dist
 
 ## 2. Deploy dist/ to gh-pages branch
 git subtree push --prefix dist origin gh-pages

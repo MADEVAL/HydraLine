@@ -3,7 +3,6 @@ library;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
 void main() {
@@ -126,6 +125,28 @@ void main() {
       expect(root.body, hasLength(1));
       final island = root.body[0] as IslandPlaceholderNode;
       expect(island.id, 'responsive');
+    });
+
+    testWidgets('mediaQuery reaches the serialized HTML as data-media', (
+      tester,
+    ) async {
+      final collector = SsgCollector('/test');
+      await tester.pumpWidget(
+        SsgSandbox(
+          collector: collector,
+          child: const Island(
+            id: 'responsive',
+            type: IslandType.flutter,
+            directive: HydrationDirective.onMedia,
+            mediaQuery: '(min-width: 800px)',
+          ),
+        ),
+      );
+      await tester.pump();
+      final root = collector.seal() as DocumentRootNode;
+      final html = const HtmlSerializer().serialize(root);
+      expect(html, contains('data-directive="hydrateOnMedia"'));
+      expect(html, contains('data-media="(min-width: 800px)"'));
     });
   });
 }

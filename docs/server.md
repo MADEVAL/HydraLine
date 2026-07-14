@@ -16,10 +16,10 @@ import 'package:shelf/shelf_io.dart' as io;
 
 void main() async {
   final manifest = RouteManifest.builder()
-    .route(RouteEntry(path: '/', mode: RouteMode.document))
-    .route(RouteEntry(path: '/product/:id', mode: RouteMode.hybrid))
-    .route(RouteEntry(path: '/app/dashboard', mode: RouteMode.app))
-    .build();
+      .route(const RouteEntry(path: '/', mode: RouteMode.document))
+      .route(const RouteEntry(path: '/product/:id', mode: RouteMode.hybrid))
+      .route(const RouteEntry(path: '/app/dashboard', mode: RouteMode.app))
+      .build();
 
   final config = HydralineConfig(
     manifest: manifest,
@@ -29,29 +29,29 @@ void main() async {
     },
   );
 
-  final handler = Pipeline()
-    .addMiddleware(hydralineMiddleware(config))
-    .addHandler((req) => Response.notFound('Not found'));
+  final handler = const Pipeline()
+      .addMiddleware(hydralineMiddleware(config))
+      .addHandler((req) => Response.ok('app shell'));
 
-  final server = await io.serve(handler, 'localhost', 8080);
+  await io.serve(handler, 'localhost', 8080);
 }
 ```
+
+Requests that match a `document`/`hybrid` route are rendered by the
+middleware. Requests that match an `app` route are passed through to the inner
+handler (your Flutter app shell). Requests that match nothing return 404 —
+serve API endpoints and static assets *in front of* the middleware (see
+[Complete Example](#complete-example)).
 
 ### With Dart Frog
 
 ```dart
-import 'package:dart_frog/dart_frog.dart';
 import 'package:hydraline_server/hydraline_server.dart';
 
-Handler middleware(Handler handler) {
-  final config = HydralineConfig(
-    manifest: RouteManifest.parseYaml(yamlString),
-    builders: {'/': homeBuilder},
-  );
-
-  final adapter = DartFrogAdapter(config);
-  return adapter.wrap(handler);
-}
+final middleware = DartFrogAdapter.middleware(HydralineConfig(
+  manifest: RouteManifest.parseYaml(yamlString),
+  builders: {'/': homeBuilder},
+));
 ```
 
 ## Route Configuration
@@ -85,7 +85,7 @@ routes:
 |---|---|
 | `document` | Full HTML from a `DocumentBuilder`. No Flutter engine required. |
 | `hybrid` | Full HTML from a `DocumentBuilder`. Island placeholders are included for Flutter hydration. |
-| `app` | Passes through to the inner handler (Flutter SPA). Defaults to `noindex` and exclusion from sitemap. Optional `document`-fallback for bots. |
+| `app` | Passes through to the inner handler (Flutter SPA). Defaults to `noindex` and exclusion from the sitemap. |
 
 ## Document Builders
 
@@ -101,11 +101,11 @@ typedef DocumentBuilder = FutureOr<DocumentNode> Function(
 
 The signature deliberately **does not accept `User-Agent`**. The builder is
 architecturally prevented from cloaking — it always produces the same tree for
-the same input, regardless of who requested it.
+the same input, regardless of who requested it. Keep builders deterministic:
+no `DateTime.now()`, no random values.
 
 ```dart
-DocumentRootNode buildProduct(Request req, Object? data) {
-  // Parse route params, fetch data from DB, etc.
+DocumentNode buildProduct(Request req, Object? data) {
   final productId = req.url.pathSegments.last;
   final product = fetchProduct(productId);
 
@@ -120,7 +120,7 @@ DocumentRootNode buildProduct(Request req, Object? data) {
       ParagraphNode(children: [TextNode(product.description)]),
       IslandPlaceholderNode(
         id: 'calculator',
-        size: IslandSize(width: 640, height: 480),
+        size: const IslandSize(width: 640, height: 480),
         state: {'price': product.price},
       ),
     ],
@@ -128,7 +128,7 @@ DocumentRootNode buildProduct(Request req, Object? data) {
 }
 ```
 
-Builders are registered per-path in the `HydralineConfig`:
+Builders are registered per route pattern in the `HydralineConfig`:
 
 ```dart
 HydralineConfig(
@@ -157,7 +157,7 @@ The serializer emits in document order:
 3. **Island placeholders** — skeletons with `data-state`
 
 This allows the browser to start rendering and fetching subresources before
-the full response arrives. TTFB (first chunk) is < 100ms for most routes.
+the full response arrives.
 
 ### Bot-Aware Transport
 
@@ -180,35 +180,50 @@ builder never sees the `User-Agent` header.
 **Important**: `botUserAgentPattern` is read only by the transport layer, not
 by the content builder. This separation is architectural, not just a convention.
 
+Verify the invariant against a running server at any time:
+
+```bash
+dart run hydraline:audit --server-integration https://example.com
+```
+
 ## HTTP Semantics
 
 ### Status Codes and Redirects
 
-Throw `RedirectException` from a builder to issue a redirect:
+Throw `RedirectException` from a builder to issue a redirect. The location
+comes first; the status is a named parameter (301 by default):
 
 ```dart
-DocumentRootNode redirectBuilder(Request req, Object? data) {
-  if (someCondition) {
-    throw const RedirectException(301, '/new-location');
-  }
-  // ... normal rendering
+DocumentNode oldPageBuilder(Request req, Object? data) {
+  throw const RedirectException('/new-location');            // 301
+  // throw const RedirectException('/temp', status: 302);    // 302
+  // throw const RedirectException.gone();                   // 410
 }
 ```
 
-| Status | Method |
+| Status | How |
 |---|---|
 | 200 | Normal rendering |
-| 301 | `Response.movedPermanently(location)` via `RedirectException(301, ...)` |
-| 302 | `Response.found(location)` via `RedirectException(302, ...)` |
-| 404 | `Response.notFound(...)` — returned when no route matches |
-| 410 | Throw `RedirectException(410, ...)` for permanently removed content |
+| 301 | `throw RedirectException(location)` (default status) |
+| 302 | `throw RedirectException(location, status: 302)` |
+| 404 | Returned automatically when no route matches |
+| 410 | `throw RedirectException.gone()` for permanently removed content |
+| other | `throw RedirectException(location, status: 308)` — status + `Location` header |
 | 5xx | Unhandled exceptions in the builder produce a 500 |
+
+The standalone `Http` helper covers the same ground outside builders:
+`Http.redirect`, `Http.notFound`, `Http.gone`, `Http.withRobots`,
+`Http.canonicalizePath`.
 
 ### X-Robots-Tag
 
-When a route has `noindex: true` (explicitly or because `mode: app`), the
-server adds `X-Robots-Tag: noindex` to the response headers in addition to
-the `<meta name="robots">` tag in the HTML body.
+The middleware adds `X-Robots-Tag` automatically:
+
+- `document`/`hybrid` routes with `noindex: true` (or metadata
+  `robots.noindex/nofollow`) get `X-Robots-Tag: noindex[, nofollow]` in
+  addition to the `<meta name="robots">` tag in the HTML.
+- `app` routes get `X-Robots-Tag: noindex` by default; override with
+  `noindex: false` in the manifest.
 
 ## HTMX Helpers
 
@@ -216,11 +231,12 @@ For HTMX-driven endpoints (used by `HtmxIslandNode`), render HTML fragments
 without `<html>`/`<head>`:
 
 ```dart
+import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_server/hydraline_server.dart';
 
 Future<Response> reviewsEndpoint(Request req) async {
   final reviews = await fetchReviews();
-  final fragment = DocumentRootNode(body: [
+  final fragment = SectionNode(role: SectionRole.section, children: [
     for (final review in reviews)
       SectionNode(role: SectionRole.article, children: [
         HeadingNode(level: 3, children: [TextNode(review.title)]),
@@ -230,72 +246,95 @@ Future<Response> reviewsEndpoint(Request req) async {
 
   return Htmx.response(
     const HtmlSerializer().serializeFragment(fragment),
-    triggers: {
-      'showConfirmation': 'Updated!',
-    },
+    triggers: {'showConfirmation': 'Updated!'},
   );
 }
 ```
 
-The `Htmx` class provides helpers:
+The `Htmx` class provides:
 
 | Method | Description |
 |---|---|
-| `Htmx.response(String html, {Map<String, String>? triggers})` | Returns a 200 response with HTMX trigger headers |
-| `Htmx.trigger(String event, [String? detail])` | Creates an `HtmxTrigger` for response headers |
-| `Htmx.redirect(String url)` | Returns a response that triggers client-side redirect via HTMX |
+| `Htmx.renderFragment(DocumentNode node)` | Serializes a fragment and returns it as `text/html` |
+| `Htmx.response(String html, {triggers})` | 200 response; `triggers` become an `HX-Trigger` JSON header |
+| `Htmx.trigger(String event, [String? detail])` | Builds an `HtmxTrigger` value |
+| `Htmx.redirect(String url)` | Client-side redirect via `HX-Redirect` |
+
+For full control use `HtmxResponse`:
+
+```dart
+HtmxResponse(
+  body: fragment,                       // a DocumentNode
+  trigger: Htmx.trigger('saved'),
+  retarget: '#result',                  // HX-Retarget
+  reswap: 'outerHTML',                  // HX-Reswap
+).toResponse();
+```
 
 ## Caching
 
 ```dart
-final cache = HydralineCache.inMemory(maxSize: 500);
-
 HydralineConfig(
   manifest: manifest,
   builders: builders,
-  cache: cache,
+  cache: HydralineCache.inMemory(maxSize: 500),
+  cacheTtl: const Duration(minutes: 5),
 )
 ```
 
-The cache stores rendered HTML keyed by path. Keys to `HydralineCache`:
+When a cache is configured the middleware:
+
+- stores rendered HTML keyed by path and serves subsequent requests from it;
+- adds a deterministic `ETag` and answers `If-None-Match` revalidation with
+  `304 Not Modified`;
+- emits `Cache-Control: public, max-age=<ttl>` when `cacheTtl` is set.
+
+The `HydralineCache` interface is pluggable (implement it over Redis, files,
+etc.):
 
 | Method | Description |
 |---|---|
-| `get(String key)` | Returns cached value or null |
-| `set(String key, String value, {Duration? ttl})` | Stores with optional TTL |
+| `get(String key)` | Returns the cached HTML or null |
+| `set(String key, String html, {Duration? ttl, String? etag})` | Stores with optional TTL |
 | `invalidate(String key)` | Removes a cached entry |
 
-The middleware sets `Cache-Control` headers based on configured TTL and
-supports `ETag`/`If-None-Match` for conditional requests.
+`HydralineCache.inMemory({int maxSize = 500})` evicts the oldest entry past
+`maxSize` and honours per-entry TTLs.
 
-## Asset Injection
+## Asset Serving
 
-For routes with Flutter islands, the server injects:
+### L0–L1 JS Assets, robots.txt, sitemap.xml
 
-- `<link rel="preload">` for `flutter_bootstrap.js`, `main.dart.js`, `canvaskit.wasm`
-- Absolute paths to Flutter assets (`/main.dart.js`, `/canvaskit/`, etc.)
-- `<base href="/">` for correct resolution on nested path routes
-
-For routes without Flutter islands, zero Flutter assets are injected.
-
-### Serving L0–L1 Assets
-
-Vanilla islands and HTMX scripts are served as first-party assets from the
-`hydraline` package. No external CDN dependencies — compatible with
-`Content-Security-Policy: script-src 'self'`.
+Vanilla islands and the HTMX glue are served as first-party assets straight
+from the `hydraline` package — no CDN, compatible with
+`Content-Security-Policy: script-src 'self'`:
 
 ```dart
-// Serve vanilla islands JS
-import 'package:hydraline/hydraline.dart';
-
-// The vanillaIslandsJs constant contains the minified JS bundle (~8 KB)
-// The htmxGlueJs constant contains the HTMX runtime (~14 KB)
+final assets = Assets.serveCoreAssets(
+  sitemapXml: mySitemapXml,             // optional; 404 when omitted
+  robotsTxt: myRobotsTxt,               // optional; sane default otherwise
+);
+// Serves: /robots.txt, /sitemap.xml, /vanilla-islands.js, /htmx-glue.js
+// (also under the /assets/hydraline/ prefix)
 ```
 
-The server's asset handler (`assets_handler.dart`) serves these along with
-`sitemap.xml` and `robots.txt`.
+### Flutter Asset Injection
+
+For routes with Flutter islands, inject the engine scripts into a document:
+
+```dart
+final page = Assets.injectFlutterAssets(root, baseHref: '/');
+// Appends <script src="/flutter_bootstrap.js" defer> and
+// <script src="/main.dart.js" type="module" defer> before </body>.
+```
+
+For routes without Flutter islands, no Flutter assets are injected — the
+zero-overhead guarantee.
 
 ## Complete Example
+
+A runnable version of this example lives in
+[`packages/hydraline_server/example/main.dart`](../packages/hydraline_server/example/main.dart).
 
 ```dart
 import 'package:hydraline/hydraline.dart';
@@ -303,65 +342,68 @@ import 'package:hydraline_server/hydraline_server.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
-// ── Builders (UA-blind) ──────────────────────────────────────────────────
+// ── Builders (UA-blind, deterministic) ──────────────────────────────────
 
-DocumentRootNode buildHome(Request req, Object? data) => DocumentRootNode(
-  head: buildHead(SeoMeta(
+DocumentNode buildHome(Request req, Object? data) => DocumentRootNode(
+  head: buildHead(const SeoMeta(
     title: 'My Site',
     description: 'A Hydraline-powered website',
-    openGraph: OpenGraph(title: 'My Site', type: 'website'),
   )),
   body: [
-    SectionNode(role: SectionRole.main, children: [
+    SectionNode(role: SectionRole.main, children: const [
       HeadingNode(level: 1, children: [TextNode('Welcome!')]),
-      ParagraphNode(children: [TextNode('Rendered at: ${DateTime.now()}')]),
+      HtmxIslandNode(
+        id: 'faq',
+        endpoint: '/api/faq',
+        fallback: [ParagraphNode(children: [TextNode('Loading FAQ…')])],
+      ),
     ]),
   ],
 );
 
-// ── HTMX endpoint ────────────────────────────────────────────────────────
+// ── HTMX endpoint (served in front of the middleware) ───────────────────
 
-Future<Response> faqEndpoint(Request req) async {
-  final items = [
-    ('What is Hydraline?', 'SEO + islands for Flutter Web.'),
-    ('Is it a framework?', 'No. It is a set of libraries.'),
-  ];
-  final fragment = DocumentRootNode(body: [
-    for (final (q, a) in items)
-      DetailsNode(
-        summary: SummaryNode(children: [TextNode(q)]),
-        children: [ParagraphNode(children: [TextNode(a)])],
-      ),
-  ]);
-  return Htmx.response(
-    const HtmlSerializer().serializeFragment(fragment),
+Response faqEndpoint(Request req) {
+  const fragment = DetailsNode(
+    summary: SummaryNode(children: [TextNode('What is Hydraline?')]),
+    children: [
+      ParagraphNode(children: [TextNode('SEO + islands for Flutter Web.')]),
+    ],
   );
+  return Htmx.renderFragment(fragment);
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────
 
 void main() async {
-  final manifest = RouteManifest.builder()
-    .route(RouteEntry(path: '/', mode: RouteMode.document))
-    .route(RouteEntry(
-      path: '/api/faq',
-      mode: RouteMode.document,
-      noindex: true,
-    ))
-    .build();
+  final pages = const Pipeline()
+      .addMiddleware(hydralineMiddleware(HydralineConfig(
+        manifest: RouteManifest.builder()
+            .route(const RouteEntry(path: '/', mode: RouteMode.document))
+            .build(),
+        builders: {'/': buildHome},
+        botUserAgentPattern: RegExp(r'Googlebot|bingbot'),
+        cache: HydralineCache.inMemory(),
+        cacheTtl: const Duration(minutes: 5),
+      )))
+      .addHandler((req) => Response.ok('app shell'));
 
-  final handler = Pipeline()
-    .addMiddleware(hydralineMiddleware(HydralineConfig(
-      manifest: manifest,
-      builders: {'/': buildHome},
-      botUserAgentPattern: RegExp(r'Googlebot|bingbot'),
-    )))
-    .addHandler((req) {
-      if (req.url.path == 'api/faq') return faqEndpoint(req);
-      return Response.notFound('Not found');
-    });
+  final assets = Assets.serveCoreAssets();
 
-  final server = await io.serve(handler, 'localhost', 8080);
-  print('Server running on http://${server.address.host}:${server.port}');
+  final server = await io.serve((Request req) {
+    final path = req.url.path;
+    if (path == 'api/faq') return faqEndpoint(req);
+    if (path == 'robots.txt' || path.endsWith('.js')) return assets(req);
+    return pages(req);
+  }, 'localhost', 8080);
+
+  print('Serving on http://${server.address.host}:${server.port}');
 }
 ```
+
+## See Also
+
+- [Architecture](./architecture.md) — SSR flow, two-layer delivery design
+- [Configuration](./configuration.md) — route manifest reference
+- [Security](./security.md) — cloaking prevention, CSP
+- [`hydraline_server` package README](../packages/hydraline_server/README.md)

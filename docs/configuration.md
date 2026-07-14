@@ -130,6 +130,7 @@ dispatcher reads it to know what to hydrate and when.
   "styleMode": "shadow",
   "size": { "width": 640, "height": 480 },
   "state": { "price": 89990 },
+  "mediaQuery": null,
   "mountSelector": null
 }
 ```
@@ -143,7 +144,8 @@ dispatcher reads it to know what to hydrate and when.
 | `styleMode` | `shadow` (isolated) or `scoped` (shared styles) |
 | `size` | `{width, height}` in px for anti-CLS reservation |
 | `state` | `Map<String, Object?>` — props passed to the island (JSON-safe types only) |
-| `mountSelector` | CSS selector or media query for conditional mounting |
+| `mediaQuery` | CSS media query for `hydrateOnMedia` (serialized as `data-media`) |
+| `mountSelector` | CSS selector for conditional mounting |
 
 ### data-state Contract
 
@@ -172,9 +174,10 @@ routes are included by default; `app` routes are excluded.
 final output = await Sitemap.generate(
   source,                   // SitemapSource (list or async provider)
   baseUrl: SafeUrl.parse('https://example.com'),
-  changefreq: Changefreq.weekly,
-  defaultPriority: 0.5,
+  changefreq: ChangeFreq.weekly,   // default for entries without their own
+  defaultPriority: 0.5,            // default for entries without their own
 );
+// output.files: {'sitemap.xml': '<?xml ...'}
 ```
 
 When the source provides more than 50,000 URLs or the sitemap exceeds 50 MB,
@@ -189,7 +192,7 @@ abstract class SitemapSource {
 class SitemapEntry {
   final SafeUrl loc;
   final DateTime? lastmod;
-  final Changefreq? changefreq;
+  final ChangeFreq? changefreq;
   final double? priority;
   final List<({String hreflang, SafeUrl href})> alternates;
 }
@@ -202,24 +205,25 @@ final robots = Robots.generate(
   rules: [
     RobotsRule(userAgent: '*', allow: ['/'], disallow: ['/app/']),
   ],
-  sitemapUrl: SafeUrl.parse('https://example.com/sitemap.xml'),
+  sitemaps: [SafeUrl.parse('https://example.com/sitemap.xml')],
 );
 ```
 
-### SEO Validators
+### SEO Validators and Audit CLI
 
 ```bash
+# What a crawler sees: title/description lengths, alt text, canonical,
+# Open Graph, h1. Non-zero exit code on errors (CI-compatible).
 dart run hydraline:audit https://example.com
+dart run hydraline:audit dist/index.html
+
+# Cloaking check: bot body must be byte-identical to the user body.
+dart run hydraline:audit --server-integration https://example.com
 ```
 
-The CLI audit tool checks:
-- Title and description length
-- Presence of `alt` attributes on images
-- Duplicate canonical URLs
-- Missing or broken hreflang alternates
-- Open Graph and Twitter Card completeness
-- JSON-LD validity
-- Exits with non-zero code on failures (CI-compatible)
+In code, the same checks are `Audit.auditHtml(html)` and
+`Audit.compareBodies(buffered, chunks)`; document trees and `SeoMeta` are
+validated with `const SeoValidator().validate(target)`.
 
 ## Performance Budgets
 
@@ -327,4 +331,10 @@ runner operate within the host's environment:
 | Port binding | User's shelf/Dart Frog setup |
 | Database connections | User's builder functions |
 | API keys / secrets | User's configuration — never logged by Hydraline |
-| `FLUTTER_VERSION` | Read by SSG runner to select correct binding behaviour |
+
+## See Also
+
+- [Getting Started](./getting-started.md) — installation, minimal examples
+- [Server](./server.md) — how the manifest drives SSR
+- [Flutter Widgets](./flutter-widgets.md) — how the manifest drives SSG
+- [Security](./security.md) — CSP, SafeUrl, data-state contract

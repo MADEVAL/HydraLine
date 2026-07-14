@@ -72,5 +72,18 @@ void main() {
       expect(restored.islands[1].type, IslandType.htmx);
       expect(restored.islands[1].endpoint, '/api/reviews');
     });
+
+    test('mediaQuery survives a serialize/deserialize round-trip', () {
+      final manifest = IslandManifest([
+        const IslandSpec(
+          id: 'm',
+          type: IslandType.flutter,
+          directive: HydrationDirective.onMedia,
+          mediaQuery: '(min-width: 800px)',
+        ),
+      ]);
+      final restored = IslandManifest.deserialize(manifest.serialize());
+      expect(restored.islands.single.mediaQuery, '(min-width: 800px)');
+    });
   });
 }

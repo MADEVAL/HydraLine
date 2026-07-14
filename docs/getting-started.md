@@ -4,7 +4,7 @@
 
 - **Dart SDK** ≥ 3.9
 - **Flutter SDK** ≥ 3.35 (only for `hydraline_flutter`; core and server work with plain Dart)
-- A **Dart server** (shelf, Dart Frog) for SSR — but you can use static hosting for SSG
+- A **Dart server** (shelf, Dart Frog) for SSR — or static hosting for SSG
 - A **Flutter Web** application to add SEO to
 
 ## Installation
@@ -13,12 +13,12 @@ Add the packages you need to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  hydraline: ^1.0.0           # always needed
-  hydraline_server: ^1.0.0   # for SSR / HTMX
-  hydraline_flutter: ^1.0.0  # for Flutter widgets / SSG
+  hydraline: ^0.0.1           # always needed
+  hydraline_server: ^0.0.1    # for SSR / HTMX
+  hydraline_flutter: ^0.0.1   # for Flutter widgets / SSG
 ```
 
-If you only need a static blog (SSG, no server), you can skip `hydraline_server`.
+If you only need a static site (SSG, no server), you can skip `hydraline_server`.
 If you only need server-side rendering with pure-Dart builders, you can skip
 `hydraline_flutter`.
 
@@ -75,12 +75,43 @@ Islands hydrate according to a **hydration directive**:
 
 Hydraline supports two delivery paths:
 
-- **SSG (Static Site Generation)** — HTML is generated at build time via
-  `flutter_tester`. Outputs `dist/` directory ready for static hosting.
+- **SSG (Static Site Generation)** — HTML is generated at build time.
+  Outputs a `dist/` directory ready for static hosting.
 - **SSR (Server-Side Rendering)** — HTML is generated at request time from
   pure-Dart builders. Supports streaming delivery.
 
-## Minimal Blog Page (SSG)
+## Minimal Static Site (SSG)
+
+Describe your routes:
+
+```yaml
+# hydraline.routes.yaml
+routes:
+  - path: /
+    mode: document
+    metadata:
+      title: My Blog
+      description: A blog built with Hydraline
+      lang: en
+  - path: /blog/:slug
+    mode: document
+    dynamic_segments:
+      slug: [post-1, post-2]
+```
+
+Generate the site:
+
+```bash
+dart run hydraline_flutter:build hydraline.routes.yaml dist
+# dist/: index.html, blog/post-1.html, blog/post-2.html,
+#        sitemap.xml, robots.txt
+```
+
+Register pure-Dart page builders for real body content (see
+[Flutter Widgets → SSG Runner](./flutter-widgets.md#ssg-runner)), or extract
+content from your widgets with `SsgSandbox` + `SsgCollector`.
+
+## Minimal Flutter Page (widgets)
 
 ```dart
 // lib/pages/blog_page.dart
@@ -105,27 +136,10 @@ class BlogPage extends StatelessWidget {
       Seo.heading('Welcome to My Blog', level: 1),
       Seo.text('This page is rendered as semantic HTML for SEO.'),
       Seo.image('/images/hero.png', alt: 'Hero banner', width: 1200, height: 630),
-      Seo.link(
-        href: '/about',
-        child: const Text('About me'),
-      ),
+      Seo.link(href: '/about', child: const Text('About me')),
     ]),
   );
 }
-```
-
-```yaml
-# hydraline.routes.yaml
-routes:
-  - path: /
-    mode: document
-    content_source: widget:BlogPage
-```
-
-```bash
-# Generate static HTML
-dart run hydraline_flutter:build
-# Output in dist/: index.html, sitemap.xml, robots.txt
 ```
 
 ## Minimal Server (SSR)
@@ -137,12 +151,12 @@ import 'package:hydraline_server/hydraline_server.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
-DocumentRootNode buildHome(Request req, Object? data) => DocumentRootNode(
-  head: buildHead(SeoMeta(
+DocumentNode buildHome(Request req, Object? data) => DocumentRootNode(
+  head: buildHead(const SeoMeta(
     title: 'Hello from SSR',
     description: 'Rendered at request time',
   )),
-  body: [
+  body: const [
     HeadingNode(level: 1, children: [TextNode('Hello, world!')]),
     ParagraphNode(children: [TextNode('This page is server-rendered.')]),
   ],
@@ -150,24 +164,33 @@ DocumentRootNode buildHome(Request req, Object? data) => DocumentRootNode(
 
 void main() async {
   final manifest = RouteManifest.builder()
-    .route(RouteEntry(path: '/', mode: RouteMode.document))
-    .build();
+      .route(const RouteEntry(path: '/', mode: RouteMode.document))
+      .build();
 
-  final handler = Pipeline()
-    .addMiddleware(hydralineMiddleware(HydralineConfig(
-      manifest: manifest,
-      builders: {'/': buildHome},
-    )))
-    .addHandler((req) => Response.notFound('Not found'));
+  final handler = const Pipeline()
+      .addMiddleware(hydralineMiddleware(HydralineConfig(
+        manifest: manifest,
+        builders: {'/': buildHome},
+      )))
+      .addHandler((req) => Response.ok('app shell'));
 
   final server = await io.serve(handler, 'localhost', 8080);
-  print('Listening on ${server.address}:${server.port}');
+  print('Listening on ${server.address.host}:${server.port}');
 }
+```
+
+## Verify What Crawlers See
+
+```bash
+dart run hydraline:audit http://localhost:8080/          # SEO audit
+dart run hydraline:audit --server-integration http://localhost:8080/  # anti-cloaking
 ```
 
 ## Next Steps
 
+- [Full-stack showcase](../example/README.md) — runnable demo of all three packages
 - [Document Model](./document-model.md) — full `DocumentNode` reference
 - [Server](./server.md) — SSR, streaming, HTMX, caching
 - [Flutter Widgets](./flutter-widgets.md) — widget API reference
 - [Configuration](./configuration.md) — route manifest, islands, SEO settings
+- [Security](./security.md) — escaping, SafeUrl, CSP, anti-cloaking

@@ -1,0 +1,24 @@
+# hydraline.routes.yaml — the single source of truth for routes and modes.
+version: "1"
+base_url: https://demo.example
+
+routes:
+  - path: /
+    mode: document
+    metadata:
+      title: Hydraline Demo Shop
+      description: A Flutter Web shop with real, crawlable HTML.
+      canonical: https://demo.example/
+      lang: en
+
+  - path: /product/:id
+    mode: hybrid
+    dynamic_segments:
+      id: [espresso, grinder]
+    metadata:
+      title: Product
+
+  - path: /app/dashboard
+    mode: app
+    noindex: true
+    sitemap: false

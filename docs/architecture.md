@@ -211,19 +211,26 @@ Build-time static site generation:
 
 ```
 1. Parse hydraline.routes.yaml
-2. For each document/hybrid route:
-   a. (Surface A) Run Flutter widgets in flutter_tester
-      → Seo.* widgets self-register into SsgCollector
-   b. (Surface B) Call pure-Dart builder directly
+2. For each document/hybrid route (dynamic segments expanded):
+   a. (Surface B) Call the registered pure-Dart SsgPageBuilder
+   b. (Surface A) Or extract widgets in flutter_tester:
+      Seo.* widgets self-register into SsgCollector (SsgSandbox harness)
+   c. Fallback: metadata-only shell from the manifest
 3. Serialize DocumentNode → HTML files in dist/
 4. Generate sitemap.xml + robots.txt
-5. Copy island bundle + web assets into dist/ (if Flutter islands exist)
+5. Copy island runtime assets into dist/ (only if Flutter islands exist)
 6. Output: self-contained dist/ ready for static hosting
 ```
 
-The SSG runner must execute inside a Flutter environment (`flutter_tester`).
-It cannot run as plain `dart`. The CLI command `dart run hydraline_flutter:build`
-encapsulates this.
+The CLI runs surface B on the plain Dart VM:
+
+```bash
+dart run hydraline_flutter:build hydraline.routes.yaml dist
+```
+
+Surface A (widget extraction) requires `flutter_tester` — run it as a test
+tagged `ssg` that pumps pages inside `SsgSandbox` and feeds the sealed
+collector output to the runner.
 
 ## Client-Side Runtime
 
@@ -255,11 +262,19 @@ time. The same element is reused during hydration (no re-creation).
 
 ### Dispatcher
 
-A single global script that:
-- Observes all islands and triggers hydration per directive
-- Loads the Flutter engine once (on first trigger)
-- Creates `FlutterView` instances and hands them to `IslandHost`
-- Manages lifecycle states and error handling
+A single global script (≤ 2 KB) that:
+- Observes all islands and triggers hydration per directive — one
+  `IntersectionObserver` for all `onVisible` islands, one idle callback for
+  `onIdle`, one delegated listener for `onInteraction`
+- Loads the Flutter engine once (on the first trigger)
+- Manages `data-hydration` lifecycle states, timeouts and the
+  `hydraline:island-error` event
+- Exposes `window.hydraline.hydrate(id)` / `hydrateAll()` for
+  `hydrateManual` islands
+
+On the Dart side, view → island bindings are registered in
+`IslandViewRegistry` and resolved by `IslandHost` — one engine instance,
+N views (see [Flutter Widgets](./flutter-widgets.md#islandhost-and-islandviewregistry)).
 
 ### Service Worker
 
@@ -272,3 +287,11 @@ instantiation.
 If a page has no `IslandType.flutter` islands, `flutter_bootstrap.js` is never
 inserted and the Flutter engine is never loaded. Levels 0 and 1 work entirely
 without Flutter. This is verified at the dispatcher and SSR/SSG generator levels.
+
+## See Also
+
+- [Getting Started](./getting-started.md) — first steps
+- [Document Model](./document-model.md) — the tree in detail
+- [Server](./server.md) — SSR delivery in practice
+- [Flutter Widgets](./flutter-widgets.md) — the widget surface
+- [Security](./security.md) — threat model and guarantees

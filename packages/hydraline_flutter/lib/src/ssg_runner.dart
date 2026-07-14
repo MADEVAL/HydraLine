@@ -32,6 +32,10 @@ class SsgResult {
   final bool assetsCopied;
 }
 
+/// A pure-Dart page builder (surface B) invoked at build time for each
+/// concrete path expanded from the route pattern it is registered under.
+typedef SsgPageBuilder = DocumentNode Function(String path);
+
 /// MUST be executed inside a flutter_tester harness
 /// (`flutter test --tags ssg`). Never plain `dart run`.
 abstract interface class SsgRunner {
@@ -39,11 +43,8 @@ abstract interface class SsgRunner {
     required Object routeManifest,
     required RouteAdapter routeAdapter,
     required Map<String, Object?> islandFactories,
-  }) => _SsgRunner(
-    manifest: routeManifest as RouteManifest,
-    adapter: routeAdapter,
-    islandFactories: islandFactories,
-  );
+    Map<String, SsgPageBuilder> builders,
+  }) = _SsgRunner.create;
 
   /// The ONLY responsible for copying the island bundle + web/ assets
   /// into the output dir (only when islands of type flutter are present).
@@ -56,13 +57,28 @@ class _SsgRunner implements SsgRunner {
     required RouteManifest manifest,
     required RouteAdapter adapter,
     required Map<String, Object?> islandFactories,
+    Map<String, SsgPageBuilder> builders = const {},
   }) : _manifest = manifest,
        _adapter = adapter,
-       _islandFactories = islandFactories;
+       _islandFactories = islandFactories,
+       _builders = builders;
+
+  factory _SsgRunner.create({
+    required Object routeManifest,
+    required RouteAdapter routeAdapter,
+    required Map<String, Object?> islandFactories,
+    Map<String, SsgPageBuilder> builders = const {},
+  }) => _SsgRunner(
+    manifest: routeManifest as RouteManifest,
+    adapter: routeAdapter,
+    islandFactories: islandFactories,
+    builders: builders,
+  );
 
   final RouteManifest _manifest;
   final RouteAdapter _adapter;
   final Map<String, Object?> _islandFactories;
+  final Map<String, SsgPageBuilder> _builders;
   final HtmlSerializer _serializer = const HtmlSerializer();
 
   bool _hasFlutterIslands() => _islandFactories.isNotEmpty;
@@ -88,12 +104,7 @@ class _SsgRunner implements SsgRunner {
           : <String>[route.path];
 
       for (final concretePath in paths) {
-        final head = buildHead(route.metadata ?? defaultSeoMeta(route));
-        final root = DocumentRootNode(
-          head: head,
-          body: const [],
-          lang: route.metadata?.lang,
-        );
+        final root = _buildRoot(route, concretePath);
         final html = _serializer.serialize(root);
 
         final filePath = _filePath(outputDir, concretePath);
@@ -133,6 +144,28 @@ class _SsgRunner implements SsgRunner {
     }
 
     return SsgResult(pagesWritten: pagesWritten, assetsCopied: assetsCopied);
+  }
+
+  /// Builds the page for [concretePath]: a registered [SsgPageBuilder] wins;
+  /// otherwise a metadata-only shell is produced from the route manifest.
+  DocumentNode _buildRoot(RouteEntry route, String concretePath) {
+    final builder = _builders[route.path];
+    if (builder != null) {
+      final built = builder(concretePath);
+      if (built is DocumentRootNode) {
+        return built;
+      }
+      return DocumentRootNode(
+        head: buildHead(route.metadata ?? defaultSeoMeta(route)),
+        body: [built],
+        lang: route.metadata?.lang,
+      );
+    }
+    return DocumentRootNode(
+      head: buildHead(route.metadata ?? defaultSeoMeta(route)),
+      body: const [],
+      lang: route.metadata?.lang,
+    );
   }
 
   Future<void> _copyAssets(String outputDir) async {

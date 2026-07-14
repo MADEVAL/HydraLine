@@ -13,6 +13,9 @@ import 'package:shelf/shelf.dart';
 class RedirectException implements Exception {
   const RedirectException(this.location, {this.status = 301});
 
+  /// Marks content as permanently removed (HTTP 410 Gone).
+  const RedirectException.gone() : this('', status: 410);
+
   final String location;
   final int status;
 }

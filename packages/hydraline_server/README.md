@@ -9,16 +9,20 @@ and HTMX helpers for shelf and Dart Frog.
 |---|---|
 | `hydralineMiddleware` | Route-matching shelf middleware for document/hybrid/app routes |
 | `ResponseDelivery` | Buffered (bots) and chunked streaming (users) from DocumentNode |
-| `HtmxResponse` | HTMX fragment rendering + `HX-Trigger` response headers |
-| `Http` | Status codes, redirects, `X-Robots-Tag`, path canonicalization |
-| `HydralineCache` | Pluggable cache interface + in-memory implementation |
-| `Assets` | robots.txt, sitemap.xml endpoints + Flutter asset injection |
+| `HydralineCache` | Pluggable cache + in-memory implementation; ETag / 304 / Cache-Control |
+| `Htmx` / `HtmxResponse` | Fragment rendering, `HX-Trigger`, `HX-Redirect`, retarget/reswap |
+| `RedirectException` | 301/302/custom + `.gone()` (410) from inside builders |
+| `Http` | Status helpers, `X-Robots-Tag`, path canonicalization |
+| `Assets` | robots.txt, sitemap.xml, first-party L0–L1 JS + Flutter asset injection |
 | `DartFrogAdapter` | Drop-in adapter for Dart Frog servers |
-| `BotDetector` | User-Agent matching for bot-aware transport selection |
 
 ## Rules
 
 No `package:flutter` — this package is pure Dart and works on any Dart server.
+
+Automatic behaviors: bot-aware transport (byte-identical bodies),
+`X-Robots-Tag` for noindex routes and `app` routes, ETag revalidation when a
+cache is configured.
 
 ## Quick start
 
@@ -28,25 +32,32 @@ import 'package:hydraline_server/hydraline_server.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
-DocumentNode homePage() => DocumentRootNode(
-  head: buildHead(SeoMeta(title: 'Home')),
-  body: [HeadingNode(level: 1, children: [TextNode('Home')])],
+DocumentNode homePage(Request req, Object? data) => DocumentRootNode(
+  head: buildHead(const SeoMeta(title: 'Home')),
+  body: const [
+    HeadingNode(level: 1, children: [TextNode('Home')]),
+  ],
 );
 
 void main() async {
-  final handler = Pipeline()
-    .addMiddleware(hydralineMiddleware(HydralineConfig(
-      manifest: RouteManifest.builder()
-        .route(RouteEntry(path: '/', mode: RouteMode.document))
-        .build(),
-      builders: {'/': (req, data) async => homePage()},
-      botUserAgentPattern: RegExp(r'Googlebot|bingbot'),
-    )))
-    .addHandler((req) => Response.notFound(''));
+  final handler = const Pipeline()
+      .addMiddleware(hydralineMiddleware(HydralineConfig(
+        manifest: RouteManifest.builder()
+            .route(const RouteEntry(path: '/', mode: RouteMode.document))
+            .build(),
+        builders: {'/': homePage},
+        botUserAgentPattern: RegExp(r'Googlebot|bingbot'),
+        cache: HydralineCache.inMemory(),
+        cacheTtl: const Duration(minutes: 5),
+      )))
+      .addHandler((req) => Response.ok('app shell'));
 
   await io.serve(handler, 'localhost', 8080);
 }
 ```
+
+Runnable example: [`example/main.dart`](example/main.dart) — SSR, streaming,
+bot-aware delivery, caching and an HTMX endpoint.
 
 ## Documentation
 

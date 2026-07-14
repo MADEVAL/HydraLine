@@ -79,9 +79,7 @@ class _IslandState extends State<Island> {
           ? IslandSize(width: w.toInt(), height: h.toInt())
           : null,
       state: widget.props,
-      mountSelector: widget.mediaQuery != null
-          ? '@media(${widget.mediaQuery})'
-          : null,
+      mediaQuery: widget.mediaQuery,
     );
   }
 

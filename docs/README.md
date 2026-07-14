@@ -158,6 +158,7 @@ Widget build(BuildContext context) => HydraApp(
 - [Flutter Widgets](./flutter-widgets.md) — Seo.* widgets, Island, HydraApp, IslandHost, SSG runner
 - [Configuration](./configuration.md) — route manifest, island manifest, SEO config, budgets, security
 - [Security](./security.md) — SafeUrl, contextual escaping, CSP, XSS prevention, cloaking guarantee
+- [Showcase example](../example/README.md) — runnable full-stack demo (SSR + SSG + Flutter)
 
 ## What Hydraline Is Not
 

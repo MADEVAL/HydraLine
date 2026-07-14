@@ -7,8 +7,8 @@ Thanks for your interest in contributing!
 ```bash
 dart pub global activate melos
 git clone https://github.com/MADEVAL/HydraLine.git
-cd hydraline
-melos bootstrap
+cd HydraLine
+dart pub get
 ```
 
 ## Development workflow
@@ -19,7 +19,13 @@ melos bootstrap
 4. Run the full suite: `melos run test`
 5. Verify analysis: `melos run analyze`
 6. Ensure formatting: `melos run format`
-7. Open a pull request
+7. Run everything at once with `melos run precommit`
+8. Open a pull request using the
+   [PR template](.github/PULL_REQUEST_TEMPLATE/pull_request_template.md)
+
+Bug reports and feature requests have templates too:
+[bug report](.github/ISSUE_TEMPLATE/bug_report.md) ·
+[feature request](.github/ISSUE_TEMPLATE/feature_request.md).
 
 ## Commit conventions
 
@@ -47,7 +53,14 @@ Scopes: `core`, `server`, `flutter`, `web`, `ci`, `docs`
 - Flutter code lives only in `hydraline_flutter`
 - Document public API with dartdoc
 - Use English for all code, comments, and documentation
+- Keep builders deterministic — no `DateTime.now()` / random values at render time
+
+## Security issues
+
+Never report vulnerabilities in public issues — see the
+[Security Policy](SECURITY.md).
 
 ## Questions?
 
-Open an issue or discussion on GitHub.
+Open an issue or discussion on GitHub. Community expectations are described
+in the [Code of Conduct](CODE_OF_CONDUCT.md).

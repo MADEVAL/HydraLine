@@ -2,7 +2,6 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
 void main() {
@@ -17,12 +16,14 @@ void main() {
 
     test('single island with normal props', () {
       final c = SsgCollector('/')
-        ..addIsland(const IslandSpec(
-          id: 'hero',
-          type: IslandType.flutter,
-          size: IslandSize(width: 400, height: 300),
-          state: {'title': 'Hello'},
-        ));
+        ..addIsland(
+          const IslandSpec(
+            id: 'hero',
+            type: IslandType.flutter,
+            size: IslandSize(width: 400, height: 300),
+            state: {'title': 'Hello'},
+          ),
+        );
       final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 1);
       final island = report.islands.single;
@@ -38,32 +39,43 @@ void main() {
     test('island with props > 10KB warns', () {
       final bigStr = 'x' * IslandStateCodec.maxBytes;
       final c = SsgCollector('/')
-        ..addIsland(IslandSpec(
-          id: 'big',
-          type: IslandType.flutter,
-          state: {'data': bigStr},
-        ));
+        ..addIsland(
+          IslandSpec(
+            id: 'big',
+            type: IslandType.flutter,
+            state: {'data': bigStr},
+          ),
+        );
       final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 1);
-      expect(report.islands.single.warnings, contains('Props size exceeds 10 KB'));
+      expect(
+        report.islands.single.warnings,
+        contains('Props size exceeds 10 KB'),
+      );
     });
 
     test('island missing width/height warns about CLS', () {
       final c = SsgCollector('/')
-        ..addIsland(const IslandSpec(
-          id: 'no-size',
-          type: IslandType.flutter,
-        ));
+        ..addIsland(const IslandSpec(id: 'no-size', type: IslandType.flutter));
       final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 1);
-      expect(report.islands.single.warnings, contains('Missing width/height (anti-CLS)'));
+      expect(
+        report.islands.single.warnings,
+        contains('Missing width/height (anti-CLS)'),
+      );
     });
 
     test('multiple islands correct totals', () {
       final c = SsgCollector('/')
-        ..addIsland(const IslandSpec(id: 'a', type: IslandType.flutter, state: {'n': 1}))
-        ..addIsland(const IslandSpec(id: 'b', type: IslandType.flutter, state: {'n': 2}))
-        ..addIsland(const IslandSpec(id: 'c', type: IslandType.flutter, state: {'n': 3}));
+        ..addIsland(
+          const IslandSpec(id: 'a', type: IslandType.flutter, state: {'n': 1}),
+        )
+        ..addIsland(
+          const IslandSpec(id: 'b', type: IslandType.flutter, state: {'n': 2}),
+        )
+        ..addIsland(
+          const IslandSpec(id: 'c', type: IslandType.flutter, state: {'n': 3}),
+        );
       final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 3);
       expect(report.islands, hasLength(3));
@@ -76,12 +88,14 @@ void main() {
 
     test('fromCollector returns correct report after seal', () {
       final c = SsgCollector('/about')
-        ..addIsland(const IslandSpec(
-          id: 'sticky-header',
-          type: IslandType.flutter,
-          size: IslandSize(width: 800, height: 64),
-          state: {'sticky': true},
-        ))
+        ..addIsland(
+          const IslandSpec(
+            id: 'sticky-header',
+            type: IslandType.flutter,
+            size: IslandSize(width: 800, height: 64),
+            state: {'sticky': true},
+          ),
+        )
         ..seal();
       final report = SsgDevTools.fromCollector(c).analyze();
       expect(report.totalCount, 1);
@@ -148,9 +162,11 @@ void main() {
     });
 
     test('deeply nested text nodes compared correctly', () {
-      const h1 = '<html><body><div><section><article><p>Deep text</p>'
+      const h1 =
+          '<html><body><div><section><article><p>Deep text</p>'
           '</article></section></div></body></html>';
-      const h2 = '<html><body><div><section><article><p>Shallow text</p>'
+      const h2 =
+          '<html><body><div><section><article><p>Shallow text</p>'
           '</article></section></div></body></html>';
       final diff = SsgDomDiff.compare(h1, h2);
       expect(diff.diffs, isNotEmpty);

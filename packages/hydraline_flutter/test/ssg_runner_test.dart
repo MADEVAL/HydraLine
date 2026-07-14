@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 import 'package:test/test.dart';
 
@@ -53,6 +52,64 @@ void main() {
       final robots = File('${tmpDir.path}/robots.txt');
       expect(await sitemap.exists(), isTrue);
       expect(await robots.exists(), isTrue);
+    });
+
+    test('renders body content from a registered pure-Dart builder', () async {
+      final adapter = _TestAdapter([const RouteInfo(path: '/')]);
+      const manifestYaml = 'routes:\n  - path: /\n    mode: document\n';
+      final runner = SsgRunner(
+        routeManifest: RouteManifest.parseYaml(manifestYaml),
+        routeAdapter: adapter,
+        islandFactories: {},
+        builders: {
+          '/': (path) => DocumentRootNode(
+            head: buildHead(const SeoMeta(title: 'Built Home')),
+            body: const [
+              HeadingNode(level: 1, children: [TextNode('Hello from B')]),
+            ],
+          ),
+        },
+      );
+      await runner.run(outputDir: tmpDir.path);
+      final html = await File('${tmpDir.path}/index.html').readAsString();
+      expect(html, contains('<title>Built Home</title>'));
+      expect(html, contains('<h1>Hello from B</h1>'));
+    });
+
+    test('builder receives each expanded dynamic path', () async {
+      final adapter = _TestAdapter([]);
+      final manifest = RouteManifest.builder()
+          .route(
+            const RouteEntry(
+              path: '/blog/:slug',
+              mode: RouteMode.document,
+              dynamicSegments: {
+                'slug': ['a', 'b'],
+              },
+            ),
+          )
+          .build();
+      final seen = <String>[];
+      final runner = SsgRunner(
+        routeManifest: manifest,
+        routeAdapter: adapter,
+        islandFactories: {},
+        builders: {
+          '/blog/:slug': (path) {
+            seen.add(path);
+            return DocumentRootNode(
+              body: [
+                ParagraphNode(children: [TextNode('page $path')]),
+              ],
+            );
+          },
+        },
+      );
+      final result = await runner.run(outputDir: tmpDir.path);
+      expect(result.pagesWritten, 2);
+      expect(seen, ['/blog/a', '/blog/b']);
+      final pageA = await File('${tmpDir.path}/blog/a.html').readAsString();
+      expect(pageA, contains('page /blog/a'));
     });
   });
 

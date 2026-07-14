@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
 void main() {
@@ -58,18 +57,27 @@ void main() {
       final node = seal().body[0] as AnchorNode;
       expect(node.href.value, '/about');
     });
+
+    testWidgets('extracts the label from a Text child', (tester) async {
+      await tester.pumpWidget(
+        sandbox(Seo.link(href: '/about', child: const Text('About me'))),
+      );
+      final node = seal().body[0] as AnchorNode;
+      final html = const HtmlSerializer().serializeFragment(node);
+      expect(html, '<a href="/about">About me</a>');
+    });
   });
 
   group('Seo.section', () {
-    testWidgets('registers sentinel + children via flat collector', (
-      tester,
-    ) async {
+    testWidgets('registers children via the flat collector', (tester) async {
       await tester.pumpWidget(
         sandbox(
           Seo.section(role: SectionRole.main, children: [Seo.text('content')]),
         ),
       );
-      expect(seal().body, hasLength(2));
+      final body = seal().body;
+      expect(body, hasLength(1));
+      expect(body[0], isA<ParagraphNode>());
     });
   });
 

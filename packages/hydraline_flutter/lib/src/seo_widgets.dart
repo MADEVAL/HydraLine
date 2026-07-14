@@ -8,7 +8,7 @@ library;
 
 import 'package:flutter/widgets.dart';
 import 'package:hydraline/hydraline.dart'
-    show SafeUrl, SectionRole, SeoMeta, SsgCollector, TextNode;
+    show SafeUrl, SectionRole, SeoMeta, SsgCollector;
 
 import 'hydra_app.dart' show HydraScope;
 
@@ -138,7 +138,11 @@ class _SeoLink extends StatelessWidget {
   Widget build(BuildContext context) {
     final url = SafeUrl.tryParse(href);
     if (url != null) {
-      HydraScope.of(context).collector?.addLink(url, '');
+      final label = switch (child) {
+        final Text text => text.data ?? '',
+        _ => '',
+      };
+      HydraScope.of(context).collector?.addLink(url, label);
     }
     return GestureDetector(child: child);
   }
@@ -152,7 +156,8 @@ class _SeoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    HydraScope.of(context).collector?.addNode(const TextNode(''));
+    // Registration is flat: the section's children self-register into the
+    // collector in build order. The [role] shapes the visual grouping only.
     return Column(children: children);
   }
 }

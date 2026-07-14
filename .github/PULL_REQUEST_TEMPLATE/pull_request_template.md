@@ -1,4 +1,6 @@
-<!-- Hydraline PR template. Fill in all sections; remove inapplicable checkboxes. -->
+<!-- Hydraline PR template. Fill in all sections; remove inapplicable checkboxes.
+     Workflow and conventions: ../../CONTRIBUTING.md
+     Run `melos run precommit` locally before pushing. -->
 
 ## What and why
 <!-- Brief description of the change and motivation. -->
