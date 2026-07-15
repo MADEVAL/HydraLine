@@ -23,6 +23,31 @@ Islands hydrate on scroll, click, idle - engine loads only when triggered.
 [![e2e](https://img.shields.io/badge/e2e-Chrome%2026%20passed-brightgreen)](#)
 [![CLS](https://img.shields.io/badge/CLS-≈%200-blue)](#)
 
+## Why
+
+Your Flutter Web app already works. You just need it to be **visible in Google**.
+This package adds that without touching `main()` or `MaterialApp`.
+
+- **Seo.* widgets — dual nature.** `Seo.heading`, `Seo.text`, `Seo.image`,
+  `Seo.link`, `Seo.section` (emits `<main>`/`<nav>`/`<article>`), `Seo.list`
+  (emits `<ol>`/`<ul>` + `<li>`) — each renders visually AND registers the
+  corresponding semantic `DocumentNode`. One widget tree, real HTML output.
+- **Islands — interactive Flutter, zero overhead.** `Island` zones with
+  hydration directives (`onVisible`, `onIdle`, `onInteraction`, `onMedia`,
+  `manual`). Props cross as JSON in `data-state`. One engine hosts N islands in
+  N views. Pages without islands **never load** the Flutter engine — proven by
+  CI in real Chrome.
+- **Zero layout shift.** Islands reserve pixel dimensions via Declarative
+  Shadow DOM. CLS < 0.01 — proven by CI.
+- **SSG runner.** `dart run hydraline_flutter:build` — routes to static HTML +
+  sitemap + robots + runtime JS in one command. Pure-Dart build surface for
+  your own `bin/build.dart`.
+- **Proven in real Chrome.** 26 Playwright e2e tests for the runtime JS, 5
+  real-engine tests (CanvasKit boot, IslandHost mounting, semantics-tree
+  interaction), service worker caching, Edge channel.
+- **A11y.** Accessibility tree driven through the Flutter engine semantics
+  placeholder, auto-activated for screen readers and test assertions.
+
 ## What's inside
 
 | Module | Description |

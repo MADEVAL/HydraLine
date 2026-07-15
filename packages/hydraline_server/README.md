@@ -20,6 +20,24 @@ by architecture). Add SEO to one route, keep the rest on your existing server.
 [![pub](https://img.shields.io/pub/v/hydraline_server)](https://pub.dev/packages/hydraline_server)
 [![tests](https://img.shields.io/badge/tests-107%20passed-brightgreen)](#)
 
+## Why
+
+SEO without a server is SSG-only — you ship static files. Add this package and
+you get **server-side rendering**: the same `DocumentNode` tree streams from a
+shelf/Dart Frog handler, with real HTTP semantics.
+
+- **Anti-cloaking, proven.** Builders physically cannot see `User-Agent`.
+  Bots and humans get byte-identical HTML bodies — verified by CI test.
+- **ETag, 304, cache-control.** Deterministic FNV-1a hash over rendered HTML,
+  `If-None-Match` revalidation, configurable TTL, cache-key query normalisation.
+- **Bot-aware transport.** Buffered (Content-Length) for crawlers when cache is
+  on; chunked streaming for humans. HEAD semantics, redirects (301/302/303/307/
+  308/410), X-Robots-Tag per route type.
+- **HTMX helpers.** First-class `HtmxResponse` with trigger/retarget/reswap
+  headers, CRLF validation, fragment rendering, client-side redirect support.
+- **Zero Flutter dependency.** Works on any Dart server, not just behind a
+  Flutter Web app. Use it for API doc sites, landing pages, micro-frontends.
+
 ## What's inside
 
 | Module | Description |

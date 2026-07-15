@@ -20,6 +20,23 @@ placeholders - all typed, all safe, all crawlable.
 [![pub](https://img.shields.io/pub/v/hydraline)](https://pub.dev/packages/hydraline)
 [![tests](https://img.shields.io/badge/tests-229%20passed-brightgreen)](#)
 
+## Why
+
+Flutter Web renders into a `<canvas>` — crawlers see an empty shell. Hydraline
+fixes this: your pages become **real semantic HTML** in `view-source`. This
+package is the foundation — the `DocumentNode` tree that both the SSR server
+and the SSG compiler consume. One model, two delivery paths, same bytes.
+
+- **Safe by construction.** `SafeUrl` rejects `javascript:`/`data:` at type
+  level; context-aware escaping (text vs attribute); `sanitizeHtml()` strips
+  scripts and event handlers. 1e6-input XSS fuzz suite.
+- **Full SEO head.** Open Graph (with image dimensions), Twitter Card, 9
+  JSON-LD types (Product, Article, FAQ, Recipe, Event...), sitemap.xml
+  (auto-split at 50k URLs), robots.txt, hreflang alternates, audit CLI.
+- **Zero dependencies on Flutter.** Works in any Dart VM — servers, CLIs, build
+  pipelines. The `hydraline_server` and `hydraline_flutter` packages build on
+  this core, adding SSR/streaming (server) and widgets/SSG/islands (Flutter).
+
 ## What's inside
 
 | Module | Description |
