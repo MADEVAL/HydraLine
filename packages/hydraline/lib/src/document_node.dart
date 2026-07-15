@@ -326,7 +326,7 @@ final class VanillaIslandNode extends DocumentNode {
 
 /// Strips the most common XSS vectors from raw HTML: `<script>` elements
 /// and inline event-handler attributes (`on*`). This is a baseline
-/// defence, not a full HTML sanitizer — pass it as [UnsafeHtmlNode.sanitizer]
+/// defence, not a full HTML sanitizer - pass it as [UnsafeHtmlNode.sanitizer]
 /// when the raw HTML cannot be fully trusted.
 String sanitizeHtml(String html) {
   var clean = html;

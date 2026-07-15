@@ -26,17 +26,17 @@ SEO · SSR · SSG · Islands
 
 Flutter Web paints your app into a `<canvas>`. Crawlers and social bots see an
 empty shell. **Hydraline fixes this at the root: your pages become real semantic
-HTML in the very first HTTP response** — and Flutter hydrates interactive islands
+HTML in the very first HTTP response** - and Flutter hydrates interactive islands
 on top. No new framework. No rewrite. **Works with ANY existing Flutter Web app
-— additively, one route at a time.**
+- additively, one route at a time.**
 
 ## vs. Alternatives
 
 | Approach | Crawlable? | No Cloaking? | Islands? |
 |---|---|---|---|
 | **Hydraline** | Real HTML in `view-source` | Builders can't see `User-Agent` | L0/L1/L2 per route |
-| Runtime `<meta>` injectors | No — JS-only, `view-source` is empty | Yes, but tags don't survive | No |
-| UA-sniff prerender | Yes | **No** — different content per UA (risk) | No |
+| Runtime `<meta>` injectors | No - JS-only, `view-source` is empty | Yes, but tags don't survive | No |
+| UA-sniff prerender | Yes | **No** - different content per UA (risk) | No |
 | Next.js / Nuxt (rewrite) | Yes | Yes | Needed, but **new framework** |
 
 ## Why Hydraline
@@ -49,9 +49,9 @@ on top. No new framework. No rewrite. **Works with ANY existing Flutter Web app
   (engine loads only when an island triggers). ~80% of content interactivity
   never needs the engine.
 - **Zero cloaking, by architecture.** Builders physically cannot see the
-  `User-Agent` — bots and users get byte-identical bodies. Verified by CI test.
+  `User-Agent` - bots and users get byte-identical bodies. Verified by CI test.
 - **Zero layout shift.** Islands reserve exact pixel dimensions with Declarative
-  Shadow DOM — CLS ≈ 0. Verified by CI test in real Chrome.
+  Shadow DOM - CLS ≈ 0. Verified by CI test in real Chrome.
 - **Safe by construction.** `SafeUrl` rejects `javascript:`/`data:` at type
   level; context-aware escaping (text vs attribute); inline event handlers get
   auto-stripped by `sanitizeHtml()`. SRI (`integrity`/`crossorigin`) on runtime
@@ -82,7 +82,7 @@ dart pub add hydraline_server       # for SSR / HTMX
 flutter pub add hydraline_flutter   # for widgets / SSG / islands
 ```
 
-`hydraline_flutter` re-exports the entire `hydraline` core — one import, full API:
+`hydraline_flutter` re-exports the entire `hydraline` core - one import, full API:
 
 ```dart
 import 'package:hydraline_flutter/hydraline_flutter.dart'; // everything
@@ -92,7 +92,7 @@ import 'package:hydraline_server/hydraline_server.dart';    // server
 
 ## Quick Start
 
-### Option A — Pure-Dart builders (no Flutter widget changes)
+### Option A - Pure-Dart builders (no Flutter widget changes)
 
 ```dart
 import 'package:hydraline/hydraline.dart';
@@ -134,7 +134,7 @@ final handler = const Pipeline()
     .addHandler((req) => Response.ok('app shell')); // your existing Flutter Web
 ```
 
-### Option B — Seo.* widgets (Flutter-native DX)
+### Option B - Seo.* widgets (Flutter-native DX)
 
 ```dart
 import 'package:hydraline_flutter/hydraline_flutter.dart';
@@ -174,7 +174,7 @@ L2  Flutter islands         on trigger   charts, configurators, 3D
 
 An **island** is an isolated interactive zone. Props cross the server → client
 boundary as JSON in `data-state`. One Flutter engine instance hosts N islands in
-N views via the multi-view API. Pages without islands never load the engine —
+N views via the multi-view API. Pages without islands never load the engine -
 that's the zero-overhead guarantee. Deep dive: [Architecture](docs/architecture.md).
 
 ## Packages
@@ -193,12 +193,12 @@ Dart ≥ 3.9 · Flutter ≥ 3.35 (only for `hydraline_flutter`) · MIT licensed.
 
 ## Community
 
-- **Contribute** — [Contributing Guide](CONTRIBUTING.md)
-- **Bug?** — [bug report](.github/ISSUE_TEMPLATE/bug_report.md)
-- **Idea?** — [feature request](.github/ISSUE_TEMPLATE/feature_request.md)
-- **Security issue?** — follow [Security Policy](SECURITY.md)
-- **Be kind** — [Code of Conduct](CODE_OF_CONDUCT.md)
+- **Contribute** - [Contributing Guide](CONTRIBUTING.md)
+- **Bug?** - [bug report](.github/ISSUE_TEMPLATE/bug_report.md)
+- **Idea?** - [feature request](.github/ISSUE_TEMPLATE/feature_request.md)
+- **Security issue?** - follow [Security Policy](SECURITY.md)
+- **Be kind** - [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## License
 
-[MIT](LICENSE) — [Yevhen Leonidov](https://leonidov.dev) / [Globus Studio](https://globus.studio)
+[MIT](LICENSE) - [Yevhen Leonidov](https://leonidov.dev) / [Globus Studio](https://globus.studio)

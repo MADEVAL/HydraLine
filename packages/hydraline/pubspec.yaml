@@ -1,6 +1,6 @@
 name: hydraline
 description: >-
-  SEO, SSR, SSG + islands for Flutter Web — pure-Dart core.
+  SEO, SSR, SSG + islands for Flutter Web - pure-Dart core.
   DocumentNode tree, HTML serializer, SafeUrl, metadata, JSON-LD,
   sitemap, robots, audit CLI. Use with hydraline_server (SSR) or
   hydraline_flutter (widgets/SSG).

@@ -1,4 +1,4 @@
-// /app/dashboard — a pure Flutter CanvasKit page (app mode).
+// /app/dashboard - a pure Flutter CanvasKit page (app mode).
 // No Hydraline involvement: this route is noindex'd and crawlers never
 // see it. It demonstrates that Hydraline coexists with any existing
 // Flutter Web routes without modification.
@@ -12,7 +12,7 @@ class AppDashboardPage extends StatelessWidget {
     appBar: AppBar(title: const Text('Dashboard')),
     body: const Center(
       child: Text(
-        'This page runs on CanvasKit. No Hydraline — just Flutter.',
+        'This page runs on CanvasKit. No Hydraline - just Flutter.',
         style: TextStyle(fontSize: 18),
       ),
     ),

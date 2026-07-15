@@ -4,7 +4,7 @@
 
 - **Dart SDK** ≥ 3.9
 - **Flutter SDK** ≥ 3.35 (only for `hydraline_flutter`; core and server work with plain Dart)
-- A **Dart server** (shelf, Dart Frog) for SSR — or static hosting for SSG
+- A **Dart server** (shelf, Dart Frog) for SSR - or static hosting for SSG
 - A **Flutter Web** application to add SEO to
 
 ## Installation
@@ -36,7 +36,7 @@ Result: /blog is real HTML in view-source; /app still runs CanvasKit
 
 ### DocumentNode
 
-`DocumentNode` is the central data model — a tree of semantic HTML nodes
+`DocumentNode` is the central data model - a tree of semantic HTML nodes
 (headings, paragraphs, links, images, lists, tables, island placeholders, etc.).
 It is **not** Flutter widget trees. Serialization is single-pass, deterministic,
 and produces valid HTML5.
@@ -49,7 +49,7 @@ Every route in `hydraline.routes.yaml` has a mode:
 |---|---|---|
 | `document` | Full semantic HTML | No |
 | `hybrid` | Semantic HTML + island placeholders | Yes, per-island on trigger |
-| `app` | Empty shell (Flutter CanvasKit) | Yes — auto `noindex` |
+| `app` | Empty shell (Flutter CanvasKit) | Yes - auto `noindex` |
 
 ### Two surfaces, same HTML
 
@@ -58,13 +58,13 @@ semantic HTML**:
 
 | Surface | What you write | Best for |
 |---|---|---|
-| **A — Seo.\* widgets** | Flutter widgets inside `HydraApp` / `SsgSandbox` | Teams that think in Flutter; widget tests |
-| **B — pure-Dart builders** | `DocumentRootNode` / `HeadingNode` / ... in `.dart` files | CI pipelines; content teams; SSG |
+| **A - Seo.\* widgets** | Flutter widgets inside `HydraApp` / `SsgSandbox` | Teams that think in Flutter; widget tests |
+| **B - pure-Dart builders** | `DocumentRootNode` / `HeadingNode` / ... in `.dart` files | CI pipelines; content teams; SSG |
 
 You can mix both: surface A for product pages, surface B for blog posts. The
 serializer produces the same HTML from either.
 
-## Option A — Seo.* Widgets (Flutter-native)
+## Option A - Seo.* Widgets (Flutter-native)
 
 Replace the root of your page widget tree with `HydraApp` and `SsgSandbox`:
 
@@ -76,7 +76,7 @@ Widget productPage() => SsgSandbox(
   child: HydraApp(
     child: Column(children: [
       Seo.head(SeoMeta(
-        title: 'Product — Espresso Machine',
+        title: 'Product - Espresso Machine',
         description: 'Compact 15-bar espresso machine.',
         canonical: SafeUrl.parse('https://shop.example/product/123'),
         openGraph: OpenGraph(type: 'product',
@@ -110,14 +110,14 @@ Widget productPage() => SsgSandbox(
   fails on missing Flutter ancestors.
 - Widget-based tests use `flutter test --tags ssg`.
 
-## Option B — Pure-Dart Builders (no Flutter dependency)
+## Option B - Pure-Dart Builders (no Flutter dependency)
 
 ```dart
 import 'package:hydraline/hydraline.dart';
 
 DocumentNode productPage() => DocumentRootNode(
   head: buildHead(SeoMeta(
-    title: 'Product — Espresso Machine',
+    title: 'Product - Espresso Machine',
     description: 'Compact 15-bar espresso machine.',
     canonical: SafeUrl.parse('https://shop.example/product/123'),
     openGraph: OpenGraph(type: 'product',
@@ -151,7 +151,7 @@ DocumentNode productPage() => DocumentRootNode(
 ### Securing your scripts with SRI
 
 `islandRuntime()` accepts optional Subresource Integrity hashes. Compute them
-once and hardcode — the browser will reject a tampered runtime even on a
+once and hardcode - the browser will reject a tampered runtime even on a
 compromised CDN:
 
 ```dart
@@ -253,7 +253,7 @@ Future<void> main() async {
 
 ```bash
 dart run your_app:build
-# dist/: HTML pages + sitemap.xml + robots.txt + runtime JS — ready for any static host.
+# dist/: HTML pages + sitemap.xml + robots.txt + runtime JS - ready for any static host.
 ```
 
 ## Island Runtime

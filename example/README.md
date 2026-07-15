@@ -6,15 +6,15 @@ in one app: a shop that renders **real semantic HTML** for `/` and
 
 | File | Shows |
 |---|---|
-| [`lib/main.dart`](lib/main.dart) | Flutter app with `Seo.*` widgets: `Seo.section` (emits `<main>`), `Seo.list` (emits `<ul><li>`), `Seo.heading`, `Seo.image`, `Seo.link`, `Seo.head`, and `Island` zones (L1 vanilla + L2 Flutter) — [`hydraline_flutter`](../packages/hydraline_flutter/) |
-| [`lib/content.dart`](lib/content.dart) | Pure-Dart page builders (surface B) — **one source of truth** shared by the SSR server and SSG build |
+| [`lib/main.dart`](lib/main.dart) | Flutter app with `Seo.*` widgets: `Seo.section` (emits `<main>`), `Seo.list` (emits `<ul><li>`), `Seo.heading`, `Seo.image`, `Seo.link`, `Seo.head`, and `Island` zones (L1 vanilla + L2 Flutter) - [`hydraline_flutter`](../packages/hydraline_flutter/) |
+| [`lib/content.dart`](lib/content.dart) | Pure-Dart page builders (surface B) - **one source of truth** shared by the SSR server and SSG build |
 | [`lib/island_main.dart`](lib/island_main.dart) | Island entry-point: `IslandMultiViewApp` + deferred island factories (`loadLibrary()`) |
 | [`lib/islands/calculator.dart`](lib/islands/calculator.dart) | The Flutter widget inside a L2 island: a quantity picker with live total |
-| [`lib/app_dashboard.dart`](lib/app_dashboard.dart) | Pure Flutter CanvasKit page — **no Hydraline, no SEO**, automatically `noindex`'d |
+| [`lib/app_dashboard.dart`](lib/app_dashboard.dart) | Pure Flutter CanvasKit page - **no Hydraline, no SEO**, automatically `noindex`'d |
 | [`web/flutter_bootstrap.js`](web/flutter_bootstrap.js) | Custom bootstrap exposing `window._hydralineApp` (multi-view engine contract) |
-| [`bin/server.dart`](bin/server.dart) | SSR server: streaming, bot-aware delivery, caching + ETag/304 — [`hydraline_server`](../packages/hydraline_server/) |
+| [`bin/server.dart`](bin/server.dart) | SSR server: streaming, bot-aware delivery, caching + ETag/304 - [`hydraline_server`](../packages/hydraline_server/) |
 | [`bin/build.dart`](bin/build.dart) | SSG build: manifest + pure-Dart builders → static `dist/` |
-| [`hydraline.routes.yaml`](hydraline.routes.yaml) | Route manifest: `document` / `hybrid` / `app` modes — [`hydraline`](../packages/hydraline/) |
+| [`hydraline.routes.yaml`](hydraline.routes.yaml) | Route manifest: `document` / `hybrid` / `app` modes - [`hydraline`](../packages/hydraline/) |
 
 ## Run the SSR server
 
@@ -23,7 +23,7 @@ cd example
 dart run bin/server.dart
 
 curl -N http://localhost:8080/                # chunked streaming (humans)
-curl -A Googlebot http://localhost:8080/      # buffered (bots) — byte-identical body
+curl -A Googlebot http://localhost:8080/      # buffered (bots) - byte-identical body
 curl http://localhost:8080/product/espresso   # hybrid: HTML + island + JSON-LD
 curl http://localhost:8080/robots.txt
 ```

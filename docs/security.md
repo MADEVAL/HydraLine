@@ -177,7 +177,7 @@ advisory and a regression test for the specific vector.
 ## HTML Sanitizer
 
 The `UnsafeHtmlNode` escape hatch carries a warning from the `SeoValidator` when
-used without a sanitizer. Hydraline provides `sanitizeHtml()` — a baseline
+used without a sanitizer. Hydraline provides `sanitizeHtml()` - a baseline
 defence that strips `<script>` elements and inline `on*` event-handler
 attributes:
 
@@ -206,9 +206,9 @@ the shipped `hydraline-island.js` and `hydraline-dispatcher.js` scripts:
 ```
 
 The browser will refuse to execute the scripts if their bytes have been
-tampered with — even when the CDN or static host is compromised. Each release
+tampered with - even when the CDN or static host is compromised. Each release
 changes the integrity hash (re-compute with `openssl dgst -sha384 -binary |
-base64`). The hash values above are examples only — use fresh hashes for your
+base64`). The hash values above are examples only - use fresh hashes for your
 deployed version.
 
 ## Header Injection Prevention
