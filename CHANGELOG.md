@@ -16,9 +16,7 @@ each package's own changelog:
   README with comparison table and proof badges, updated getting-started and
   security docs, visual example README, Seo.section/Seo.list showcased in the
   example app.
-
-## 0.0.5
-
+- Install section with decision table, pub.dev links on all package badges.
 - E2E expansion: directive coverage (`onVisible`/`onIdle`/`onMedia` +
   multi-island), a vanilla-islands (L1) suite in real Chrome, and a
   real-engine project (`melos run e2e:engine`) that builds the example with
