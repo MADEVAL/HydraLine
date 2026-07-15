@@ -89,20 +89,23 @@ Seo.section({
 })
 ```
 
-Renders a `Column` with the children. The children self-register into the
-collector in build order (flat model); the `role` shapes visual grouping.
+Renders a `Column` with the children and registers a `SectionNode` carrying
+`role`, so the extracted HTML wraps the children in the matching semantic
+element (`<section>`/`<article>`/`<nav>`/`<header>`/`<footer>`/`<main>`). The
+children self-register into the section's nested scope in build order.
 
 ### Seo.list
 
 ```dart
 Seo.list({
-  required bool ordered,         // visual hint only
+  required bool ordered,         // true -> <ol>, false -> <ul>
   required List<Widget> items,
   Key? key,
 })
 ```
 
-Renders a `Column`; the items self-register individually (flat model).
+Renders a `Column` and registers a `ListNode`; each item self-registers into
+its own `<li>` (`ListItemNode`) in build order.
 
 ### Seo.head
 

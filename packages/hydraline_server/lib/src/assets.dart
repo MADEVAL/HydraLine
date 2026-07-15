@@ -12,6 +12,7 @@ import 'package:hydraline/hydraline.dart'
         RouteMode,
         SeoMeta,
         UnsafeHtmlNode,
+        escapeHtmlAttribute,
         htmxGlueJs,
         vanillaIslandsJs;
 import 'package:shelf/shelf.dart';
@@ -71,12 +72,13 @@ abstract final class Assets {
       return root;
     }
     final base = baseHref.endsWith('/') ? baseHref : '$baseHref/';
+    final safeBase = escapeHtmlAttribute(base);
     final scripts = <DocumentNode>[
       UnsafeHtmlNode(
-        '<script src="${base}flutter_bootstrap.js" defer></script>',
+        '<script src="${safeBase}flutter_bootstrap.js" defer></script>',
       ),
       UnsafeHtmlNode(
-        '<script src="${base}main.dart.js" type="module" defer></script>',
+        '<script src="${safeBase}main.dart.js" type="module" defer></script>',
       ),
     ];
     return DocumentRootNode(

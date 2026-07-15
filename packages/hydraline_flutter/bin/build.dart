@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:hydraline_flutter/src/route_adapter.dart';
-import 'package:hydraline_flutter/src/ssg_cli.dart';
+import 'package:hydraline_flutter/build.dart';
 
 const _usage = '''
 Usage: dart run hydraline_flutter:build <manifest.yaml> <outputDir>

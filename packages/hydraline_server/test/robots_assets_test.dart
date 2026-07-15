@@ -164,5 +164,16 @@ routes:
       final html = const HtmlSerializer().serialize(root);
       expect(html, contains('/app/main.dart.js'));
     });
+
+    test('escapes a baseHref that would break out of the script attribute', () {
+      final root =
+          Assets.injectFlutterAssets(
+                const DocumentRootNode(body: []),
+                baseHref: '/a"></script><script>alert(1)//',
+              )
+              as DocumentRootNode;
+      final html = const HtmlSerializer().serialize(root);
+      expect(html, isNot(contains('<script>alert(1)')));
+    });
   });
 }

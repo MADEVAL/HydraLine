@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_server/hydraline_server.dart';
 import 'package:test/test.dart';
 
@@ -49,6 +50,35 @@ void main() {
       final response = Htmx.redirect('/after-login');
       expect(response.statusCode, 200);
       expect(response.headers['hx-redirect'], '/after-login');
+    });
+
+    test('rejects a CRLF-injecting redirect location', () {
+      expect(
+        () => Htmx.redirect('/x\r\nSet-Cookie: evil=1'),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('HtmxResponse header safety', () {
+    test('rejects a CRLF-injecting trigger value', () {
+      expect(
+        () => HtmxResponse(
+          body: const ParagraphNode(children: []),
+          trigger: const HtmxTrigger('evt\r\nX-Injected: 1'),
+        ).toResponse(),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects a CRLF-injecting retarget value', () {
+      expect(
+        () => HtmxResponse(
+          body: const ParagraphNode(children: []),
+          retarget: '#a\nX-Injected: 1',
+        ).toResponse(),
+        throwsArgumentError,
+      );
     });
   });
 }

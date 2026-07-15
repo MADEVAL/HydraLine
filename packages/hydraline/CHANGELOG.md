@@ -1,3 +1,16 @@
+## Unreleased
+
+- `SsgCollector` gained `beginSection`/`beginList` (and `SsgListScope.beginItem`)
+  for nested semantic sectioning; child scopes have their own dedup namespace
+  and forward `addMeta` to the document root.
+- `SafeUrl.tryParse` now rejects empty and whitespace-only input (no more
+  `href=""`/`src=""` self-link footgun).
+- Sitemap `lastmod` is emitted in UTC, so dates no longer shift by a day for
+  local-time `DateTime`s near midnight.
+- Vanilla island runtime: `Carousel`/`CopyButton` guard missing controls and
+  the bootstrap loop isolates a throwing handler so one bad island cannot abort
+  hydration of the rest of the page.
+
 ## 0.0.3
 
 - `RouteManifestBuilder` gained `version()` and `baseUrl()` setters, so

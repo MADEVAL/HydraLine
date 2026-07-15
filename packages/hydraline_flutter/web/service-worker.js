@@ -1,9 +1,10 @@
 /*! ==========================================================================
  *  HYDRALINE - Service Worker
  *
- *  Caches the heavy Flutter engine assets (main.dart.js, canvaskit.*) with
- *  a cache-first strategy, so warm visits hydrate islands in about one
- *  second instead of re-downloading the engine.
+ *  Caches the heavy Flutter engine assets (main.dart.js, canvaskit.*) with a
+ *  stale-while-revalidate strategy: warm visits hydrate in about one second
+ *  from cache, while a background fetch refreshes the cache so the next visit
+ *  picks up a redeployed engine. Bump CACHE_NAME to force a full purge.
  *
  *  Part of the Hydraline project - MIT License
  *  https://github.com/MADEVAL/HydraLine
@@ -18,7 +19,17 @@ self.addEventListener('install', function () {
 });
 
 self.addEventListener('activate', function (event) {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then(function (names) {
+      return Promise.all(
+        names.map(function (name) {
+          return name === CACHE_NAME ? null : caches.delete(name);
+        })
+      );
+    }).then(function () {
+      return self.clients.claim();
+    })
+  );
 });
 
 self.addEventListener('fetch', function (event) {
@@ -32,15 +43,17 @@ self.addEventListener('fetch', function (event) {
   event.respondWith(
     caches.open(CACHE_NAME).then(function (cache) {
       return cache.match(event.request).then(function (cached) {
-        if (cached) {
-          return cached;
-        }
-        return fetch(event.request).then(function (response) {
-          if (response.ok) {
-            cache.put(event.request, response.clone());
-          }
-          return response;
-        });
+        var network = fetch(event.request)
+          .then(function (response) {
+            if (response.ok) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          })
+          .catch(function () {
+            return cached;
+          });
+        return cached || network;
       });
     })
   );

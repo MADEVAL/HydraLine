@@ -67,9 +67,20 @@ class IslandHost extends StatelessWidget {
     if (binding == null || factory == null) {
       return Container(width: double.infinity, height: double.infinity);
     }
+    final Future<Widget> future;
+    try {
+      future = factory(binding.state);
+    } catch (_) {
+      return const SizedBox.expand();
+    }
     return FutureBuilder<Widget>(
-      future: factory(binding.state),
-      builder: (context, snapshot) => snapshot.data ?? const SizedBox.expand(),
+      future: future,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const SizedBox.expand();
+        }
+        return snapshot.data ?? const SizedBox.expand();
+      },
     );
   }
 }

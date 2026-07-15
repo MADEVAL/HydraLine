@@ -44,5 +44,15 @@ void main() {
       expect(response.statusCode, 308);
       expect(response.headers['location'], '/new');
     });
+
+    test('303 See Other carries status and Location', () async {
+      final handler = _handlerFor(
+        '/old',
+        (_, _) => throw const RedirectException('/new', status: 303),
+      );
+      final response = await httpGet(handler, '/old');
+      expect(response.statusCode, 303);
+      expect(response.headers['location'], '/new');
+    });
   });
 }

@@ -69,6 +69,19 @@ void main() {
       expect(SafeUrl.tryParse('java\u0000script:alert(1)'), isNull);
     });
 
+    test('rejects empty and whitespace-only URLs (no self-link footgun)', () {
+      expect(SafeUrl.tryParse(''), isNull);
+      expect(SafeUrl.tryParse('   '), isNull);
+      expect(SafeUrl.tryParse('\t\n'), isNull);
+    });
+
+    test('still allows relative and fragment URLs', () {
+      expect(SafeUrl.tryParse('/path'), isNotNull);
+      expect(SafeUrl.tryParse('#anchor'), isNotNull);
+      expect(SafeUrl.tryParse('?q=1'), isNotNull);
+      expect(SafeUrl.tryParse('./rel'), isNotNull);
+    });
+
     test('parse throws UnsafeUrlException carrying the raw input', () {
       expect(
         () => SafeUrl.parse('javascript:alert(1)'),

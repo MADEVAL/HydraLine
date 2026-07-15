@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>virtual views</title>
+  </head>
+  <body>
+    <script>
+      window.__enter = [];
+      window.__leave = [];
+      window.addEventListener('hydraline:segment-enter', function (e) {
+        window.__enter.push(e.target.id);
+      });
+      window.addEventListener('hydraline:segment-leave', function (e) {
+        window.__leave.push(e.target.id);
+      });
+    </script>
+
+    <hydraline-island-segment id="seg-1">segment one</hydraline-island-segment>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-virtual-views.js"></script>
+  </body>
+</html>

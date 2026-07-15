@@ -6,6 +6,24 @@ each package's own changelog:
 [hydraline_server](packages/hydraline_server/CHANGELOG.md) ·
 [hydraline_flutter](packages/hydraline_flutter/CHANGELOG.md).
 
+## Unreleased
+
+Pre-production review follow-up: every confirmed finding from `REVIEW.md`
+fixed and regression-tested (see per-package changelogs).
+
+- `hydraline` - nested semantic sectioning in `SsgCollector`; `SafeUrl` rejects
+  empty input; sitemap `lastmod` in UTC; hardened vanilla island runtime.
+- `hydraline_server` - HEAD support; `DocumentBuilder` receives the matched
+  route; cache byte cap; HTMX CRLF header validation; escaped Flutter-asset
+  injection; unified redirects.
+- `hydraline_flutter` - `Seo.section`/`Seo.list` emit real structure;
+  `RouteAdapter.navigateToForExtraction` implemented; `IslandHost` error
+  fallback; stale-while-revalidate service worker.
+- Tooling - Playwright e2e harness in `e2e/` (`melos run e2e`, CI job): the
+  shipped island runtime JS is exercised in real Chrome with a mocked Flutter
+  engine (hydration directives, failure path, dehydrate, DSD, anti-CLS sizing,
+  virtual views).
+
 ## 0.0.3
 
 Second-pass review polish - every remaining finding from the follow-up review

@@ -17,6 +17,8 @@ class RouteInfo {
 abstract interface class RouteAdapter {
   List<RouteInfo> get routes;
 
+  /// Drives the underlying router to [route] so a widget-based extractor can
+  /// pump the tree for that location. Returns once navigation is dispatched.
   Future<void> navigateToForExtraction(RouteInfo route);
 }
 
@@ -44,7 +46,13 @@ class GoRouterAdapter implements RouteAdapter {
   }
 
   @override
-  Future<void> navigateToForExtraction(RouteInfo route) async {}
+  Future<void> navigateToForExtraction(RouteInfo route) async {
+    try {
+      (_goRouter as dynamic).go(route.path);
+    } catch (_) {
+      // Router does not expose go(); nothing to drive.
+    }
+  }
 }
 
 /// Fallback for bare Navigator 2.0 applications.
@@ -53,10 +61,18 @@ class Navigator2Adapter implements RouteAdapter {
     : _routes = List.unmodifiable(routes);
 
   final List<RouteInfo> _routes;
+  RouteInfo? _current;
 
   @override
   List<RouteInfo> get routes => _routes;
 
+  /// The route most recently passed to [navigateToForExtraction], or `null`
+  /// before any navigation. Read by widget-based extractors to know which
+  /// location the tree is currently pumped for.
+  RouteInfo? get current => _current;
+
   @override
-  Future<void> navigateToForExtraction(RouteInfo route) async {}
+  Future<void> navigateToForExtraction(RouteInfo route) async {
+    _current = route;
+  }
 }

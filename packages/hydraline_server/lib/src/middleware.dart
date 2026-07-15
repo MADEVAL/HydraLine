@@ -53,6 +53,9 @@ class HydralineConfig {
 /// A pure-Dart function that builds a [DocumentNode] for a given request and
 /// optional application data. The signature deliberately does **not** include
 /// `User-Agent` - the builder is architecturally prevented from cloaking.
+///
+/// The `data` argument carries the matched [RouteEntry] so builders can read
+/// route metadata and the concrete path without re-parsing the request.
 typedef DocumentBuilder =
     FutureOr<DocumentNode> Function(Request request, Object? data);
 
@@ -74,82 +77,108 @@ Middleware hydralineMiddleware(HydralineConfig config) {
 
   return (Handler inner) {
     return (Request request) async {
-      final path = Http.canonicalizePath(
-        request.url.path.isEmpty ? '/' : '/${request.url.path}',
+      final response = await _dispatch(
+        request,
+        inner: inner,
+        routes: routes,
+        builders: builders,
+        cache: cache,
+        cacheTtl: cacheTtl,
+        botPattern: botPattern,
+        delivery: delivery,
       );
-      final match = _matchRoute(routes, path);
-
-      if (match == null) {
-        return Response.notFound('');
+      // HEAD must carry the same status and headers as GET but no body.
+      if (request.method == 'HEAD') {
+        return response.change(body: const <int>[]);
       }
+      return response;
+    };
+  };
+}
 
-      switch (match.mode) {
-        case RouteMode.app:
-          final response = await inner(request);
-          // App routes default to noindex unless explicitly overridden, and
-          // honour nofollow from route metadata.
-          final robots = match.metadata?.robots;
-          return Http.withRobots(
-            response,
-            noindex: match.noindex ?? robots?.noindex ?? true,
-            nofollow: robots?.nofollow ?? false,
-          );
-        case RouteMode.document:
-        case RouteMode.hybrid:
-          final robotsHeaders = _robotsHeaders(match);
-          final builder = builders[match.path];
+Future<Response> _dispatch(
+  Request request, {
+  required Handler inner,
+  required List<RouteEntry> routes,
+  required Map<String, DocumentBuilder> builders,
+  required HydralineCache? cache,
+  required Duration? cacheTtl,
+  required Pattern? botPattern,
+  required ResponseDelivery delivery,
+}) async {
+  final path = Http.canonicalizePath(
+    request.url.path.isEmpty ? '/' : '/${request.url.path}',
+  );
+  final match = _matchRoute(routes, path);
 
-          if (cache != null) {
-            final cacheKey = _cacheKey(path, request);
-            final cached = await cache.get(cacheKey);
-            String html;
-            if (cached != null) {
-              html = cached;
-            } else {
-              final DocumentNode root;
-              try {
-                root = await _buildRoot(builder, request);
-              } on RedirectException catch (e) {
-                return _redirectResponse(e);
-              }
-              html = const HtmlSerializer().serialize(root);
-              await cache.set(cacheKey, html, ttl: cacheTtl);
-            }
-            return _cachedResponse(request, html, cacheTtl, robotsHeaders);
-          }
+  if (match == null) {
+    return Response.notFound('');
+  }
 
+  switch (match.mode) {
+    case RouteMode.app:
+      final response = await inner(request);
+      // App routes default to noindex unless explicitly overridden, and
+      // honour nofollow from route metadata.
+      final robots = match.metadata?.robots;
+      return Http.withRobots(
+        response,
+        noindex: match.noindex ?? robots?.noindex ?? true,
+        nofollow: robots?.nofollow ?? false,
+      );
+    case RouteMode.document:
+    case RouteMode.hybrid:
+      final robotsHeaders = _robotsHeaders(match);
+      final builder = builders[match.path];
+
+      if (cache != null) {
+        final cacheKey = _cacheKey(path, request);
+        final cached = await cache.get(cacheKey);
+        String html;
+        if (cached != null) {
+          html = cached;
+        } else {
           final DocumentNode root;
           try {
-            root = await _buildRoot(builder, request);
+            root = await _buildRoot(builder, request, match);
           } on RedirectException catch (e) {
             return _redirectResponse(e);
           }
-
-          if (_isBotRequest(request, botPattern)) {
-            return delivery.buffered(root, headers: robotsHeaders);
-          }
-          return delivery.chunked(root, headers: robotsHeaders);
+          html = const HtmlSerializer().serialize(root);
+          await cache.set(cacheKey, html, ttl: cacheTtl);
+        }
+        return _cachedResponse(request, html, cacheTtl, robotsHeaders);
       }
-    };
-  };
+
+      final DocumentNode root;
+      try {
+        root = await _buildRoot(builder, request, match);
+      } on RedirectException catch (e) {
+        return _redirectResponse(e);
+      }
+
+      if (_isBotRequest(request, botPattern)) {
+        return delivery.buffered(root, headers: robotsHeaders);
+      }
+      return delivery.chunked(root, headers: robotsHeaders);
+  }
 }
 
 Future<DocumentNode> _buildRoot(
   DocumentBuilder? builder,
   Request request,
+  RouteEntry match,
 ) async {
   if (builder == null) {
     return const DocumentRootNode(body: []);
   }
-  return builder(request, null);
+  return builder(request, match);
 }
 
-Response _redirectResponse(RedirectException e) => switch (e.status) {
-  301 => Response.movedPermanently(e.location),
-  302 => Response.found(e.location),
-  410 => Response(410, body: ''),
-  _ => Response(e.status, headers: {'location': e.location}),
-};
+/// Maps a [RedirectException] to a shelf [Response], sharing the semantic
+/// helpers in [Http] so both redirect code paths behave identically.
+Response _redirectResponse(RedirectException e) =>
+    e.status == 410 ? Http.gone() : Http.redirect(e.location, status: e.status);
 
 Map<String, String> _robotsHeaders(RouteEntry route) {
   final robots = route.metadata?.robots;
@@ -171,10 +200,10 @@ Response _cachedResponse(
   final etag = _etag(html);
   final headers = <String, String>{
     ...robotsHeaders,
-    'ETag': etag,
-    'Vary': 'Accept-Encoding',
+    'etag': etag,
+    'vary': 'Accept-Encoding',
     if (cacheTtl != null)
-      'Cache-Control': 'public, max-age=${cacheTtl.inSeconds}',
+      'cache-control': 'public, max-age=${cacheTtl.inSeconds}',
   };
   if (_ifNoneMatchContains(request.headers['if-none-match'], etag)) {
     return Response(304, headers: headers);
@@ -182,7 +211,7 @@ Response _cachedResponse(
   return Response(
     200,
     body: html,
-    headers: {'Content-Type': 'text/html; charset=utf-8', ...headers},
+    headers: {'content-type': 'text/html; charset=utf-8', ...headers},
   );
 }
 

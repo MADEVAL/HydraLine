@@ -128,6 +128,16 @@ void main() {
     test('carries the Hydraline banner', () {
       expect(jsServiceWorker, contains('HYDRALINE'));
     });
+
+    test('revalidates engine assets in the background after a cache hit', () {
+      expect(jsServiceWorker, contains('fetch(event.request)'));
+      expect(jsServiceWorker, contains('cache.put'));
+    });
+
+    test('purges caches from previous versions on activate', () {
+      expect(jsServiceWorker, contains('caches.keys'));
+      expect(jsServiceWorker, contains('caches.delete'));
+    });
   });
 
   group('JS budget checks (pretty, unminified)', () {

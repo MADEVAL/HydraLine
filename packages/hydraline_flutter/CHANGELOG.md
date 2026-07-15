@@ -1,3 +1,19 @@
+## Unreleased
+
+- `Seo.section` and `Seo.list` now register real `SectionNode`/`ListNode`
+  structure (honouring `role` and `ordered`), so extracted HTML carries
+  `<section>`/`<main>`/`<nav>`/`<ol>`/`<ul>`/`<li>` semantics instead of a flat
+  paragraph stream.
+- `RouteAdapter.navigateToForExtraction` is now functional: `GoRouterAdapter`
+  drives `go()` on the wrapped router and `Navigator2Adapter` records the
+  current route.
+- `IslandHost` renders a fallback (instead of crashing) when an island factory
+  throws synchronously or its future rejects.
+- Service worker uses stale-while-revalidate and purges caches from previous
+  versions on `activate`, so redeployed engine assets are picked up.
+- `bin/build.dart` imports the public `package:hydraline_flutter/build.dart`
+  surface instead of reaching into `src/`.
+
 ## 0.0.3
 
 - `Seo.image` renders a lightweight `SizedBox` placeholder during SSG

@@ -8,7 +8,7 @@ library;
 
 import 'package:flutter/widgets.dart';
 import 'package:hydraline/hydraline.dart'
-    show SafeUrl, SectionRole, SeoMeta, SsgCollector;
+    show SafeUrl, SectionRole, SeoMeta, SsgCollector, SsgListScope;
 
 import 'hydra_app.dart' show HydraScope;
 
@@ -200,9 +200,16 @@ class _SeoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Registration is flat: the section's children self-register into the
-    // collector in build order. The [role] shapes the visual grouping only.
-    return Column(children: children);
+    final scope = HydraScope.of(context);
+    final sectionCollector = scope.collector?.beginSection(
+      role,
+      key: key?.toString(),
+    );
+    return HydraScope(
+      collector: sectionCollector,
+      isSsgMode: scope.isSsgMode,
+      child: Column(children: children),
+    );
   }
 }
 
@@ -214,7 +221,38 @@ class _SeoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: items);
+    final scope = HydraScope.of(context);
+    final listScope = scope.collector?.beginList(
+      ordered: ordered,
+      key: key?.toString(),
+    );
+    return Column(
+      children: [
+        for (final item in items)
+          _SeoListItem(scope: scope, listScope: listScope, child: item),
+      ],
+    );
+  }
+}
+
+class _SeoListItem extends StatelessWidget {
+  const _SeoListItem({
+    required this.scope,
+    required this.listScope,
+    required this.child,
+  });
+
+  final HydraScope scope;
+  final SsgListScope? listScope;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return HydraScope(
+      collector: listScope?.beginItem(),
+      isSsgMode: scope.isSsgMode,
+      child: child,
+    );
   }
 }
 

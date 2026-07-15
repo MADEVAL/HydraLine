@@ -287,5 +287,17 @@ routes:
       final cache = HydralineCache.inMemory();
       expect(await cache.get('nonexistent'), isNull);
     });
+
+    test('does not store an entry larger than maxEntryBytes', () async {
+      final cache = InMemoryCache(maxEntryBytes: 8);
+      await cache.set('k', 'x' * 100);
+      expect(await cache.get('k'), isNull);
+    });
+
+    test('stores an entry within maxEntryBytes', () async {
+      final cache = InMemoryCache(maxEntryBytes: 100);
+      await cache.set('k', 'small');
+      expect(await cache.get('k'), 'small');
+    });
   });
 }

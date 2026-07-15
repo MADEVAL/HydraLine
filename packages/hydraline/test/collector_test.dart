@@ -107,6 +107,60 @@ void main() {
     });
   });
 
+  group('SsgCollector nested sectioning', () {
+    test('beginSection wraps children in a SectionNode with its role', () {
+      final root = sealed((c) {
+        c.beginSection(SectionRole.main)
+          ..addText('Heading', headingLevel: 1)
+          ..addText('Body');
+        c.addText('after');
+      });
+      expect(root.body[0], isA<SectionNode>());
+      final section = root.body[0] as SectionNode;
+      expect(section.role, SectionRole.main);
+      expect(section.children, hasLength(2));
+      expect(section.children[0], isA<HeadingNode>());
+      expect(section.children[1], isA<ParagraphNode>());
+      expect(root.body[1], isA<ParagraphNode>());
+    });
+
+    test('beginList wraps items in a ListNode of ListItemNodes', () {
+      final root = sealed((c) {
+        final list = c.beginList(ordered: true);
+        list.beginItem().addText('a');
+        list.beginItem().addText('b');
+      });
+      expect(root.body[0], isA<ListNode>());
+      final list = root.body[0] as ListNode;
+      expect(list.ordered, isTrue);
+      expect(list.items, hasLength(2));
+      expect(list.items[0].children[0], isA<ParagraphNode>());
+    });
+
+    test('nested section keys do not collide with the root namespace', () {
+      final root = sealed((c) {
+        c.addText('dup', key: 'k');
+        c.beginSection(SectionRole.section).addText('dup', key: 'k');
+      });
+      expect(root.body, hasLength(2));
+      final section = root.body[1] as SectionNode;
+      expect(section.children, hasLength(1));
+    });
+
+    test('meta added inside a section still reaches the document head', () {
+      final root = sealed((c) {
+        c
+            .beginSection(SectionRole.main)
+            .addMeta(const SeoMeta(title: 'Nested'));
+      });
+      expect(root.head, isNotNull);
+      expect(
+        const HtmlSerializer().serializeFragment(root.head!),
+        contains('<title>Nested</title>'),
+      );
+    });
+  });
+
   group('SsgCollector invariants', () {
     test('dedup by key keeps the first occurrence', () {
       final root = sealed((c) {

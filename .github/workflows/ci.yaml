@@ -71,3 +71,16 @@ jobs:
       - run: dart pub get
       - name: flutter tests
         run: dart run melos:melos run test:flutter
+
+  e2e:
+    name: island runtime e2e (Chrome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: install playwright runner
+        run: npm --prefix e2e install
+      - name: browser tests (system Chrome)
+        run: npm --prefix e2e test

@@ -42,6 +42,41 @@ void main() {
       await tester.pumpWidget(const IslandHost(factories: {}));
       expect(find.byType(Container), findsOneWidget);
     });
+
+    testWidgets('renders a fallback when the factory throws synchronously', (
+      tester,
+    ) async {
+      IslandViewRegistry.register(tester.view.viewId, 'boom');
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: IslandHost(
+            factories: {'boom': (props) => throw StateError('sync boom')},
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+      expect(find.byType(SizedBox), findsWidgets);
+    });
+
+    testWidgets('renders a fallback when the factory future rejects', (
+      tester,
+    ) async {
+      IslandViewRegistry.register(tester.view.viewId, 'boom');
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: IslandHost(
+            factories: {
+              'boom': (props) async => throw StateError('async boom'),
+            },
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+    });
   });
 
   group('IslandViewRegistry', () {

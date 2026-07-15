@@ -24,14 +24,33 @@ abstract interface class SsgCollector {
   void addNode(DocumentNode node, {String? key});
   void addMeta(SeoMeta meta);
 
+  /// Opens a nested sectioning scope: registers a [SectionNode] with [role]
+  /// into this collector and returns a child collector whose additions become
+  /// the section's children, in build order. The child scope has its own
+  /// dedup namespace; [addMeta] on it is forwarded to the document root.
+  SsgCollector beginSection(SectionRole role, {String? key});
+
+  /// Opens a nested list scope: registers a [ListNode] and returns a
+  /// [SsgListScope] whose [SsgListScope.beginItem] wraps each item in a `<li>`.
+  SsgListScope beginList({required bool ordered, String? key});
+
   /// Finalises: dedup by key, no cycles, immutable result.
   DocumentNode seal();
 }
 
+/// A nested list scope returned by [SsgCollector.beginList]. Each
+/// [beginItem] appends a `<li>` to the list and returns a collector that
+/// gathers that item's content.
+abstract interface class SsgListScope {
+  /// Opens a new `<li>` and returns a collector for its content.
+  SsgCollector beginItem({String? key});
+}
+
 class _SsgCollector implements SsgCollector {
-  _SsgCollector(this.route);
+  _SsgCollector(this.route, {_SsgCollector? metaRoot}) : _metaRoot = metaRoot;
 
   final String route;
+  final _SsgCollector? _metaRoot;
   final List<DocumentNode> _body = [];
   final Set<String> _keys = {};
   SeoMeta? _meta;
@@ -80,10 +99,28 @@ class _SsgCollector implements SsgCollector {
 
   @override
   void addMeta(SeoMeta meta) {
+    if (_metaRoot != null) {
+      _metaRoot.addMeta(meta);
+      return;
+    }
     if (_sealed != null) {
       return;
     }
     _meta = meta;
+  }
+
+  @override
+  SsgCollector beginSection(SectionRole role, {String? key}) {
+    final child = _SsgCollector(route, metaRoot: _metaRoot ?? this);
+    _add(SectionNode(role: role, children: child._body), key);
+    return child;
+  }
+
+  @override
+  SsgListScope beginList({required bool ordered, String? key}) {
+    final items = <ListItemNode>[];
+    _add(ListNode(ordered: ordered, items: items), key);
+    return _SsgListScope(route, items, _metaRoot ?? this);
   }
 
   @override
@@ -93,6 +130,21 @@ class _SsgCollector implements SsgCollector {
       body: List.unmodifiable(_body),
       lang: _meta?.lang,
     );
+  }
+}
+
+class _SsgListScope implements SsgListScope {
+  _SsgListScope(this._route, this._items, this._metaRoot);
+
+  final String _route;
+  final List<ListItemNode> _items;
+  final _SsgCollector _metaRoot;
+
+  @override
+  SsgCollector beginItem({String? key}) {
+    final child = _SsgCollector(_route, metaRoot: _metaRoot);
+    _items.add(ListItemNode(children: child._body));
+    return child;
   }
 }
 

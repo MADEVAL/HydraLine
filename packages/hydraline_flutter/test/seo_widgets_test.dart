@@ -139,7 +139,9 @@ void main() {
   });
 
   group('Seo.section', () {
-    testWidgets('registers children via the flat collector', (tester) async {
+    testWidgets('wraps children in a SectionNode carrying its role', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         sandbox(
           Seo.section(role: SectionRole.main, children: [Seo.text('content')]),
@@ -147,16 +149,23 @@ void main() {
       );
       final body = seal().body;
       expect(body, hasLength(1));
-      expect(body[0], isA<ParagraphNode>());
+      final section = body[0] as SectionNode;
+      expect(section.role, SectionRole.main);
+      expect(section.children[0], isA<ParagraphNode>());
     });
   });
 
   group('Seo.list', () {
-    testWidgets('registers items via flat collector', (tester) async {
+    testWidgets('wraps items in a ListNode of ListItemNodes', (tester) async {
       await tester.pumpWidget(
         sandbox(Seo.list(ordered: true, items: [Seo.text('a'), Seo.text('b')])),
       );
-      expect(seal().body, hasLength(2));
+      final body = seal().body;
+      expect(body, hasLength(1));
+      final list = body[0] as ListNode;
+      expect(list.ordered, isTrue);
+      expect(list.items, hasLength(2));
+      expect(list.items[0].children[0], isA<ParagraphNode>());
     });
   });
 

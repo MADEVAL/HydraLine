@@ -33,6 +33,20 @@ void main() {
       expect(xml, contains('<priority>0.8</priority>'));
     });
 
+    test('lastmod is emitted in UTC regardless of local timezone', () async {
+      final source = _ListSource([
+        SitemapEntry(
+          loc: SafeUrl.parse('https://x.example/'),
+          lastmod: DateTime.utc(2026, 7, 14, 23, 30).toLocal(),
+        ),
+      ]);
+      final out = await Sitemap.generate(source, baseUrl: base);
+      expect(
+        out.files['sitemap.xml']!,
+        contains('<lastmod>2026-07-14</lastmod>'),
+      );
+    });
+
     test('XML-escapes ampersands in loc', () async {
       final source = _ListSource([
         SitemapEntry(loc: SafeUrl.parse('https://x.example/s?a=1&b=2')),

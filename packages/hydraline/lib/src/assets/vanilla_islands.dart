@@ -33,12 +33,13 @@ btns[k].addEventListener('click',function(){show(this.getAttribute('data-tab'))}
 function Carousel(root){var slides=$$('[data-slide]',root),idx=0;function go(i){
 idx=((i%slides.length)+slides.length)%slides.length;for(var s=0;s<slides.length;s++)
 slides[s].hidden=s!==idx;attr(root,'data-slide-index',String(idx))}
-root.querySelector('[data-carousel-prev]').addEventListener('click',function(){go(idx-1)});
-root.querySelector('[data-carousel-next]').addEventListener('click',function(){go(idx+1)});go(0)}g('carousel',Carousel);
+var prev=root.querySelector('[data-carousel-prev]'),next=root.querySelector('[data-carousel-next]');
+if(prev)prev.addEventListener('click',function(){go(idx-1)});
+if(next)next.addEventListener('click',function(){go(idx+1)});go(0)}g('carousel',Carousel);
 
 /* Copy-button -- [data-island="copy-button"] */
 function CopyButton(root){var btn=$('[data-copy-target]',root)||root.querySelector('button');
-var targetId=attr(btn,'data-copy-target');if(!targetId)return;btn.addEventListener('click',function(){
+if(!btn)return;var targetId=attr(btn,'data-copy-target');if(!targetId)return;btn.addEventListener('click',function(){
 var src=$(targetId);if(!src)return;navigator.clipboard.writeText(src.textContent||'').then(function(){
 attr(root,'data-copied','1');setTimeout(function(){root.removeAttribute('data-copied')},2000)})})}
 g('copy-button',CopyButton);
@@ -58,10 +59,9 @@ btn.addEventListener('click',function(){apply(current==='dark'?'light':'dark');c
 g('theme',Theme);
 
 /* Bootstrap -- called on DOMContentLoaded */
+function run(el){var kind=attr(el,'data-island');if(h[kind])
+for(var i=0;i<h[kind].length;i++){try{h[kind][i](el)}catch(e){}}}
 document.addEventListener('DOMContentLoaded',function(){
-each('[data-island]',function(el){var kind=attr(el,'data-island');if(h[kind])
-for(var i=0;i<h[kind].length;i++)h[kind][i](el)});
-each('[data-island-level="vanilla"]',function(el){var kind=attr(el,'data-island');
-if(h[kind])for(var i=0;i<h[kind].length;i++)h[kind][i](el)})});
+each('[data-island]',run);each('[data-island-level="vanilla"]',run)});
 })();
 ''';

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>dispatcher failure</title>
+    <script>
+      window.__errors = [];
+      window.addEventListener('hydraline:island-error', function (e) {
+        window.__errors.push(e.detail);
+      });
+      // No _hydralineApp: the dispatcher falls back to loading the engine
+      // bootstrap script, which 404s here. It creates and handles that promise
+      // internally, so the island ends in "failed" and emits
+      // hydraline:island-error with no uncaught rejection.
+      window.HYDRALINE_CONFIG = {
+        engineScript: '/e2e/fixtures/does-not-exist.js',
+        timeoutMs: 5000,
+      };
+    </script>
+    </script>
+  </head>
+  <body>
+    <hydraline-island
+      id="broken"
+      data-directive="hydrateOnLoad"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="100,100"
+      data-state='{}'
+      role="region"
+      aria-busy="true"
+    >
+      <template shadowrootmode="open">
+        <style>
+          :host {
+            display: block;
+          }
+          .host {
+            width: 100px;
+            height: 100px;
+          }
+        </style>
+        <div class="host"><slot></slot></div>
+      </template>
+    </hydraline-island>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-island.js"></script>
+    <script src="/packages/hydraline_flutter/web/hydraline-dispatcher.js"></script>
+  </body>
+</html>

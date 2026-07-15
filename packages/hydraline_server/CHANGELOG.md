@@ -1,3 +1,18 @@
+## Unreleased
+
+- `HEAD` requests now return the response headers with an empty body instead of
+  a full rendered body.
+- `DocumentBuilder` receives the matched `RouteEntry` as its `data` argument, so
+  builders can read route metadata and the concrete path without re-parsing.
+- `InMemoryCache` gained an optional `maxEntryBytes` cap: oversized pages are
+  not stored, bounding worst-case memory.
+- HTMX helpers (`HtmxResponse`, `Htmx.redirect`) reject header values containing
+  CR/LF (response-splitting defense).
+- `Assets.injectFlutterAssets` escapes `baseHref` before embedding it in the
+  injected `<script>` tags.
+- Redirect handling unified through `Http.redirect`/`Http.gone`; cached-response
+  headers emitted lowercase for HTTP/2 friendliness.
+
 ## 0.0.3
 
 - **Fixed:** route patterns with a trailing slash in the manifest (e.g.

@@ -15,6 +15,19 @@ void main() {
     test('contains the event bus bootstrap', () {
       expect(vanillaIslandsJs, contains('document.addEventListener'));
     });
+
+    test('carousel guards missing prev/next controls', () {
+      expect(vanillaIslandsJs, contains('if(prev)'));
+      expect(vanillaIslandsJs, contains('if(next)'));
+    });
+
+    test('copy-button guards a missing trigger element', () {
+      expect(vanillaIslandsJs, contains('if(!btn)return'));
+    });
+
+    test('bootstrap isolates a throwing island handler', () {
+      expect(vanillaIslandsJs, contains('catch'));
+    });
   });
 
   group('HTMX glue (<=14 KB)', () {

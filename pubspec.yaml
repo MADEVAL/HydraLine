@@ -119,3 +119,17 @@ melos:
         - test
         - boundaries
         - audit
+
+    e2e:
+      description: Playwright browser tests for the island runtime (real Chrome).
+      steps:
+        - e2e:install
+        - e2e:run
+
+    e2e:install:
+      description: Install the Playwright test runner (uses system Chrome).
+      run: npm --prefix e2e install
+
+    e2e:run:
+      description: Run the island-runtime browser tests.
+      run: npm --prefix e2e test

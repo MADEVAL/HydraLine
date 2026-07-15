@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>dispatcher onInteraction</title>
+    <script>
+      window.__addView = [];
+      window._hydralineApp = Promise.resolve({
+        addView: function (cfg) {
+          window.__addView.push(cfg);
+          return 7;
+        },
+        removeView: function () {},
+      });
+    </script>
+  </head>
+  <body>
+    <button id="outside">focus target</button>
+    <hydraline-island
+      id="chart"
+      data-directive="hydrateOnInteraction"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="200,100"
+      data-state='{}'
+      role="region"
+      aria-busy="true"
+    >
+      <template shadowrootmode="open">
+        <style>
+          :host {
+            display: block;
+          }
+          .host {
+            width: 200px;
+            height: 100px;
+          }
+        </style>
+        <div class="host"><button id="inside">tap me</button></div>
+      </template>
+    </hydraline-island>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-island.js"></script>
+    <script src="/packages/hydraline_flutter/web/hydraline-dispatcher.js"></script>
+  </body>
+</html>

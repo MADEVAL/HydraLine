@@ -16,6 +16,13 @@ class _MockRouter {
   final _MockConfig configuration;
 }
 
+class _NavRecordingRouter {
+  _NavRecordingRouter(this.configuration);
+  final _MockConfig configuration;
+  final List<String> navigated = [];
+  void go(String location) => navigated.add(location);
+}
+
 void main() {
   group('RouteAdapter', () {
     test('RouteInfo stores path and optional name', () {
@@ -55,6 +62,16 @@ void main() {
       await adapter.navigateToForExtraction(const RouteInfo(path: '/'));
     });
 
+    test(
+      'GoRouterAdapter.navigateToForExtraction drives go() on the router',
+      () async {
+        final router = _NavRecordingRouter(_MockConfig([_MockGoRoute('/x')]));
+        final adapter = GoRouterAdapter(router);
+        await adapter.navigateToForExtraction(const RouteInfo(path: '/x'));
+        expect(router.navigated, ['/x']);
+      },
+    );
+
     test('GoRouterAdapter.routes parses valid configuration', () {
       final mockRoute = _MockGoRoute('/test');
       final mockConfig = _MockConfig([mockRoute]);
@@ -75,6 +92,13 @@ void main() {
     test('Navigator2Adapter.navigateToForExtraction completes', () async {
       final adapter = Navigator2Adapter([const RouteInfo(path: '/')]);
       await adapter.navigateToForExtraction(const RouteInfo(path: '/'));
+    });
+
+    test('Navigator2Adapter records the last navigated route', () async {
+      final adapter = Navigator2Adapter([const RouteInfo(path: '/')]);
+      expect(adapter.current, isNull);
+      await adapter.navigateToForExtraction(const RouteInfo(path: '/a'));
+      expect(adapter.current?.path, '/a');
     });
   });
 }

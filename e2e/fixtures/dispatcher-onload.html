@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>dispatcher onLoad</title>
+    <!-- Mock the Flutter engine BEFORE the dispatcher loads. The dispatcher
+         resolves window._hydralineApp without ever loading a real engine. -->
+    <script>
+      window.__addView = [];
+      window.__removeView = [];
+      window.__errors = [];
+      window.addEventListener('hydraline:island-error', function (e) {
+        window.__errors.push(e.detail);
+      });
+      window._hydralineApp = Promise.resolve({
+        addView: function (cfg) {
+          window.__addView.push(cfg);
+          return 42;
+        },
+        removeView: function (id) {
+          window.__removeView.push(id);
+        },
+      });
+    </script>
+  </head>
+  <body>
+    <hydraline-island
+      id="calc"
+      data-directive="hydrateOnLoad"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="320,200"
+      data-state='{"price":9}'
+      role="region"
+      aria-busy="true"
+    >
+      <template shadowrootmode="open">
+        <style>
+          :host {
+            display: block;
+            contain: layout style paint;
+          }
+          .host {
+            width: 320px;
+            height: 200px;
+          }
+        </style>
+        <div class="host"><slot></slot></div>
+      </template>
+    </hydraline-island>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-island.js"></script>
+    <script src="/packages/hydraline_flutter/web/hydraline-dispatcher.js"></script>
+  </body>
+</html>

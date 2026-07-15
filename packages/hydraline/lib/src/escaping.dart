@@ -70,6 +70,9 @@ abstract interface class SafeUrl {
   /// `javascript:`, `data:`, `vbscript:`.
   static SafeUrl? tryParse(String raw) {
     final cleaned = raw.replaceAll(_controlChars, '').trim();
+    if (cleaned.isEmpty) {
+      return null;
+    }
     final scheme = _schemePattern.firstMatch(cleaned);
     if (scheme != null &&
         !_allowedSchemes.contains(scheme.group(1)!.toLowerCase())) {

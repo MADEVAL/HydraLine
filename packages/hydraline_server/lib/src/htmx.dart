@@ -6,6 +6,14 @@ import 'dart:convert';
 import 'package:hydraline/hydraline.dart' show DocumentNode, HtmlSerializer;
 import 'package:shelf/shelf.dart';
 
+/// Rejects header values carrying `CR`/`LF` (HTTP response-splitting vector).
+String _safeHeaderValue(String value, String field) {
+  if (value.contains('\r') || value.contains('\n')) {
+    throw ArgumentError.value(value, field, 'must not contain CR or LF');
+  }
+  return value;
+}
+
 /// An HTMX trigger (`HX-Trigger` header).
 class HtmxTrigger {
   const HtmxTrigger(this.value);
@@ -32,13 +40,13 @@ class HtmxResponse {
     final fragment = const HtmlSerializer().serializeFragment(body);
     final headers = <String, String>{};
     if (trigger != null) {
-      headers['HX-Trigger'] = trigger!.value;
+      headers['HX-Trigger'] = _safeHeaderValue(trigger!.value, 'trigger');
     }
     if (retarget != null) {
-      headers['HX-Retarget'] = retarget!;
+      headers['HX-Retarget'] = _safeHeaderValue(retarget!, 'retarget');
     }
     if (reswap != null) {
-      headers['HX-Reswap'] = reswap!;
+      headers['HX-Reswap'] = _safeHeaderValue(reswap!, 'reswap');
     }
     return Response(
       status,
@@ -88,5 +96,5 @@ abstract final class Htmx {
   /// Returns a response instructing HTMX to perform a client-side redirect
   /// via the `HX-Redirect` header.
   static Response redirect(String url) =>
-      Response.ok('', headers: {'HX-Redirect': url});
+      Response.ok('', headers: {'HX-Redirect': _safeHeaderValue(url, 'url')});
 }

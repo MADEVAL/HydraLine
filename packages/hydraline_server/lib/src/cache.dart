@@ -16,10 +16,16 @@ abstract interface class HydralineCache {
 
 /// Simple in-memory cache for development and low-traffic scenarios.
 class InMemoryCache implements HydralineCache {
-  InMemoryCache({this.maxSize = 500});
+  InMemoryCache({this.maxSize = 500, this.maxEntryBytes});
 
   /// Maximum number of entries; the oldest entry is evicted past this.
   final int maxSize;
+
+  /// Optional per-entry size cap. Entries whose HTML length (UTF-16 code
+  /// units, a close proxy for byte size) exceeds this are not stored, bounding
+  /// worst-case memory against a single oversized page. `null` disables the
+  /// cap.
+  final int? maxEntryBytes;
 
   final Map<String, _Entry> _store = {};
 
@@ -38,6 +44,10 @@ class InMemoryCache implements HydralineCache {
 
   @override
   Future<void> set(String key, String html, {Duration? ttl}) async {
+    if (maxEntryBytes != null && html.length > maxEntryBytes!) {
+      _store.remove(key);
+      return;
+    }
     _store.remove(key);
     _store[key] = _Entry(html, ttl != null ? DateTime.now().add(ttl) : null);
     while (_store.length > maxSize) {

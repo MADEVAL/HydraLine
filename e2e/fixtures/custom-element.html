@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>custom element</title>
+  </head>
+  <body>
+    <!-- data-size must be reserved as :host width/height (anti-CLS), and the
+         declarative shadow root must survive with the fallback slot content. -->
+    <hydraline-island
+      id="sized"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="480,270"
+    >
+      <template shadowrootmode="open">
+        <style>
+          .host {
+            width: 480px;
+            height: 270px;
+          }
+        </style>
+        <div class="host"><slot></slot></div>
+      </template>
+      <p id="fallback">server-rendered fallback</p>
+    </hydraline-island>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-island.js"></script>
+  </body>
+</html>
