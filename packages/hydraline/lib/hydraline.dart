@@ -5,6 +5,7 @@
 library;
 
 export 'src/assets/htmx_glue.dart' show htmxGlueJs;
+export 'src/assets/runtime_scripts.dart' show islandRuntime;
 export 'src/assets/vanilla_islands.dart' show vanillaIslandsJs;
 export 'src/audit.dart';
 export 'src/audit_cli.dart' show HtmlFetcher, defaultHtmlFetcher, runAuditCli;

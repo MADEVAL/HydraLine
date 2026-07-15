@@ -12,13 +12,21 @@ each package's own changelog:
   multi-island), a vanilla-islands (L1) suite in real Chrome, and a
   real-engine project (`melos run e2e:engine`) that builds the example with
   `flutter build web`, overlays the SSG output and verifies actual island
-  hydration, interactivity (via the engine semantics tree) and the
-  zero-overhead guarantee for document pages.
+  hydration, interactivity (via the engine semantics tree), CLS measurement
+  and the zero-overhead guarantee for document pages.
+- SSR invariants test suite (anti-cloaking byte-identical bodies, ETag/304,
+  HEAD, cache-key normalisation).
+- Widget-extraction pipeline: adapter navigation + widget pump + seal + audit
+  per route, making surface A (Seo.* widgets) symmetric with surface B
+  (pure-Dart builders). Edge channel added to Playwright; coverage step in
+  precommit.
 - `hydraline` - `web/` mirrors for `vanilla-islands.js`/`htmx-glue.js`
   (byte-identity locked by test); accordion guards a `details` without a
-  `summary`.
-- Example - hybrid pages now wire the island runtime scripts and a
-  `<base href="/">` so nested SSG pages resolve the engine bundle.
+  `summary`; `islandRuntime()` helper for injecting runtime script nodes.
+- `hydraline_server` - SSR invariants: bot-vs-human body equality, etag
+  revalidation, HEAD, cache-key normalisation all proven by tests.
+- Example - hybrid pages wire the island runtime via `islandRuntime()`;
+  `<base href="/">` anchors nested SSG paths for the Flutter loader.
 
 ## 0.0.4
 

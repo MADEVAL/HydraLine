@@ -119,6 +119,7 @@ melos:
         - test
         - boundaries
         - audit
+        - test:coverage
 
     e2e:
       description: Playwright browser tests for the island runtime (real Chrome).

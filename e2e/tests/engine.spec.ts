@@ -8,6 +8,7 @@ import { test, expect } from '@playwright/test';
 declare global {
   interface Window {
     hydraline: { views: Record<string, number> };
+    __cls: number;
   }
 }
 
@@ -92,3 +93,73 @@ test('a document page never loads the Flutter engine (zero overhead)', async ({
 
   expect(engineRequests).toEqual([]);
 });
+
+test('cumulative layout shift stays under 0.01 (anti-CLS invariant)', async ({
+  page,
+}) => {
+  // Inject the observer as early as possible so it catches layout shifts
+  // during the initial paint and subsequent island hydration.
+  await page.addInitScript(() => {
+    window.__cls = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!(entry as any).hadRecentInput) {
+          window.__cls += (entry as any).value;
+        }
+      }
+    }).observe({ type: 'layout-shift', buffered: true });
+  });
+
+  await page.goto('/product/espresso.html');
+  const island = page.locator('#calculator-espresso');
+
+  // Let the initial layout settle, then trigger hydration.
+  await page.waitForTimeout(500);
+  await island.scrollIntoViewIfNeeded();
+
+  // The island reserves 640×320 via data-size; any layout shift during
+  // engine boot and view attachment pushes CLS above the threshold.
+  await expect(island).toHaveAttribute('data-hydration', 'hydrated', {
+    timeout: 90000,
+  });
+
+  // Give the engine one extra frame to render and stabilise.
+  await page.waitForTimeout(1000);
+
+  const cls = await page.evaluate(() => window.__cls as number);
+  expect(cls).toBeLessThan(0.01);
+});
+
+test('service worker caches engine assets for warm visits', async ({
+  page,
+}) => {
+  await page.goto('/product/espresso.html');
+
+  // The SSG runner copies service-worker.js but the page does not register
+  // it - the host site bootstrap is responsible. Register it here and
+  // wait for activation so the fetch handler caches engine subresources.
+  await page.evaluate(async () => {
+    if (!navigator.serviceWorker.controller) {
+      await navigator.serviceWorker.register('/service-worker.js');
+      await navigator.serviceWorker.ready;
+      // The SW's activate handler calls clients.claim(); give it a tick.
+      await new Promise((r) => setTimeout(r, 500));
+    }
+  });
+
+  const island = page.locator('#calculator-espresso');
+  await island.scrollIntoViewIfNeeded();
+  await expect(island).toHaveAttribute('data-hydration', 'hydrated', {
+    timeout: 90000,
+  });
+
+  const cacheEntries = await page.evaluate(async () => {
+    const cache = await caches.open('hydraline-v1');
+    const keys = await cache.keys();
+    return keys.map((k) => k.url).filter(
+      (u) => u.includes('main.dart.js') || u.includes('canvaskit'),
+    );
+  });
+  expect(cacheEntries.length).toBeGreaterThan(0);
+});
+

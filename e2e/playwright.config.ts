@@ -28,6 +28,15 @@ export default defineConfig({
       },
     },
     {
+      name: 'edge',
+      testIgnore: /engine\.spec\.ts/,
+      use: {
+        ...devices['Desktop Edge'],
+        channel: 'msedge',
+        baseURL: 'http://localhost:4173',
+      },
+    },
+    {
       name: 'engine',
       testMatch: /engine\.spec\.ts/,
       timeout: 120000,

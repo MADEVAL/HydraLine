@@ -107,14 +107,7 @@ DocumentNode productPage(String id) => DocumentRootNode(
         ),
       ],
     ),
-    // The island runtime: custom element + dispatcher, plus the engine
-    // bootstrap location. Static trusted markup (no user input).
-    const UnsafeHtmlNode(
-      '<script>'
-      "window.HYDRALINE_CONFIG={engineScript:'/flutter_bootstrap.js'}"
-      '</script>'
-      '<script src="/hydraline-island.js" defer></script>'
-      '<script src="/hydraline-dispatcher.js" defer></script>',
-    ),
+    // L2 island runtime: custom element + dispatcher + engine location.
+    ...islandRuntime(),
   ],
 );

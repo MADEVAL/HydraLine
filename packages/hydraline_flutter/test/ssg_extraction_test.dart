@@ -149,4 +149,58 @@ void main() {
       expect(html, contains('data-media="(min-width: 800px)"'));
     });
   });
+
+  group('full extraction pipeline', () {
+    testWidgets('navigates adapter, pumps widget tree, seals and audits', (
+      tester,
+    ) async {
+      // Surface A: a minimal app using Seo.* widgets and HydraApp.
+      // The adapter navigates per route; the collector seals into HTML;
+      // the audit validates SEO invariants.
+      final routes = [
+        RouteInfo(path: '/', name: 'home'),
+        RouteInfo(path: '/about', name: 'about'),
+      ];
+      final adapter = Navigator2Adapter(routes);
+
+      for (final route in routes) {
+        await adapter.navigateToForExtraction(route);
+
+        final collector = SsgCollector(route.path);
+        await tester.pumpWidget(
+          SsgSandbox(
+            collector: collector,
+            child: HydraApp(
+              collector: collector,
+              child: Builder(
+                builder: (context) {
+                  final scope = HydraScope.of(context);
+                  return scope.isSsgMode
+                      ? Column(
+                          children: [
+                            Seo.head(SeoMeta(title: route.path)),
+                            Seo.heading('Title ${route.path}', level: 1),
+                            Seo.text('Content of ${route.path}'),
+                          ],
+                        )
+                      : const SizedBox.shrink();
+                },
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        final root = collector.seal() as DocumentRootNode;
+        final html = const HtmlSerializer().serialize(root);
+
+        expect(html, contains('<!DOCTYPE html>'));
+        expect(html, contains('<h1>Title ${route.path}</h1>'));
+        expect(html, contains('<title>${route.path}</title>'));
+
+        final report = Audit.auditHtml(html);
+        expect(report.exitCode, 0, reason: report.issues.join('\n'));
+      }
+    });
+  });
 }

@@ -56,6 +56,21 @@ void main() {
       expect(html, contains('engineScript'));
     });
 
+    test('islandRuntime helper emits scripts matching the manual version', () {
+      final helperHtml = const HtmlSerializer().serialize(
+        DocumentRootNode(
+          body: [
+            ...islandRuntime(engineScript: '/flutter_bootstrap.js'),
+            const ParagraphNode(children: [TextNode('x')]),
+          ],
+        ),
+      );
+      expect(helperHtml, contains('src="/hydraline-island.js"'));
+      expect(helperHtml, contains('HYDRALINE_CONFIG'));
+      expect(helperHtml, contains("engineScript:'/flutter_bootstrap.js'"));
+      expect(helperHtml, contains('<p>x</p>'));
+    });
+
     test('anchors relative engine URLs with <base href="/">', () {
       expect(html, contains('<base href="/">'));
     });
