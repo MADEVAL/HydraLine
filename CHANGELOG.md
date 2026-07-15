@@ -6,6 +6,11 @@ each package's own changelog:
 [hydraline_server](packages/hydraline_server/CHANGELOG.md) ·
 [hydraline_flutter](packages/hydraline_flutter/CHANGELOG.md).
 
+## 0.0.8
+
+- Cross-link banner at top of every package README: shows all three packages
+  in the Hydraline toolkit with links to each other and the main GitHub repo.
+
 ## 0.0.7
 
 - Updated CHANGELOGs referencing current version; better package descriptions
