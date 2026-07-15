@@ -6,6 +6,10 @@ each package's own changelog:
 [hydraline_server](packages/hydraline_server/CHANGELOG.md) ·
 [hydraline_flutter](packages/hydraline_flutter/CHANGELOG.md).
 
+## 0.0.6
+
+- Publisher verification: homepage switched to verified domain `leonidov.dev`.
+
 ## 0.0.5
 
 - Documentation overhaul: polished per-package READMEs, marketing-forward root
@@ -13,7 +17,7 @@ each package's own changelog:
   security docs, visual example README, Seo.section/Seo.list showcased in the
   example app.
 
-## Unreleased
+## 0.0.5
 
 - E2E expansion: directive coverage (`onVisible`/`onIdle`/`onMedia` +
   multi-island), a vanilla-islands (L1) suite in real Chrome, and a
