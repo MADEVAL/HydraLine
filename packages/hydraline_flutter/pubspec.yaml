@@ -1,9 +1,8 @@
 name: hydraline_flutter
 description: >-
-  Flutter widgets + web runtime for Hydraline. Seo.* self-registering
-  widgets, Island zones, IslandHost multi-view engine, SSG runner,
-  L2 dispatcher + Service Worker. Re-exports hydraline core.
-  Use with hydraline_server for full-stack SSR.
+  Flutter widgets + web runtime for Hydraline. Seo.* widgets,
+  Island zones, IslandHost engine, SSG runner, L2 dispatcher
+  + Service Worker. Re-exports hydraline core.
 version: 0.0.10
 repository: https://github.com/MADEVAL/HydraLine
 homepage: https://leonidov.dev
