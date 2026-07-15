@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>dispatcher bootstrap fails before any hydration</title>
+    <script>
+      window.__errors = [];
+      window.addEventListener('hydraline:island-error', function (e) {
+        window.__errors.push(e.detail);
+      });
+      // Realistic failing bootstrap: the engine load rejects asynchronously,
+      // AFTER the dispatcher evaluated. The only island is hydrateManual, so
+      // loadEngine() never attached handlers - without the dispatcher parking
+      // the app promise, this rejection would surface as unhandled.
+      window._hydralineApp = new Promise(function (_, reject) {
+        setTimeout(function () {
+          reject(new Error('engine load failed'));
+        }, 50);
+      });
+    </script>
+  </head>
+  <body>
+    <hydraline-island
+      id="early"
+      data-directive="hydrateManual"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="100,100"
+      data-state='{}'
+      role="region"
+      aria-busy="true"
+    >
+      <template shadowrootmode="open">
+        <style>
+          :host {
+            display: block;
+          }
+          .host {
+            width: 100px;
+            height: 100px;
+          }
+        </style>
+        <div class="host"><slot></slot></div>
+      </template>
+    </hydraline-island>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-island.js"></script>
+    <script src="/packages/hydraline_flutter/web/hydraline-dispatcher.js"></script>
+  </body>
+</html>

@@ -120,6 +120,27 @@ test.describe('dispatcher: failure handling', () => {
     // A rejected engine must never surface as an uncaught page error.
     expect(errors).toEqual([]);
   });
+
+  test('parks a bootstrap rejection while no island has hydrated', async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+
+    await page.goto('/e2e/fixtures/dispatcher-prerejected.html');
+
+    // Give the deferred bootstrap rejection time to settle unhandled.
+    await page.waitForTimeout(200);
+    expect(errors).toEqual([]);
+
+    // A later manual hydration still receives the failure per island.
+    await page.evaluate(() => window.hydraline.hydrate('early'));
+    await expect.poll(() => hydration(page, 'early')).toBe('failed');
+    const captured = await page.evaluate(() => window.__errors);
+    expect(captured).toHaveLength(1);
+    expect(captured[0].id).toBe('early');
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('custom element', () => {

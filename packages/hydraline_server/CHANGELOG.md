@@ -1,4 +1,4 @@
-## Unreleased
+## 0.0.4
 
 - `HEAD` requests now return the response headers with an empty body instead of
   a full rendered body.

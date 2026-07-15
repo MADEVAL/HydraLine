@@ -6,7 +6,7 @@ each package's own changelog:
 [hydraline_server](packages/hydraline_server/CHANGELOG.md) ·
 [hydraline_flutter](packages/hydraline_flutter/CHANGELOG.md).
 
-## Unreleased
+## 0.0.4
 
 Pre-production review follow-up: every confirmed finding from `REVIEW.md`
 fixed and regression-tested (see per-package changelogs).
@@ -18,7 +18,8 @@ fixed and regression-tested (see per-package changelogs).
   injection; unified redirects.
 - `hydraline_flutter` - `Seo.section`/`Seo.list` emit real structure;
   `RouteAdapter.navigateToForExtraction` implemented; `IslandHost` error
-  fallback; stale-while-revalidate service worker.
+  fallback; stale-while-revalidate service worker; dispatcher parks the
+  bootstrap promise so engine failures never surface as unhandled rejections.
 - Tooling - Playwright e2e harness in `e2e/` (`melos run e2e`, CI job): the
   shipped island runtime JS is exercised in real Chrome with a mocked Flutter
   engine (hydration directives, failure path, dehydrate, DSD, anti-CLS sizing,

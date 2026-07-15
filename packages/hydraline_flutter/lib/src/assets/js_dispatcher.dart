@@ -84,6 +84,13 @@ const jsDispatcher =
   var STATE = 'data-hydration';
   var DIRECTIVE = 'data-directive';
 
+  /* Park the bootstrap app promise: an engine failure must never surface
+   * as an unhandled rejection, even when no island ever hydrates. Each
+   * hydrating island still receives the failure via loadEngine(). */
+  if (win._hydralineApp && typeof win._hydralineApp.then === 'function') {
+    win._hydralineApp.then(null, function () {});
+  }
+
   var enginePromise = null; /* Promise<app|null>, created on first trigger */
   var islandViews = {};     /* island id -> FlutterView id                  */
   var visibleObserver = null;
@@ -409,7 +416,7 @@ const jsDispatcher =
   /* -- public API ---------------------------------------------------------------- */
 
   win.hydraline = {
-    version: '0.0.3',
+    version: '0.0.4',
     config: config,
     views: islandViews,
     hydrate: hydrate,

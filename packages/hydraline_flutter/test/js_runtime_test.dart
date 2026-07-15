@@ -141,8 +141,8 @@ void main() {
   });
 
   group('JS budget checks (pretty, unminified)', () {
-    test('dispatcher JS stays under 12 KB', () {
-      expect(jsDispatcher.codeUnits.length, lessThan(12288));
+    test('dispatcher JS stays under 13 KB', () {
+      expect(jsDispatcher.codeUnits.length, lessThan(13312));
     });
 
     test('custom element JS stays under 4 KB', () {

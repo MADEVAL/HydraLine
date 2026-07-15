@@ -1,5 +1,13 @@
-## Unreleased
+## 0.0.4
 
+- Dispatcher parks the `window._hydralineApp` bootstrap promise on evaluation,
+  so an engine-load failure never surfaces as an unhandled rejection even when
+  no island has hydrated yet (each hydrating island still receives the failure
+  and emits `hydraline:island-error`). Dispatcher budget raised to 13 KB;
+  `window.hydraline.version` is now `0.0.4`.
+- New Playwright e2e harness (`e2e/`, `melos run e2e`): the shipped runtime JS
+  is exercised in real Chrome - hydration directives, failure paths, dehydrate,
+  DSD adoption, anti-CLS sizing, virtual views.
 - `Seo.section` and `Seo.list` now register real `SectionNode`/`ListNode`
   structure (honouring `role` and `ordered`), so extracted HTML carries
   `<section>`/`<main>`/`<nav>`/`<ol>`/`<ul>`/`<li>` semantics instead of a flat

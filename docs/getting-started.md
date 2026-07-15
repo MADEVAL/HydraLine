@@ -13,9 +13,9 @@ Add the packages you need to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  hydraline: ^0.0.3           # always needed
-  hydraline_server: ^0.0.3    # for SSR / HTMX
-  hydraline_flutter: ^0.0.3   # for Flutter widgets / SSG
+  hydraline: ^0.0.4           # always needed
+  hydraline_server: ^0.0.4    # for SSR / HTMX
+  hydraline_flutter: ^0.0.4   # for Flutter widgets / SSG
 ```
 
 If you only need a static site (SSG, no server), you can skip `hydraline_server`.

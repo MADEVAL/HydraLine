@@ -58,9 +58,9 @@ top.** No new framework. No rewrite. One route at a time.
 ```yaml
 # pubspec.yaml
 dependencies:
-  hydraline: ^0.0.3           # core - pure Dart
-  hydraline_server: ^0.0.3    # SSR - pure Dart (shelf / Dart Frog)
-  hydraline_flutter: ^0.0.3   # widgets + SSG + web runtime
+  hydraline: ^0.0.4           # core - pure Dart
+  hydraline_server: ^0.0.4    # SSR - pure Dart (shelf / Dart Frog)
+  hydraline_flutter: ^0.0.4   # widgets + SSG + web runtime
 ```
 
 Build a page in pure Dart:

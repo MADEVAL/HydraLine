@@ -1,4 +1,4 @@
-## Unreleased
+## 0.0.4
 
 - `SsgCollector` gained `beginSection`/`beginList` (and `SsgListScope.beginItem`)
   for nested semantic sectioning; child scopes have their own dedup namespace
