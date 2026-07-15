@@ -26,4 +26,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Product: grinder'), findsOneWidget);
   });
+
+  testWidgets('home page uses Seo.section and Seo.list for semantic HTML', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const DemoShopApp());
+    expect(find.text('Real headings, paragraphs, images with alt'), findsOneWidget);
+    expect(find.text('Sectioning elements: <main>, <nav>, <article>'), findsOneWidget);
+  });
 }

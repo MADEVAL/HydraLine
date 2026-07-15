@@ -6,6 +6,8 @@
 import 'package:flutter/material.dart';
 import 'package:hydraline_flutter/hydraline_flutter.dart';
 
+import 'app_dashboard.dart';
+
 void main() {
   runApp(const DemoShopApp());
 }
@@ -22,6 +24,12 @@ class DemoShopApp extends StatelessWidget {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const HomePage(),
+        );
+      }
+      if (name == '/app/dashboard') {
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const AppDashboardPage(),
         );
       }
       final product = RegExp(r'^/product/([^/]+)$').firstMatch(name);
@@ -52,6 +60,20 @@ class HomePage extends StatelessWidget {
           ),
           Seo.heading('Hydraline Demo Shop', level: 1),
           Seo.text('Static HTML loads instantly; islands hydrate on demand.'),
+          Seo.section(
+            role: SectionRole.main,
+            children: [
+              Seo.text('All of this becomes semantic HTML in view-source:'),
+              Seo.list(
+                ordered: false,
+                items: [
+                  Seo.text('Real headings, paragraphs, images with alt'),
+                  Seo.text('Sectioning elements: <main>, <nav>, <article>'),
+                  Seo.text('Links with canonical and hreflang'),
+                ],
+              ),
+            ],
+          ),
           Seo.link(href: '/product/espresso', child: const Text('Espresso')),
           Seo.link(href: '/product/grinder', child: const Text('Grinder')),
         ],
@@ -79,19 +101,31 @@ class ProductPage extends StatelessWidget {
             height: 600,
           ),
 
-          // Level 2 island: the Flutter engine loads only when this becomes
-          // visible. The reserved size prevents layout shift.
-          Island(
-            id: 'calculator-$id',
-            type: IslandType.flutter,
-            directive: HydrationDirective.onVisible,
-            props: const {'price': 249},
-            width: 640,
-            height: 320,
-          ),
+          Seo.section(
+            role: SectionRole.main,
+            children: [
+              // Level 2 island: the Flutter engine loads only when this becomes
+              // visible. The reserved size prevents layout shift.
+              Island(
+                id: 'calculator-$id',
+                type: IslandType.flutter,
+                directive: HydrationDirective.onVisible,
+                props: const {'price': 249},
+                width: 640,
+                height: 320,
+              ),
 
-          // Level 1 island: vanilla JS accordion, no Flutter engine at all.
-          Island(id: 'faq-$id', type: IslandType.vanilla, kind: 'accordion'),
+              // Level 1 island: vanilla JS accordion with no-JS fallback,
+              // no Flutter engine at all. The Island widget acts as a
+              // self-sizing placeholder at runtime; the pure-Dart builder
+              // in content.dart supplies the <details> fallback children.
+              Island(
+                id: 'faq-$id',
+                type: IslandType.vanilla,
+                kind: 'accordion',
+              ),
+            ],
+          ),
         ],
       ),
     ),
