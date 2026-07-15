@@ -1,3 +1,7 @@
+## 0.0.10
+
+- Added "Why" section to README: explains problem, solution, and core value.
+
 ## 0.0.8
 
 - Cross-link banner at top of README: shows all three packages.
