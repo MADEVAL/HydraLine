@@ -1,38 +1,46 @@
 # hydraline_flutter
 
-Flutter package for [Hydraline](../../README.md) - Seo.* widgets,
-Island, HydraApp, IslandHost, SSG runner, and web runtime assets.
+**Flutter package for Hydraline — Seo.* widgets, Island, IslandHost, SSG runner,
+and the L2 web runtime.** Re-exports the whole `hydraline` core: one import gives
+you the full API.
 
-Re-exports the whole `hydraline` core: one import gives you the full API.
+Add SEO to any existing Flutter Web app without touching your `main()` or
+`MaterialApp`. `Seo.*` widgets render visually AND register semantic HTML.
+Islands hydrate on scroll, click, idle — engine loads only when triggered.
+
+[![pub](https://img.shields.io/pub/v/hydraline_flutter)](https://pub.dev/packages/hydraline_flutter)
+[![tests](https://img.shields.io/badge/tests-140%20passed-brightgreen)](#)
+[![e2e](https://img.shields.io/badge/e2e-Chrome%2026%20passed-brightgreen)](#)
+[![CLS](https://img.shields.io/badge/CLS-≈%200-blue)](#)
 
 ## What's inside
 
 | Module | Description |
 |---|---|
-| `Seo.*` widgets | Self-registering widgets - build UI and register semantic info simultaneously |
-| `Island` | Island zones with hydration directives, render/style modes, anti-CLS sizing |
-| `HydraApp` / `HydraScope` | Integration wrapper + InheritedWidget for SsgCollector access |
-| `IslandMultiViewApp` / `IslandHost` | Multi-view runtime - one engine, one FlutterView per island |
-| `IslandViewRegistry` | View → island bindings, populated automatically from `addView()` initialData |
-| `SsgRunner` | Build-time SSG - routes → HTML + sitemap + robots into `dist/` |
-| `dart run hydraline_flutter:build` | SSG CLI (plain Dart VM) - metadata shells; register builders via `runSsgCli` for full pages |
-| `package:hydraline_flutter/build.dart` | Pure-Dart build surface for your own `bin/build.dart` (`runSsgCli`, adapters) |
-| `RouteAdapter` | go_router / Navigator 2.0 adapters for build-time route traversal |
-| `SsgSandbox` | Build-time stub ancestors (MediaQuery, Directionality) for extraction |
-| `SsgDevTools` | Island diagnostics - props size warnings, anti-CLS checks |
+| `Seo.*` widgets | Self-registering: `Seo.head`, `Seo.heading`, `Seo.text`, `Seo.image`, `Seo.link`, `Seo.section` (emits `<main>`/`<nav>`/`<article>`/...), `Seo.list` (emits `<ol>`/`<ul>` + `<li>`) |
+| `Island` | Declarative island zones: Flutter (`IslandType.flutter`), vanilla (`.vanilla`), HTMX (`.htmx`). Hydration directives: `onLoad`, `onIdle`, `onVisible`, `onInteraction`, `onMedia`, `manual` |
+| `HydraApp` / `HydraScope` | InheritedWidget for `SsgCollector` access — widgets self-register during SSG extraction |
+| `IslandMultiViewApp` / `IslandHost` | Multi-view runtime: one Flutter engine, one `FlutterView` per island. Deferred island factories (`loadLibrary()`) |
+| `IslandViewRegistry` | View → island binding registry, populated from `addView()` `initialData` |
+| `SsgRunner` / `runSsgCli()` | Build-time SSG: routes → HTML + sitemap + robots + runtime JS → `dist/` |
+| `dart run hydraline_flutter:build` | CLI for metadata-only shells; use `runSsgCli` from your own `bin/build.dart` for full pages |
+| `package:hydraline_flutter/build.dart` | Pure-Dart build surface — safe for VM executables |
+| `RouteAdapter` / `GoRouterAdapter` / `Navigator2Adapter` | Router integration: `navigateToForExtraction()` drives `go_router.go()` per route; `Navigator2Adapter` records the current route for widget extraction |
+| `SsgSandbox` | Build-time stub ancestors (`MediaQuery`, `Directionality`) for headless extraction |
+| `SsgDevTools` | Island diagnostics: props size warnings, anti-CLS checks |
 | `SsgDomDiff` | SSG-HTML vs hydrated DOM text-node divergence comparator |
-| Web runtime | Pretty, branded JS: `<hydraline-island>` element, dispatcher (engine + `addView()` per island), Service Worker, virtual views |
+| Web runtime (L2) | Pretty, branded JS kept byte-identical to `web/*.js` (locked by test): |
+| | `<hydraline-island>` — Custom Element with Declarative Shadow DOM, `data-size` anti-CLS sizing, `ResizeObserver` for multi-view constraints |
+| | `hydraline-dispatcher.js` — directive wiring (IntersectionObserver, idle callback, matchMedia), engine loading (once, on first trigger), `addView()` per island, `dehydrate()`, bootstrap rejection parking |
+| | `hydraline-virtual-views.js` — tall-island segment observer: `segment-enter` / `segment-leave` events |
+| | `service-worker.js` — stale-while-revalidate for warm visits, old-cache purge on `activate` |
 
-## Flutter version policy
+## Zero-overhead guarantee
 
-- **Minimum supported: Flutter 3.35.0** (`environment.flutter: ">=3.35.0"`),
-  the first SDK bundling Dart 3.9 - required by pub workspaces.
-- CI runs the minimum and the latest stable SDK as blocking jobs.
-
-> **Warning:** Flutter 3.41.x has a known multi-view sizing issue (#185034).
-> Hydraline pins explicit `viewConstraints` as a workaround. This version is
-> tested in CI on an informational (non-blocking) basis. Use Flutter 3.35+
-> or the latest stable.
+Pages without Flutter islands **never load the engine**. The L2 runtime
+(CanvasKit, `main.dart.js`, `canvaskit/*`) is fetched only when an island
+actually triggers. Document pages request zero engine bytes. Verified by
+CI test in real Chrome.
 
 ## Quick start
 
@@ -46,38 +54,66 @@ class ProductPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => HydraApp(
     child: Column(children: [
-      Seo.head(const SeoMeta(title: 'Product', description: 'A great product')),
-      Seo.heading('iPhone 15', level: 1),
-      Seo.text('The latest iPhone with A17 Pro chip.'),
-      Seo.image('/img/phone.png', alt: 'iPhone 15 in titanium'),
-      const Island(
+      Seo.head(const SeoMeta(
+        title: 'Espresso Machine',
+        description: 'Compact 15-bar espresso machine.',
+        openGraph: OpenGraph(
+          type: 'product',
+          image: SafeUrl.parse('https://shop.example/og.jpg'),
+        ),
+      )),
+      Seo.heading('Espresso Machine', level: 1),
+      Seo.section(role: SectionRole.main, children: [
+        Seo.text('Real HTML. Real rankings.'),
+        Seo.image('/img/espresso.jpg', alt: 'Espresso machine', width: 800, height: 600),
+        Seo.list(ordered: false, items: [
+          Seo.text('Feature one'),
+          Seo.text('Feature two'),
+        ]),
+      ]),
+      // Level 2: Flutter island — engine loads on scroll. Reserved size prevents CLS.
+      Island(
         id: 'calculator',
         type: IslandType.flutter,
-        props: {'price': 89990},
-        width: 640, height: 480,
+        directive: HydrationDirective.onVisible,
+        props: const {'price': 249},
+        width: 640, height: 320,
       ),
+      // Level 1: vanilla accordion — no Flutter engine at all.
+      Island(id: 'faq', type: IslandType.vanilla, kind: 'accordion'),
     ]),
   );
 }
 ```
 
 ```bash
-# Generate static HTML from the route manifest (metadata shells):
+# Generate static HTML (SSG):
 dart run hydraline_flutter:build hydraline.routes.yaml dist
-# Full page bodies: call runSsgCli from your own bin/build.dart with
-# pure-Dart builders - see ../../example/bin/build.dart.
+
+# Full pages: call runSsgCli from your bin/build.dart with builders —
+# see ../../example/bin/build.dart.
 ```
 
-Runnable example: [`example/lib/main.dart`](example/lib/main.dart) - a product
-page with metadata, semantic content, islands and an `IslandHost` entry-point.
+## Proven
+
+- **140 widget/unit tests** — widget extraction, SSG runner, island host, route adapter, zero-overhead
+- **26 Playwright e2e tests** in real Chrome: all hydration directives, vanilla islands (accordion/tabs/carousel/theme/lazy/copy), failure paths, re-wire guard, dehydrate
+- **5 real-engine e2e tests** (`melos run e2e:engine`): `flutter build web` + SSG overlay → Chrome verifies genuine CanvasKit boot, `IslandHost` mounting, calculator interaction via semantics tree, service worker caching, CLS < 0.01
+- **Multi-view runtime**: one engine, N islands, N `FlutterView`s — each receives `{ islandId, state }` as `initialData`
+- **Edge channel** tested alongside Chrome in Playwright
+
+Runnable example: [`example/lib/main.dart`](example/lib/main.dart) — a product
+page with `Seo.*` widgets, `Seo.section`/`Seo.list`, L1/L2 islands, and
+an `IslandHost` entry-point.
 
 ## Documentation
 
-- [Flutter Widgets Guide](../../docs/flutter-widgets.md) - Seo.*, Island, HydraApp, SSG
-- [Architecture](../../docs/architecture.md) - islands, SSG pipeline, client runtime
-- [Configuration](../../docs/configuration.md) - route manifest, island manifest
-- [Getting Started](../../docs/getting-started.md) - prerequisites, installation
+- [Flutter Widgets Guide](../../docs/flutter-widgets.md)
+- [Architecture](../../docs/architecture.md) — islands, SSG pipeline, client runtime
+- [Configuration](../../docs/configuration.md) — route manifest, island manifest
+- [Security](../../docs/security.md) — SRI, sanitizer, CSP
+- [Getting Started](../../docs/getting-started.md)
 
 ## License
 
-MIT - [Yevhen Leonidov](https://leonidov.dev)
+MIT — [Yevhen Leonidov](https://leonidov.dev)
