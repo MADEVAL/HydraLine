@@ -1,9 +1,18 @@
 import { test, expect } from '@playwright/test';
 
-// The REAL thing: a `flutter build web` engine bundle overlaid with the SSG
-// output of the example app (example/TEMP/e2e-dist, built by
-// `melos run e2e:engine`). No mocks - the dispatcher loads the actual engine
-// via flutter_bootstrap.js and mounts IslandMultiViewApp views per island.
+// REAL engine e2e: flutter build web + SSG overlay.
+
+// Polls for the semantics placeholder and clicks it the moment it appears,
+// so the Flutter accessibility tree populates without manual interaction.
+const autoSemantics = `
+  (function poll() {
+    var ph = document.querySelector('flt-semantics-placeholder');
+    if (ph) {
+      ph.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+    }
+    setTimeout(poll, 200);
+  })();
+`;
 
 declare global {
   interface Window {
@@ -52,6 +61,10 @@ test('SSG page hydrates a real Flutter island on scroll', async ({ page }) => {
 test('the hydrated calculator island is actually interactive', async ({
   page,
 }) => {
+  // Auto-click the semantics placeholder when the engine creates it, so
+  // the accessibility tree populates without manual user interaction.
+  await page.addInitScript(autoSemantics);
+
   await page.goto('/product/espresso.html');
   const island = page.locator('#calculator-espresso');
   await island.scrollIntoViewIfNeeded();
@@ -59,17 +72,6 @@ test('the hydrated calculator island is actually interactive', async ({
     timeout: 90000,
   });
 
-  // Flutter renders to canvas; the accessibility tree is the DOM contract.
-  // Activate it the way assistive tech does - via the engine's placeholder.
-  await page.evaluate(() => {
-    document
-      .querySelector('flt-semantics-placeholder')
-      ?.dispatchEvent(
-        new MouseEvent('click', { bubbles: true, cancelable: true }),
-      );
-  });
-
-  // CalculatorIsland shows "1 pcs - total 249" and a "+" IconButton.
   await expect(island.getByText(/total 249/)).toBeVisible({ timeout: 30000 });
 
   await island.getByRole('button').last().click();

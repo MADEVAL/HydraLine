@@ -22,5 +22,29 @@ void main() {
       );
       expect(node.sanitize(), 'x');
     });
+
+    test('UnsafeHtmlNode.trusted documents trusted intent', () {
+      const node = UnsafeHtmlNode.trusted('<base href="/">');
+      expect(node.sanitizer, isNull);
+      expect(node.sanitize(), '<base href="/">');
+    });
+  });
+
+  group('sanitizeHtml', () {
+    test('strips script tags including their content', () {
+      expect(sanitizeHtml('<script>alert(1)</script>'), '');
+      expect(sanitizeHtml('<SCRIPT src="x.js"></SCRIPT>'), '');
+      expect(sanitizeHtml('a<script>alert(1)</script>b'), 'ab');
+    });
+
+    test('strips inline event-handler attributes', () {
+      expect(sanitizeHtml('<div onclick="alert(1)">x</div>'), '<div>x</div>');
+      expect(sanitizeHtml("<div onload='alert(1)'>x</div>"), '<div>x</div>');
+    });
+
+    test('leaves safe HTML untouched', () {
+      expect(sanitizeHtml('<b>x</b>'), '<b>x</b>');
+      expect(sanitizeHtml('<base href="/">'), '<base href="/">');
+    });
   });
 }

@@ -324,10 +324,38 @@ final class VanillaIslandNode extends DocumentNode {
 
 // ── Unsafe HTML (opt-in, the only raw-HTML escape hatch) ─────────────────────
 
+/// Strips the most common XSS vectors from raw HTML: `<script>` elements
+/// and inline event-handler attributes (`on*`). This is a baseline
+/// defence, not a full HTML sanitizer — pass it as [UnsafeHtmlNode.sanitizer]
+/// when the raw HTML cannot be fully trusted.
+String sanitizeHtml(String html) {
+  var clean = html;
+  clean = clean.replaceAll(
+    RegExp(r'<script[^>]*>[\s\S]*?</script>', caseSensitive: false),
+    '',
+  );
+  clean = clean.replaceAll(
+    RegExp(r'\s+on\w+\s*=\s*"[^"]*"', caseSensitive: false),
+    '',
+  );
+  clean = clean.replaceAll(
+    RegExp(r"\s+on\w+\s*=\s*'[^']*'", caseSensitive: false),
+    '',
+  );
+  return clean;
+}
+
 /// The only path for raw HTML. The name intentionally contains "Unsafe".
 /// Without a [sanitizer] the `SeoValidator` emits a warning.
+///
+/// For trusted, static HTML (e.g. an injected `<base>` tag), prefer the
+/// [UnsafeHtmlNode.trusted] constructor which documents the intent.
 final class UnsafeHtmlNode extends DocumentNode {
   const UnsafeHtmlNode(this.rawHtml, {this.sanitizer});
+
+  /// Bypasses the sanitizer - use only for fully trusted, static HTML
+  /// that is known to carry no user-controlled content.
+  const UnsafeHtmlNode.trusted(this.rawHtml) : sanitizer = null;
 
   final String rawHtml;
   final String Function(String raw)? sanitizer;

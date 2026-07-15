@@ -58,7 +58,7 @@ DocumentNode productPage(String id) => DocumentRootNode(
     children: [
       // Pages live at nested paths (/product/x.html) while the engine bundle
       // sits at the site root; <base> anchors the loader's relative URLs.
-      const UnsafeHtmlNode('<base href="/">'),
+      const UnsafeHtmlNode.trusted('<base href="/">'),
       ...buildHead(
         SeoMeta(
           title: 'Product - $id',
