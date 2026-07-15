@@ -72,9 +72,9 @@ on top. No new framework. No rewrite. **Works with ANY existing Flutter Web app
 ```yaml
 # pubspec.yaml
 dependencies:
-  hydraline: ^0.0.4
-  hydraline_server: ^0.0.4
-  hydraline_flutter: ^0.0.4
+  hydraline: ^0.0.5
+  hydraline_server: ^0.0.5
+  hydraline_flutter: ^0.0.5
 ```
 
 Build a page:

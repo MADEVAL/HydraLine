@@ -31,7 +31,13 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(const DemoShopApp());
-    expect(find.text('Real headings, paragraphs, images with alt'), findsOneWidget);
-    expect(find.text('Sectioning elements: <main>, <nav>, <article>'), findsOneWidget);
+    expect(
+      find.text('Real headings, paragraphs, images with alt'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Sectioning elements: <main>, <nav>, <article>'),
+      findsOneWidget,
+    );
   });
 }

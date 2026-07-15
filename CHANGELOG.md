@@ -6,6 +6,13 @@ each package's own changelog:
 [hydraline_server](packages/hydraline_server/CHANGELOG.md) ·
 [hydraline_flutter](packages/hydraline_flutter/CHANGELOG.md).
 
+## 0.0.5
+
+- Documentation overhaul: polished per-package READMEs, marketing-forward root
+  README with comparison table and proof badges, updated getting-started and
+  security docs, visual example README, Seo.section/Seo.list showcased in the
+  example app.
+
 ## Unreleased
 
 - E2E expansion: directive coverage (`onVisible`/`onIdle`/`onMedia` +

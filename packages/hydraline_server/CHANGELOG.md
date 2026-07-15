@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Polished README: automatic behaviours list, proven metrics with test counts.
+
 ## 0.0.4
 
 - `HEAD` requests now return the response headers with an empty body instead of

@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Polished README: Seo.section/list semantics, real-engine e2e, CLS=0, zero-overhead guarantee, proven section with 26 e2e+5 engine tests.
+
 ## 0.0.4
 
 - Dispatcher parks the `window._hydralineApp` bootstrap promise on evaluation,

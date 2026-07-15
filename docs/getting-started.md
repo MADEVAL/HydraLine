@@ -12,9 +12,9 @@
 ```yaml
 # pubspec.yaml
 dependencies:
-  hydraline: ^0.0.4           # always needed
-  hydraline_server: ^0.0.4    # for SSR / HTMX
-  hydraline_flutter: ^0.0.4   # for Flutter widgets / SSG
+  hydraline: ^0.0.5           # always needed
+  hydraline_server: ^0.0.5    # for SSR / HTMX
+  hydraline_flutter: ^0.0.5   # for Flutter widgets / SSG
 ```
 
 Skip `hydraline_server` for static-only sites (SSG). Skip `hydraline_flutter`
