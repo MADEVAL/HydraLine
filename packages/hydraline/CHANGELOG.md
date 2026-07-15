@@ -1,3 +1,11 @@
+## 0.0.7
+
+- Better package description with cross-links; CHANGELOG references current version.
+
+## 0.0.6
+
+- Publisher verification: homepage switched to verified domain.
+
 ## 0.0.5
 
 - Polished README: full module catalogue, proven metrics, quick start with

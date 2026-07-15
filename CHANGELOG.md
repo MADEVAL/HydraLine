@@ -6,6 +6,11 @@ each package's own changelog:
 [hydraline_server](packages/hydraline_server/CHANGELOG.md) ·
 [hydraline_flutter](packages/hydraline_flutter/CHANGELOG.md).
 
+## 0.0.7
+
+- Updated CHANGELOGs referencing current version; better package descriptions
+  with cross-links between hydraline / hydraline_server / hydraline_flutter.
+
 ## 0.0.6
 
 - Publisher verification: homepage switched to verified domain `leonidov.dev`.
