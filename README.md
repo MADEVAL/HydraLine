@@ -65,19 +65,34 @@ on top. No new framework. No rewrite. **Works with ANY existing Flutter Web app
   (including genuine Flutter engine hydration), server-level SSR invariants,
   and a CI-ready SEO audit.
 
+## Install
+
+**You almost never need all three packages.** Pick based on what you're building:
+
+| You want to... | Add this | |
+|---|---|---|
+| Build static HTML pages (SSG) with pure Dart | `hydraline` + `hydraline_flutter` | [![pub](https://img.shields.io/pub/v/hydraline)](https://pub.dev/packages/hydraline) [![pub](https://img.shields.io/pub/v/hydraline_flutter)](https://pub.dev/packages/hydraline_flutter) |
+| Serve pages with SSR (shelf / Dart Frog) | `hydraline` + `hydraline_server` | [![pub](https://img.shields.io/pub/v/hydraline)](https://pub.dev/packages/hydraline) [![pub](https://img.shields.io/pub/v/hydraline_server)](https://pub.dev/packages/hydraline_server) |
+| Full stack (SSR + SSG + Flutter widgets) | All three | |
+| Only need the SEO data model (serializer, sitemap, audit) | `hydraline` only | |
+
+```bash
+dart pub add hydraline              # always needed
+dart pub add hydraline_server       # for SSR / HTMX
+flutter pub add hydraline_flutter   # for widgets / SSG / islands
+```
+
+`hydraline_flutter` re-exports the entire `hydraline` core — one import, full API:
+
+```dart
+import 'package:hydraline_flutter/hydraline_flutter.dart'; // everything
+import 'package:hydraline/hydraline.dart';                  // core only
+import 'package:hydraline_server/hydraline_server.dart';    // server
+```
+
 ## Quick Start
 
 ### Option A — Pure-Dart builders (no Flutter widget changes)
-
-```yaml
-# pubspec.yaml
-dependencies:
-  hydraline: ^0.0.5
-  hydraline_server: ^0.0.5
-  hydraline_flutter: ^0.0.5
-```
-
-Build a page:
 
 ```dart
 import 'package:hydraline/hydraline.dart';
@@ -164,11 +179,13 @@ that's the zero-overhead guarantee. Deep dive: [Architecture](docs/architecture.
 
 ## Packages
 
-| Package | Purpose | Flutter? |
+| Package | [pub.dev](https://pub.dev) | Purpose |
 |---|---|---|
-| [`hydraline`](packages/hydraline/) | DocumentNode model, HTML serializer, escaping/SafeUrl, sanitizer, SEO metadata, JSON-LD, sitemap/robots, audit CLI, islandRuntime() | no |
-| [`hydraline_server`](packages/hydraline_server/) | shelf/Dart Frog middleware, streaming SSR, bot-aware delivery, caching + ETag, HTMX helpers | no |
-| [`hydraline_flutter`](packages/hydraline_flutter/) | `Seo.*` widgets, `Island`, `HydraApp`, `IslandHost`, SSG runner + CLI, L2 web runtime (Custom Element, dispatcher, SW) | yes |
+| `hydraline` | [![pub](https://img.shields.io/pub/v/hydraline)](https://pub.dev/packages/hydraline) | Pure-Dart core: DocumentNode, HTML serializer, SafeUrl, sanitizer, SEO metadata, JSON-LD (9 types), sitemap/robots, audit CLI, islandRuntime() |
+| `hydraline_server` | [![pub](https://img.shields.io/pub/v/hydraline_server)](https://pub.dev/packages/hydraline_server) | Pure-Dart server: shelf/Dart Frog middleware, streaming SSR, bot-aware delivery, caching + ETag/304, HTMX helpers |
+| `hydraline_flutter` | [![pub](https://img.shields.io/pub/v/hydraline_flutter)](https://pub.dev/packages/hydraline_flutter) | Flutter: `Seo.*` widgets, `Island`, `HydraApp`, `IslandHost`, SSG runner + CLI, L2 web runtime (Custom Element, dispatcher, SW) |
+
+Package READMEs: [`hydraline`](packages/hydraline/) · [`hydraline_server`](packages/hydraline_server/) · [`hydraline_flutter`](packages/hydraline_flutter/)
 
 ## Requirements
 
