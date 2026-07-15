@@ -1,6 +1,16 @@
 # hydraline
 
-**Pure-Dart core of Hydraline — the foundation everything else builds on.**
+> Part of [**Hydraline**](https://github.com/MADEVAL/HydraLine) — real crawlable
+> HTML for Flutter Web. Three packages, one toolkit.
+>
+> [`hydraline`](https://pub.dev/packages/hydraline)
+> (core, you are here) ·
+> [`hydraline_server`](https://pub.dev/packages/hydraline_server)
+> (SSR) ·
+> [`hydraline_flutter`](https://pub.dev/packages/hydraline_flutter)
+> (widgets)
+
+**Pure-Dart core — the foundation everything else builds on.**
 No Flutter, no `dart:ui`, no `dart:html`. Works on any Dart VM.
 
 Build, serialize and audit real semantic HTML from Dart: headings, paragraphs,

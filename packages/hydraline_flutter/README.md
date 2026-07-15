@@ -1,6 +1,16 @@
 # hydraline_flutter
 
-**Flutter package for Hydraline — Seo.* widgets, Island, IslandHost, SSG runner,
+> Part of [**Hydraline**](https://github.com/MADEVAL/HydraLine) — real crawlable
+> HTML for Flutter Web. Three packages, one toolkit.
+>
+> [`hydraline`](https://pub.dev/packages/hydraline)
+> (core) ·
+> [`hydraline_server`](https://pub.dev/packages/hydraline_server)
+> (SSR) ·
+> [`hydraline_flutter`](https://pub.dev/packages/hydraline_flutter)
+> (widgets, you are here)
+
+**Flutter package — Seo.* widgets, Island, IslandHost, SSG runner,
 and the L2 web runtime.** Re-exports the whole `hydraline` core: one import gives
 you the full API.
 

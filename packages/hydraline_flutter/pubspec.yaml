@@ -4,7 +4,7 @@ description: >-
   widgets, Island zones, IslandHost multi-view engine, SSG runner,
   L2 dispatcher + Service Worker. Re-exports hydraline core.
   Use with hydraline_server for full-stack SSR.
-version: 0.0.7
+version: 0.0.8
 repository: https://github.com/MADEVAL/HydraLine
 homepage: https://leonidov.dev
 issue_tracker: https://github.com/MADEVAL/HydraLine/issues
@@ -25,7 +25,7 @@ dependencies:
   flutter:
     sdk: flutter
   html: ^0.15.4
-  hydraline: ^0.0.7
+  hydraline: ^0.0.8
 
 dev_dependencies:
   flutter_lints: ^5.0.0

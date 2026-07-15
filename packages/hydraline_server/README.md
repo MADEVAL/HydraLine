@@ -1,6 +1,16 @@
 # hydraline_server
 
-**Pure-Dart SSR for Hydraline — streaming, caching, and HTMX helpers for
+> Part of [**Hydraline**](https://github.com/MADEVAL/HydraLine) — real crawlable
+> HTML for Flutter Web. Three packages, one toolkit.
+>
+> [`hydraline`](https://pub.dev/packages/hydraline)
+> (core) ·
+> [`hydraline_server`](https://pub.dev/packages/hydraline_server)
+> (SSR, you are here) ·
+> [`hydraline_flutter`](https://pub.dev/packages/hydraline_flutter)
+> (widgets)
+
+**Pure-Dart SSR — streaming, caching, and HTMX helpers for
 shelf and Dart Frog.** No Flutter dependency. Works on any Dart server.
 
 Turn a `DocumentNode` tree into an HTTP response: real HTML in `view-source`
