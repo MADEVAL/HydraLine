@@ -4,7 +4,7 @@ description: >-
   Shelf/Dart Frog middleware, bot-aware transport, ETag/304,
   byte-identical anti-cloaking bodies. Pairs with hydraline core.
   No Flutter dependency.
-version: 0.0.8
+version: 0.0.10
 repository: https://github.com/MADEVAL/HydraLine
 homepage: https://leonidov.dev
 issue_tracker: https://github.com/MADEVAL/HydraLine/issues
@@ -21,7 +21,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  hydraline: ^0.0.8
+  hydraline: ^0.0.10
   shelf: ^1.4.1
 
 dev_dependencies:
