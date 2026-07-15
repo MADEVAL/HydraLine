@@ -4,194 +4,280 @@
 
 - **Dart SDK** ≥ 3.9
 - **Flutter SDK** ≥ 3.35 (only for `hydraline_flutter`; core and server work with plain Dart)
-- A **Dart server** (shelf, Dart Frog) for SSR - or static hosting for SSG
+- A **Dart server** (shelf, Dart Frog) for SSR — or static hosting for SSG
 - A **Flutter Web** application to add SEO to
 
 ## Installation
 
-Add the packages you need to your `pubspec.yaml`:
-
 ```yaml
+# pubspec.yaml
 dependencies:
   hydraline: ^0.0.4           # always needed
   hydraline_server: ^0.0.4    # for SSR / HTMX
   hydraline_flutter: ^0.0.4   # for Flutter widgets / SSG
 ```
 
-If you only need a static site (SSG, no server), you can skip `hydraline_server`.
-If you only need server-side rendering with pure-Dart builders, you can skip
-`hydraline_flutter`.
+Skip `hydraline_server` for static-only sites (SSG). Skip `hydraline_flutter`
+for pure-Dart builders without Flutter widgets.
+
+## Adding SEO to an Existing Flutter Web App
+
+Hydraline is **additive**. Your existing `main()` and `MaterialApp` don't change.
+You add SEO route by route:
+
+```
+Step 1: create hydraline.routes.yaml       (which routes get SEO)
+Step 2: write a page builder               (pure Dart, or Seo.* widgets)
+Step 3: wire SSR or SSG                    (two lines of code)
+Result: /blog is real HTML in view-source; /app still runs CanvasKit
+```
 
 ## Concepts
 
 ### DocumentNode
 
-`DocumentNode` is the central data model. It's a tree of semantic HTML nodes
+`DocumentNode` is the central data model — a tree of semantic HTML nodes
 (headings, paragraphs, links, images, lists, tables, island placeholders, etc.).
-Everything - SSR, SSG, and the serializer - works from this single tree.
+It is **not** Flutter widget trees. Serialization is single-pass, deterministic,
+and produces valid HTML5.
 
-The tree is built one of two ways:
+### Route modes
 
-- **Pure-Dart builders** (surface B) - construct nodes directly. Works on the
-  server and in tests without Flutter.
-- **Flutter widgets** (surface A) - `Seo.text()`, `Seo.image()`, `Island()` etc.
-  self-register into a collector during SSG extraction.
+Every route in `hydraline.routes.yaml` has a mode:
 
-Both surfaces produce an identical `DocumentNode`. One serializer handles both.
+| Mode | What the crawler sees | Flutter involved? |
+|---|---|---|
+| `document` | Full semantic HTML | No |
+| `hybrid` | Semantic HTML + island placeholders | Yes, per-island on trigger |
+| `app` | Empty shell (Flutter CanvasKit) | Yes — auto `noindex` |
 
-### Routes and Modes
+### Two surfaces, same HTML
 
-Every route in your app has a **render mode**:
+Hydraline gives you two ways to build the same page, producing **byte-identical
+semantic HTML**:
 
-| Mode | Description |
-|---|---|
-| `app` | Flutter CanvasKit renders everything. Use for dashboards, editors, private areas. |
-| `document` | Pure semantic HTML. No Flutter engine on the page. Use for blogs, docs, landing pages. |
-| `hybrid` | Semantic HTML for SEO content + Flutter islands for interactive zones. |
+| Surface | What you write | Best for |
+|---|---|---|
+| **A — Seo.\* widgets** | Flutter widgets inside `HydraApp` / `SsgSandbox` | Teams that think in Flutter; widget tests |
+| **B — pure-Dart builders** | `DocumentRootNode` / `HeadingNode` / ... in `.dart` files | CI pipelines; content teams; SSG |
 
-Modes are configured per-route in `hydraline.routes.yaml`.
+You can mix both: surface A for product pages, surface B for blog posts. The
+serializer produces the same HTML from either.
 
-### Islands
+## Option A — Seo.* Widgets (Flutter-native)
 
-An **island** is an isolated interactive zone on an otherwise static page. Three
-types exist:
+Replace the root of your page widget tree with `HydraApp` and `SsgSandbox`:
 
-- **Vanilla** - lightweight JS widgets (accordions, tabs, carousels). ~8 KB, no Flutter.
-- **HTMX** - server-driven HTML fragments (forms, lazy loading). ~14 KB, no Flutter.
-- **Flutter** - complex CanvasKit-rendered widgets. Engine loaded on trigger.
+```dart
+import 'package:hydraline_flutter/hydraline_flutter.dart';
 
-Islands hydrate according to a **hydration directive**:
+Widget productPage() => SsgSandbox(
+  collector: SsgCollector('/product/123'),
+  child: HydraApp(
+    child: Column(children: [
+      Seo.head(SeoMeta(
+        title: 'Product — Espresso Machine',
+        description: 'Compact 15-bar espresso machine.',
+        canonical: SafeUrl.parse('https://shop.example/product/123'),
+        openGraph: OpenGraph(type: 'product',
+            image: SafeUrl.parse('https://shop.example/og.jpg')),
+      )),
+      Seo.heading('Espresso Machine', level: 1),
+      Seo.text('Real HTML. Real rankings.'),
+      Seo.image('/img/espresso.jpg', alt: 'Espresso machine', width: 800, height: 600),
+      Seo.section(role: SectionRole.main, children: [
+        Seo.list(ordered: false, items: [
+          Seo.text('Feature one'),
+          Seo.text('Feature two'),
+        ]),
+      ]),
+      Island(
+        id: 'calculator-123',
+        type: IslandType.flutter,
+        props: {'price': 249},
+        width: 640, height: 320,
+        directive: HydrationDirective.onVisible,
+      ),
+    ]),
+  ),
+);
+```
 
-| Directive | Trigger |
-|---|---|
-| `hydrateOnLoad` | Immediately on page load |
-| `hydrateOnIdle` | When the main thread is idle (default) |
-| `hydrateOnVisible` | When the island scrolls into the viewport |
-| `hydrateOnInteraction` | On first click, focus, or touch |
-| `hydrateOnMedia(q)` | When a CSS media query matches |
-| `hydrateManual` | Via explicit JS API call |
+- Each `Seo.*` widget renders visually AND registers a `DocumentNode` into the
+  collector. At extraction time, `seal()` produces the same `DocumentRootNode`
+  that a pure-Dart builder would.
+- `SsgSandbox` provides stub `MediaQuery`/`Directionality` so extraction never
+  fails on missing Flutter ancestors.
+- Widget-based tests use `flutter test --tags ssg`.
 
-### Delivery
+## Option B — Pure-Dart Builders (no Flutter dependency)
 
-Hydraline supports two delivery paths:
+```dart
+import 'package:hydraline/hydraline.dart';
 
-- **SSG (Static Site Generation)** - HTML is generated at build time.
-  Outputs a `dist/` directory ready for static hosting.
-- **SSR (Server-Side Rendering)** - HTML is generated at request time from
-  pure-Dart builders. Supports streaming delivery.
+DocumentNode productPage() => DocumentRootNode(
+  head: buildHead(SeoMeta(
+    title: 'Product — Espresso Machine',
+    description: 'Compact 15-bar espresso machine.',
+    canonical: SafeUrl.parse('https://shop.example/product/123'),
+    openGraph: OpenGraph(type: 'product',
+        image: SafeUrl.parse('https://shop.example/og.jpg')),
+  )),
+  body: [
+    HeadingNode(level: 1, children: [TextNode('Espresso Machine')]),
+    ParagraphNode(children: [TextNode('Real HTML. Real rankings.')]),
+    ImageNode(
+      src: SafeUrl.parse('/img/espresso.jpg'),
+      alt: 'Espresso machine', width: 800, height: 600,
+    ),
+    SectionNode(role: SectionRole.main, children: [
+      ListNode(ordered: false, items: [
+        ListItemNode(children: [ParagraphNode(children: [TextNode('Feature one')])]),
+        ListItemNode(children: [ParagraphNode(children: [TextNode('Feature two')])]),
+      ]),
+    ]),
+    IslandPlaceholderNode(
+      id: 'calculator-123',
+      directive: HydrationDirective.onVisible,
+      size: IslandSize(width: 640, height: 320),
+      state: {'price': 249},
+    ),
+    // Inject the island runtime: custom element + dispatcher + engine location.
+    ...islandRuntime(),
+  ],
+);
+```
 
-## Minimal Static Site (SSG)
+### Securing your scripts with SRI
 
-Describe your routes:
+`islandRuntime()` accepts optional Subresource Integrity hashes. Compute them
+once and hardcode — the browser will reject a tampered runtime even on a
+compromised CDN:
+
+```dart
+...islandRuntime(
+  islandElementIntegrity: 'sha384-...',   // $ openssl dgst -sha384 -binary | base64
+  dispatcherIntegrity: 'sha384-...',
+),
+```
+
+## Route Manifest
+
+Create `hydraline.routes.yaml` in your project root:
 
 ```yaml
-# hydraline.routes.yaml
-base_url: https://example.com   # used for absolute sitemap URLs
+version: "1"
+base_url: https://mysite.example
 routes:
   - path: /
     mode: document
     metadata:
-      title: My Blog
-      description: A blog built with Hydraline
-      lang: en
-  - path: /blog/:slug
-    mode: document
+      title: Home
+      description: Welcome to my site.
+
+  - path: /product/:id
+    mode: hybrid
     dynamic_segments:
-      slug: [post-1, post-2]
+      id: [espresso, grinder]
+
+  - path: /app/dashboard
+    mode: app
+    noindex: true
 ```
 
-Generate the site:
+- `document` / `hybrid` routes get real SEO HTML.
+- `app` routes pass through to your existing Flutter Web app (auto `noindex`).
+- `dynamic_segments` expand to concrete paths for SSG or are matched at runtime
+  for SSR.
 
-```bash
-dart run hydraline_flutter:build hydraline.routes.yaml dist
-# dist/: index.html, blog/post-1.html, blog/post-2.html,
-#        sitemap.xml, robots.txt
-```
-
-Register pure-Dart page builders for real body content (see
-[Flutter Widgets → SSG Runner](./flutter-widgets.md#ssg-runner)), or extract
-content from your widgets with `SsgSandbox` + `SsgCollector`.
-
-## Minimal Flutter Page (widgets)
+## SSR (Server-Side Rendering)
 
 ```dart
-// lib/pages/blog_page.dart
-import 'package:flutter/material.dart';
-import 'package:hydraline_flutter/hydraline_flutter.dart';
-
-class BlogPage extends StatelessWidget {
-  const BlogPage({super.key});
-
-  @override
-  Widget build(BuildContext context) => HydraApp(
-    child: Column(children: [
-      Seo.head(SeoMeta(
-        title: 'My Blog',
-        description: 'A blog built with Hydraline',
-        openGraph: OpenGraph(
-          title: 'My Blog',
-          type: 'website',
-          image: SafeUrl.parse('https://example.com/og.png'),
-        ),
-      )),
-      Seo.heading('Welcome to My Blog', level: 1),
-      Seo.text('This page is rendered as semantic HTML for SEO.'),
-      Seo.image('/images/hero.png', alt: 'Hero banner', width: 1200, height: 630),
-      Seo.link(href: '/about', child: const Text('About me')),
-    ]),
-  );
-}
-```
-
-## Minimal Server (SSR)
-
-```dart
-// server.dart
-import 'package:hydraline/hydraline.dart';
 import 'package:hydraline_server/hydraline_server.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
-DocumentNode buildHome(Request req, Object? data) => DocumentRootNode(
-  head: buildHead(const SeoMeta(
-    title: 'Hello from SSR',
-    description: 'Rendered at request time',
-  )),
-  body: const [
-    HeadingNode(level: 1, children: [TextNode('Hello, world!')]),
-    ParagraphNode(children: [TextNode('This page is server-rendered.')]),
-  ],
-);
+Future<void> main() async {
+  final manifest = RouteManifest.parseYaml(
+    await File('hydraline.routes.yaml').readAsString(),
+  );
 
-void main() async {
-  final manifest = RouteManifest.builder()
-      .route(const RouteEntry(path: '/', mode: RouteMode.document))
-      .build();
+  final config = HydralineConfig(
+    manifest: manifest,
+    builders: {
+      '/': (request, data) => homePage(),
+      '/product/:id': (request, data) => productPage(),
+    },
+    botUserAgentPattern: RegExp(r'Googlebot|bingbot'),
+    cache: HydralineCache.inMemory(maxSize: 500),
+    cacheTtl: Duration(minutes: 10),
+  );
 
-  final handler = const Pipeline()
-      .addMiddleware(hydralineMiddleware(HydralineConfig(
-        manifest: manifest,
-        builders: {'/': buildHome},
-      )))
-      .addHandler((req) => Response.ok('app shell'));
+  final handler = Pipeline()
+    .addMiddleware(hydralineMiddleware(config))
+    .addHandler((req) => Response.ok('flutter app shell'));
 
-  final server = await io.serve(handler, 'localhost', 8080);
-  print('Listening on ${server.address.host}:${server.port}');
+  // Asset endpoints: robots.txt, sitemap.xml, vanilla/htmx JS
+  final assets = Assets.serveCoreAssets();
+
+  final server = await io.serve((req) {
+    final path = req.url.path;
+    if (path == 'robots.txt' || path == 'sitemap.xml' || path.endsWith('.js')) {
+      return assets(req);
+    }
+    return handler(req);
+  }, 'localhost', 8080);
 }
 ```
 
-## Verify What Crawlers See
+The `data` parameter on builders receives the matched `RouteEntry` so you can
+read route metadata without re-parsing the URL.
 
-```bash
-dart run hydraline:audit http://localhost:8080/          # SEO audit
-dart run hydraline:audit --server-integration http://localhost:8080/  # anti-cloaking
+## SSG (Static Site Generation)
+
+```dart
+import 'package:hydraline_flutter/build.dart';
+
+Future<void> main() async {
+  await runSsgCli(
+    manifestPath: 'hydraline.routes.yaml',
+    outputDir: 'dist',
+    islandFactories: {'calculator': IslandType.flutter},
+    builders: {
+      '/': (path) => homePage(),
+      '/product/:id': (path) => productPage(path.split('/').last),
+    },
+  );
+}
 ```
 
-## Next Steps
+```bash
+dart run your_app:build
+# dist/: HTML pages + sitemap.xml + robots.txt + runtime JS — ready for any static host.
+```
 
-- [Full-stack showcase](../example/README.md) - runnable demo of all three packages
-- [Document Model](./document-model.md) - full `DocumentNode` reference
-- [Server](./server.md) - SSR, streaming, HTMX, caching
-- [Flutter Widgets](./flutter-widgets.md) - widget API reference
-- [Configuration](./configuration.md) - route manifest, islands, SEO settings
-- [Security](./security.md) - escaping, SafeUrl, CSP, anti-cloaking
+## Island Runtime
+
+For hybrid routes with Flutter islands, the page needs the Hydraline runtime
+scripts. Use the one-liner helper:
+
+```dart
+// Append to the body of any DocumentRootNode that carries islands:
+body: [
+  HeadingNode(...),
+  IslandPlaceholderNode(...),
+  ...islandRuntime(),               // engine config + dispatcher + custom element
+],
+```
+
+This injects three self-contained `<script>` tags: the `HYDRALINE_CONFIG`
+engine location, the custom element definition (`<hydraline-island>`), and the
+dispatcher (directive wiring, IntersectionObserver, engine loading).
+
+## Verification
+
+- **SEO audit**: `dart run hydraline:audit dist/index.html`
+- **Unit tests**: `dart test` / `flutter test`
+- **E2E browser tests**: `melos run e2e` (runtime JS in real Chrome)
+- **Real-engine e2e**: `melos run e2e:engine` (flutter build web + SSG overlay)
+- **Full gate**: `melos run precommit`

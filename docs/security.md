@@ -174,6 +174,49 @@ Security patches follow the timelines in the
 and a fix targeted within 7 days, released as a patch version with an
 advisory and a regression test for the specific vector.
 
+## HTML Sanitizer
+
+The `UnsafeHtmlNode` escape hatch carries a warning from the `SeoValidator` when
+used without a sanitizer. Hydraline provides `sanitizeHtml()` — a baseline
+defence that strips `<script>` elements and inline `on*` event-handler
+attributes:
+
+```dart
+// Raw HTML from an untrusted source: sanitize it.
+final node = UnsafeHtmlNode(userHtml, sanitizer: sanitizeHtml);
+
+// Static, trusted HTML: document the intent with .trusted().
+const node = UnsafeHtmlNode.trusted('<base href="/">');
+```
+
+`UnsafeHtmlNode.trusted()` is identical to the default constructor but
+explicitly signals "I reviewed this content." The validator warns on unsanitized
+nodes, not on `.trusted()` ones.
+
+## SRI on Runtime Scripts
+
+The `islandRuntime()` helper accepts optional Subresource Integrity hashes for
+the shipped `hydraline-island.js` and `hydraline-dispatcher.js` scripts:
+
+```dart
+...islandRuntime(
+  islandElementIntegrity: 'sha384-DnUt0D4RwI1IWkzIVA+vap/MADELvZ1KxoUcro7sugrUNA9boL2mlDAXoqyiPRex',
+  dispatcherIntegrity: 'sha384-KKtYmHjUUREOHJb6yB6VS4tJW2qioRe0l+8prxRkwVRolKgKhtcoBJwVIwRzlmpg',
+),
+```
+
+The browser will refuse to execute the scripts if their bytes have been
+tampered with — even when the CDN or static host is compromised. Each release
+changes the integrity hash (re-compute with `openssl dgst -sha384 -binary |
+base64`). The hash values above are examples only — use fresh hashes for your
+deployed version.
+
+## Header Injection Prevention
+
+HTMX response helpers (`HtmxResponse`, `Htmx.redirect`) validate `HX-*` header
+values at construction time, rejecting CR (`\r`) and LF (`\n`) characters.
+Arbitrary user input cannot inject extra HTTP headers into an HTMX response.
+
 ## Deploying Securely
 
 1. **Set CSP header** in your production server/serving config
