@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>dispatcher onMedia</title>
+    <script>
+      window.__addView = [];
+      window._hydralineApp = Promise.resolve({
+        addView: function (cfg) {
+          window.__addView.push(cfg);
+          return 31;
+        },
+        removeView: function () {},
+      });
+    </script>
+  </head>
+  <body>
+    <hydraline-island
+      id="wide"
+      data-directive="hydrateOnMedia"
+      data-media="(min-width: 800px)"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="200,100"
+      data-state='{}'
+      role="region"
+      aria-busy="true"
+    >
+      <template shadowrootmode="open">
+        <style>
+          :host {
+            display: block;
+          }
+          .host {
+            width: 200px;
+            height: 100px;
+          }
+        </style>
+        <div class="host"><slot></slot></div>
+      </template>
+    </hydraline-island>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-island.js"></script>
+    <script src="/packages/hydraline_flutter/web/hydraline-dispatcher.js"></script>
+  </body>
+</html>

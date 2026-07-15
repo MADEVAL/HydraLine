@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>vanilla islands (L1)</title>
+  </head>
+  <body>
+    <div data-island="accordion" id="acc">
+      <details>
+        <summary id="acc-summary">More</summary>
+        <p>hidden content</p>
+      </details>
+    </div>
+
+    <div data-island="tabs" id="tabs">
+      <button data-tab="a" id="tab-a">A</button>
+      <button data-tab="b" id="tab-b">B</button>
+      <div data-panel="a" id="panel-a">panel A</div>
+      <div data-panel="b" id="panel-b">panel B</div>
+    </div>
+
+    <div data-island="carousel" id="car">
+      <div data-slide id="slide-0">slide 0</div>
+      <div data-slide id="slide-1">slide 1</div>
+      <div data-slide id="slide-2">slide 2</div>
+      <button data-carousel-prev id="car-prev">prev</button>
+      <button data-carousel-next id="car-next">next</button>
+    </div>
+
+    <!-- Hardening: a carousel WITHOUT prev/next controls must not crash the
+         bootstrap for the islands that follow it in DOM order. -->
+    <div data-island="carousel" id="car-broken">
+      <div data-slide>only slide</div>
+    </div>
+
+    <div data-island="theme" id="theme">
+      <button id="theme-btn">toggle theme</button>
+    </div>
+
+    <div data-island="lazy-image" id="lazy">
+      <img data-src="/e2e/fixtures/vanilla-islands.html" alt="lazy probe" />
+    </div>
+
+    <div data-island="copy-button" id="copy">
+      <button data-copy-target="#copy-source" id="copy-btn">copy</button>
+    </div>
+    <pre id="copy-source">copied text</pre>
+
+    <script src="/packages/hydraline/web/vanilla-islands.js"></script>
+  </body>
+</html>

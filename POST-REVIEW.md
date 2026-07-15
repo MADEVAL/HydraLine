@@ -128,25 +128,32 @@ project grows from "solid pre-1.0" to "confidently production".
 
 ### 4.1 Prove the island runtime in a real browser (highest impact)
 
-**Status: baseline delivered.** `e2e/` now hosts a Playwright harness
-(`melos run e2e`, CI job `e2e`) that runs the real shipped runtime JS
-(`packages/hydraline_flutter/web/*.js`) in system Chrome with a mocked Flutter
-engine and asserts, against a real DOM:
-- `hydrateOnLoad` mounts one view with `{ islandId, state }` and flips
-  `data-hydration` -> `hydrated` / `aria-busy` -> `false`;
-- `hydrateOnInteraction` stays cold until a real click, then hydrates once;
-- a failing engine bootstrap ends in `failed` + `hydraline:island-error`
-  with no uncaught rejection;
-- re-evaluating the dispatcher never double-mounts; `dehydrate` removes the
-  captured view id and resets to `pending`;
-- the custom element reserves `data-size` as `:host` width/height (anti-CLS)
-  and keeps the Declarative Shadow DOM fallback;
-- virtual views emit `hydraline:segment-enter` for in-viewport segments.
+**Status: delivered.** `e2e/` hosts a Playwright harness with two projects:
 
-Remaining for full 4.1: swap the engine mock for a real compiled Flutter web
-build (`flutter build web`) to cover engine boot + `IslandHost` mounting, add a
-CLS measurement, and a service-worker warm-visit scenario (needs a persistent
-origin across reloads).
+`chrome` (`melos run e2e`) - the shipped runtime JS against a mocked engine:
+- all hydration directives (`onLoad`, `onInteraction`, `onVisible` via real
+  IntersectionObserver scroll, `onIdle`, `onMedia` via viewport resize,
+  `manual`), multi-island (one engine, N views, distinct state);
+- failure paths (`failed` + `hydraline:island-error`, parked bootstrap
+  rejection), re-wire guard, `dehydrate`;
+- the custom element (DSD adoption, anti-CLS `data-size` sizing);
+- virtual views (`segment-enter`);
+- the L1 vanilla-islands suite (accordion, tabs, carousel with wrap-around,
+  theme + localStorage, lazy-image, clipboard copy-button) including per-island
+  failure isolation.
+
+`engine` (`melos run e2e:engine`, CI job `e2e-engine`) - the real thing:
+`flutter build web` of the example island bundle + SSG overlay in
+`example/TEMP/e2e-dist`, then in real Chrome:
+- a server-rendered product page hydrates a real Flutter island on scroll
+  (CanvasKit boot, deferred island library, `addView` into the shadow mount);
+- the island is interactive through the engine semantics tree (quantity +
+  live total recompute);
+- a document page never requests `main.dart.js`/`canvaskit` (zero-overhead
+  guarantee).
+
+Remaining ideas: a CLS measurement via `PerformanceObserver`, and a
+service-worker warm-visit scenario (needs a persistent origin across reloads).
 
 ### 4.2 Widget-based extraction pipeline (surface A end-to-end)
 `navigateToForExtraction` is now functional but not yet driven by an

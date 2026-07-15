@@ -54,18 +54,25 @@ DocumentNode homePage() => DocumentRootNode(
 /// vanilla FAQ accordion.
 DocumentNode productPage(String id) => DocumentRootNode(
   lang: 'en',
-  head: buildHead(
-    SeoMeta(
-      title: 'Product - $id',
-      description: 'The $id, part of the Hydraline demo shop.',
-      canonical: SafeUrl.parse('$origin/product/$id'),
-      openGraph: OpenGraph(
-        title: 'Product - $id',
-        type: 'product',
-        image: SafeUrl.parse('$origin/img/$id.jpg'),
-      ),
-    ),
-    structuredData: [JsonLd.product(name: id, price: 249, currency: 'EUR')],
+  head: HeadNode(
+    children: [
+      // Pages live at nested paths (/product/x.html) while the engine bundle
+      // sits at the site root; <base> anchors the loader's relative URLs.
+      const UnsafeHtmlNode('<base href="/">'),
+      ...buildHead(
+        SeoMeta(
+          title: 'Product - $id',
+          description: 'The $id, part of the Hydraline demo shop.',
+          canonical: SafeUrl.parse('$origin/product/$id'),
+          openGraph: OpenGraph(
+            title: 'Product - $id',
+            type: 'product',
+            image: SafeUrl.parse('$origin/img/$id.jpg'),
+          ),
+        ),
+        structuredData: [JsonLd.product(name: id, price: 249, currency: 'EUR')],
+      ).children,
+    ],
   ),
   body: [
     SectionNode(
@@ -99,6 +106,15 @@ DocumentNode productPage(String id) => DocumentRootNode(
           ],
         ),
       ],
+    ),
+    // The island runtime: custom element + dispatcher, plus the engine
+    // bootstrap location. Static trusted markup (no user input).
+    const UnsafeHtmlNode(
+      '<script>'
+      "window.HYDRALINE_CONFIG={engineScript:'/flutter_bootstrap.js'}"
+      '</script>'
+      '<script src="/hydraline-island.js" defer></script>'
+      '<script src="/hydraline-dispatcher.js" defer></script>',
     ),
   ],
 );

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>dispatcher multi-island</title>
+    <script>
+      window.__addView = [];
+      window.__nextViewId = 100;
+      window._hydralineApp = Promise.resolve({
+        addView: function (cfg) {
+          window.__addView.push(cfg);
+          return window.__nextViewId++;
+        },
+        removeView: function () {},
+      });
+    </script>
+  </head>
+  <body>
+    <hydraline-island
+      id="first"
+      data-directive="hydrateOnLoad"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="100,50"
+      data-state='{"n":1}'
+      role="region"
+      aria-busy="true"
+    >
+      <template shadowrootmode="open">
+        <style>
+          .host {
+            width: 100px;
+            height: 50px;
+          }
+        </style>
+        <div class="host"><slot></slot></div>
+      </template>
+    </hydraline-island>
+
+    <hydraline-island
+      id="second"
+      data-directive="hydrateOnLoad"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="100,50"
+      data-state='{"n":2}'
+      role="region"
+      aria-busy="true"
+    >
+      <template shadowrootmode="open">
+        <style>
+          .host {
+            width: 100px;
+            height: 50px;
+          }
+        </style>
+        <div class="host"><slot></slot></div>
+      </template>
+    </hydraline-island>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-island.js"></script>
+    <script src="/packages/hydraline_flutter/web/hydraline-dispatcher.js"></script>
+  </body>
+</html>

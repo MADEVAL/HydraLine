@@ -133,3 +133,23 @@ melos:
     e2e:run:
       description: Run the island-runtime browser tests.
       run: npm --prefix e2e test
+
+    e2e:engine:
+      description: Real-engine browser tests - flutter build web + SSG overlay + Playwright.
+      steps:
+        - e2e:install
+        - e2e:engine:build
+        - e2e:engine:ssg
+        - e2e:engine:run
+
+    e2e:engine:build:
+      description: Compile the example island bundle with the real Flutter engine.
+      run: dart run melos:melos exec --scope=hydraline_example -- flutter build web --target=lib/island_main.dart --output=TEMP/e2e-dist
+
+    e2e:engine:ssg:
+      description: Overlay the SSG pages and runtime JS onto the engine build.
+      run: dart run melos:melos exec --scope=hydraline_example -- dart run hydraline_example:build hydraline.routes.yaml TEMP/e2e-dist
+
+    e2e:engine:run:
+      description: Run the real-engine Playwright project.
+      run: npm --prefix e2e run test:engine

@@ -6,6 +6,20 @@ each package's own changelog:
 [hydraline_server](packages/hydraline_server/CHANGELOG.md) ·
 [hydraline_flutter](packages/hydraline_flutter/CHANGELOG.md).
 
+## Unreleased
+
+- E2E expansion: directive coverage (`onVisible`/`onIdle`/`onMedia` +
+  multi-island), a vanilla-islands (L1) suite in real Chrome, and a
+  real-engine project (`melos run e2e:engine`) that builds the example with
+  `flutter build web`, overlays the SSG output and verifies actual island
+  hydration, interactivity (via the engine semantics tree) and the
+  zero-overhead guarantee for document pages.
+- `hydraline` - `web/` mirrors for `vanilla-islands.js`/`htmx-glue.js`
+  (byte-identity locked by test); accordion guards a `details` without a
+  `summary`.
+- Example - hybrid pages now wire the island runtime scripts and a
+  `<base href="/">` so nested SSG pages resolve the engine bundle.
+
 ## 0.0.4
 
 Pre-production review follow-up: every confirmed finding from `REVIEW.md`

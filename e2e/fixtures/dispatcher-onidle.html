@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>dispatcher onIdle</title>
+    <script>
+      window.__addView = [];
+      window._hydralineApp = Promise.resolve({
+        addView: function (cfg) {
+          window.__addView.push(cfg);
+          return 21;
+        },
+        removeView: function () {},
+      });
+    </script>
+  </head>
+  <body>
+    <hydraline-island
+      id="lazy"
+      data-directive="hydrateOnIdle"
+      data-render-mode="ssr"
+      data-style-mode="shadow"
+      data-size="200,100"
+      data-state='{}'
+      role="region"
+      aria-busy="true"
+    >
+      <template shadowrootmode="open">
+        <style>
+          :host {
+            display: block;
+          }
+          .host {
+            width: 200px;
+            height: 100px;
+          }
+        </style>
+        <div class="host"><slot></slot></div>
+      </template>
+    </hydraline-island>
+
+    <script src="/packages/hydraline_flutter/web/hydraline-island.js"></script>
+    <script src="/packages/hydraline_flutter/web/hydraline-dispatcher.js"></script>
+  </body>
+</html>

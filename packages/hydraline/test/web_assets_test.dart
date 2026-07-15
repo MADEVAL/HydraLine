@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:hydraline/hydraline.dart';
 import 'package:test/test.dart';
 
@@ -21,12 +23,29 @@ void main() {
       expect(vanillaIslandsJs, contains('if(next)'));
     });
 
+    test('accordion guards a details without a summary', () {
+      expect(vanillaIslandsJs, contains('if(d&&s)'));
+    });
+
     test('copy-button guards a missing trigger element', () {
       expect(vanillaIslandsJs, contains('if(!btn)return'));
     });
 
     test('bootstrap isolates a throwing island handler', () {
       expect(vanillaIslandsJs, contains('catch'));
+    });
+  });
+
+  group('web/ assets stay in sync with the inline Dart constants', () {
+    String read(String name) =>
+        File('web/$name').readAsStringSync().replaceAll('\r\n', '\n');
+
+    test('vanilla-islands.js == vanillaIslandsJs', () {
+      expect(read('vanilla-islands.js'), vanillaIslandsJs);
+    });
+
+    test('htmx-glue.js == htmxGlueJs', () {
+      expect(read('htmx-glue.js'), htmxGlueJs);
     });
   });
 

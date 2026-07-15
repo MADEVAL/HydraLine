@@ -1,3 +1,11 @@
+## Unreleased
+
+- `web/vanilla-islands.js` and `web/htmx-glue.js` mirror the inline Dart
+  constants (byte-identity locked by test), so browser harnesses load the
+  exact shipped bytes.
+- Vanilla accordion guards a `<details>` without a `<summary>` (no null
+  dereference during hydration).
+
 ## 0.0.4
 
 - `SsgCollector` gained `beginSection`/`beginList` (and `SsgListScope.beginItem`)

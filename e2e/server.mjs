@@ -1,13 +1,14 @@
-// Minimal static file server for the Playwright harness. Serves the repo root
-// so fixtures can reference the real shipped runtime assets under
-// packages/hydraline_flutter/web/ over http (a secure-context origin), which
-// the file:// scheme cannot provide (e.g. for service workers).
+// Minimal static file server for the Playwright harness. By default serves the
+// repo root so fixtures can reference the real shipped runtime assets under
+// packages/*/web/ over http (a secure-context origin). Set ROOT to serve a
+// generated dist instead (the real-engine project). /__health always responds.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, resolve } from 'node:path';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
+const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+const root = process.env.ROOT ? resolve(repoRoot, process.env.ROOT) : repoRoot;
 const port = Number(process.env.PORT ?? 4173);
 
 const types = {
@@ -16,15 +17,23 @@ const types = {
   '.mjs': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
+  '.wasm': 'application/wasm',
 };
 
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url ?? '/', `http://localhost:${port}`);
-    const rel = normalize(decodeURIComponent(url.pathname)).replace(
+    if (url.pathname === '/__health') {
+      res.writeHead(200, { 'content-type': 'text/plain' }).end('ok');
+      return;
+    }
+    let rel = normalize(decodeURIComponent(url.pathname)).replace(
       /^([/\\])+/,
       '',
     );
+    if (rel === '' || rel.endsWith('/') || rel.endsWith('\\')) {
+      rel = join(rel, 'index.html');
+    }
     const file = join(root, rel);
     if (!file.startsWith(root)) {
       res.writeHead(403).end('forbidden');

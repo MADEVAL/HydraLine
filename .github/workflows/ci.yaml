@@ -84,3 +84,24 @@ jobs:
         run: npm --prefix e2e install
       - name: browser tests (system Chrome)
         run: npm --prefix e2e test
+
+  e2e-engine:
+    name: real Flutter engine e2e (Chrome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: dart pub get
+      - name: build island bundle + SSG overlay
+        run: |
+          dart run melos:melos run e2e:engine:build
+          dart run melos:melos run e2e:engine:ssg
+      - name: install playwright runner
+        run: npm --prefix e2e install
+      - name: real-engine browser tests
+        run: npm --prefix e2e run test:engine

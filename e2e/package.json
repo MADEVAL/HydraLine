@@ -5,7 +5,8 @@
   "description": "Browser end-to-end tests for the Hydraline island runtime.",
   "type": "module",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test --project=chrome",
+    "test:engine": "playwright test --project=engine"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0"

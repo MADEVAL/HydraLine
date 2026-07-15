@@ -50,6 +50,16 @@ void main() {
       expect(html, contains('<details>'));
     });
 
+    test('wires the island runtime scripts (hybrid page)', () {
+      expect(html, contains('src="/hydraline-island.js"'));
+      expect(html, contains('src="/hydraline-dispatcher.js"'));
+      expect(html, contains('engineScript'));
+    });
+
+    test('anchors relative engine URLs with <base href="/">', () {
+      expect(html, contains('<base href="/">'));
+    });
+
     test('passes the SEO audit with no errors and no warnings', () {
       final report = Audit.auditHtml(html);
       expect(report.exitCode, 0, reason: report.issues.join('\n'));

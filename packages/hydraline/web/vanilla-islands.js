@@ -1,13 +1,3 @@
-/// Standalone vanilla-islands JavaScript bundle for level-1 interactivity.
-///
-/// Enhances static HTML elements tagged with `data-island` attributes. Runs on
-/// `DOMContentLoaded` and does not depend on Flutter or any other runtime.
-/// Budget: ≤ 8 KB uncompressed.
-///
-/// Self-hosted, first-party, compatible with CSP `script-src 'self'`.
-library;
-
-const vanillaIslandsJs = r'''
 (function(){'use strict';
 var h={};function g(n,c){h[n]||(h[n]=[]);h[n].push(c)}function e(n,d){if(h[n]){for(var i=0;i<h[n].length;i++)h[n][i](d);h[n]=[]}}
 
@@ -64,4 +54,3 @@ for(var i=0;i<h[kind].length;i++){try{h[kind][i](el)}catch(e){}}}
 document.addEventListener('DOMContentLoaded',function(){
 each('[data-island]',run);each('[data-island-level="vanilla"]',run)});
 })();
-''';
