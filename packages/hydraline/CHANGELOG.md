@@ -12,16 +12,13 @@
 
 ## 0.0.5
 
-- Polished README: full module catalogue, proven metrics, quick start with
-  `sanitizeHtml`, `islandRuntime()`, `UnsafeHtmlNode.trusted`, web mirrors.
-
-## Unreleased
-
 - `web/vanilla-islands.js` and `web/htmx-glue.js` mirror the inline Dart
   constants (byte-identity locked by test), so browser harnesses load the
   exact shipped bytes.
 - Vanilla accordion guards a `<details>` without a `<summary>` (no null
   dereference during hydration).
+- Polished README: full module catalogue, proven metrics, quick start with
+  `sanitizeHtml`, `islandRuntime()`, `UnsafeHtmlNode.trusted`, web mirrors.
 
 ## 0.0.4
 
