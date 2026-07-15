@@ -1,3 +1,7 @@
+## 0.0.8
+
+- Cross-link banner at top of README: shows all three packages.
+
 ## 0.0.7
 
 - Better package description with cross-links; CHANGELOG references current version.
