@@ -1,3 +1,7 @@
+## 0.0.14
+
+- Pubspec description under 180 chars.
+
 ## 0.0.12
 
 - Further shortened pubspec description; added AGENTS.md hard rules.
