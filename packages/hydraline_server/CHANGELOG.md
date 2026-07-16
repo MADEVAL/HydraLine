@@ -1,3 +1,11 @@
+## 0.0.12
+
+- Further shortened pubspec description; added AGENTS.md hard rules.
+
+## 0.0.11
+
+- Shortened pubspec description to pass pub.dev 180-char limit.
+
 ## 0.0.10
 
 - Added "Why" section to README: anti-cloaking, ETag/304, bot-aware transport.

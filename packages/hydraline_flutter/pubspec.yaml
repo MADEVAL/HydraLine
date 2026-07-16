@@ -3,7 +3,7 @@ description: >-
   Flutter widgets + web runtime for Hydraline. Seo.* widgets,
   Island zones, IslandHost engine, SSG runner, L2 dispatcher
   + Service Worker. Re-exports hydraline core.
-version: 0.0.11
+version: 0.0.12
 repository: https://github.com/MADEVAL/HydraLine
 homepage: https://leonidov.dev
 issue_tracker: https://github.com/MADEVAL/HydraLine/issues
@@ -24,7 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   html: ^0.15.4
-  hydraline: ^0.0.11
+  hydraline: ^0.0.12
 
 dev_dependencies:
   flutter_lints: ^5.0.0

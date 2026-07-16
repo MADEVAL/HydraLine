@@ -1,3 +1,11 @@
+## 0.0.12
+
+- Further shortened pubspec description; added AGENTS.md hard rules.
+
+## 0.0.11
+
+- Shortened pubspec description: pub.dev 180-char limit compliance.
+
 ## 0.0.10
 
 - Added "Why" section to README: Seo.* widgets, zero-overhead islands, CLS, a11y.
